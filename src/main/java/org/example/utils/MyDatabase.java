@@ -5,13 +5,6 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class MyDatabase {
-<<<<<<< HEAD
-    private final String url="jdbc:mysql://localhost:4307/esport-db";
-    private final String user="root";
-    private final String password="";
-    private Connection connection;
-=======
->>>>>>> a3677fbf5857f4bda661850b38e7b4f290dd8d53
     private static MyDatabase instance;
     private Connection connection;
 

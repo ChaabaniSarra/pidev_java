@@ -16,6 +16,7 @@ public class MainMatchGameEquipe {
         ServiceMatchGame serviceMatchGame = new ServiceMatchGame();
 
         try {
+          /* 
             Equipe equipe = new Equipe("Equipe A", 11, "equipe-a.png");
             serviceEquipe.ajouter(equipe);
             serviceEquipe.getAll().forEach(System.out::println);
@@ -32,7 +33,7 @@ public class MainMatchGameEquipe {
             serviceEquipe.ajouter(equipe2);
             System.out.println("\n--- Toutes les équipes ---");
             serviceEquipe.getAll().forEach(System.out::println);
-
+*/
             MatchGame matchGame = new MatchGame(
                     Timestamp.valueOf("2026-04-08 10:00:00"),
                     0,
@@ -42,7 +43,7 @@ public class MainMatchGameEquipe {
                     5,
                     1
             );
-            /* 
+            
             serviceMatchGame.ajouter(matchGame);
             serviceMatchGame.getAll().forEach(System.out::println);
 
@@ -56,15 +57,15 @@ public class MainMatchGameEquipe {
                 serviceMatchGame.getAll().forEach(System.out::println);
             }
 
-            int idMatchToSupprimer = 1; 
+            int idMatchToSupprimer = 7; 
             serviceMatchGame.supprimer(idMatchToSupprimer);
             System.out.println("MatchGame supprime avec id=" + idMatchToSupprimer);
           
- */
+ /* 
             int idEquipeToSupprimer = 11; 
             serviceEquipe.supprimer(idEquipeToSupprimer);
             System.out.println("Equipe supprime avec id=" + idEquipeToSupprimer);
-
+*/
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
