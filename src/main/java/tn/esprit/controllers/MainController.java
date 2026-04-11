@@ -30,6 +30,11 @@ public class MainController implements Initializable {
         loadPage("/categories.fxml");
     }
 
+    @FXML
+    public void showUsers() {
+        loadPage("/users.fxml");
+    }
+
     private void loadPage(String fxmlPath) {
         try {
             Parent page = FXMLLoader.load(getClass().getResource(fxmlPath));

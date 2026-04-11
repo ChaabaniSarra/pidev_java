@@ -22,6 +22,14 @@
                    style="-fx-text-fill: #64748b; -fx-font-size: 11px;
                           -fx-padding: 0 0 10 0;"/>
 
+            <Button text="User" onAction="#showUsers"
+                    maxWidth="Infinity"
+                    style="-fx-background-color: transparent; -fx-text-fill: #94a3b8;
+                           -fx-font-size: 14px; -fx-alignment: CENTER-LEFT;
+                           -fx-padding: 10 15; -fx-cursor: hand;
+                           -fx-background-radius: 8;"/>
+
+
             <Button text="📦  Products" onAction="#showProducts"
                     maxWidth="Infinity"
                     style="-fx-background-color: transparent; -fx-text-fill: #94a3b8;
@@ -35,6 +43,7 @@
                            -fx-font-size: 14px; -fx-alignment: CENTER-LEFT;
                            -fx-padding: 10 15; -fx-cursor: hand;
                            -fx-background-radius: 8;"/>
+
 
         </VBox>
     </left>

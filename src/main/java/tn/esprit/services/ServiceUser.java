@@ -105,6 +105,17 @@ public class ServiceUser implements IService<User> {
         }
     }
 
+    public boolean emailExistsForOtherUser(String email, int userId) throws SQLException {
+        String sql = "SELECT 1 FROM `user` WHERE email = ? AND id <> ? LIMIT 1";
+        try (PreparedStatement ps = getConnectionOrThrow().prepareStatement(sql)) {
+            ps.setString(1, email);
+            ps.setInt(2, userId);
+            try (ResultSet rs = ps.executeQuery()) {
+                return rs.next();
+            }
+        }
+    }
+
     public User authenticate(String email, String password) throws SQLException {
         String sql = "SELECT * FROM `user` WHERE email = ? AND password = ? LIMIT 1";
         try (PreparedStatement ps = getConnectionOrThrow().prepareStatement(sql)) {
