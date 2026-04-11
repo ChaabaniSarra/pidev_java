@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.geometry.Insets?>
+
+<AnchorPane
+        xmlns="http://javafx.com/javafx/8"
+        xmlns:fx="http://javafx.com/fxml"
+        fx:controller="tn.esprit.controllers.LoginController"
+        prefHeight="420.0" prefWidth="680.0"
+        style="-fx-background-color: #0a0050;">
+
+    <HBox AnchorPane.topAnchor="40" AnchorPane.bottomAnchor="40"
+          AnchorPane.leftAnchor="60" AnchorPane.rightAnchor="60"
+          style="-fx-background-color: white; -fx-background-radius: 6;">
+
+        <!-- Left image panel -->
+        <ImageView fitWidth="280" fitHeight="340" preserveRatio="false">
+            <image>
+                <Image url="https://i.pinimg.com/736x/29/bf/08/29bf083bd37ae14f65bb683caf2e3096.jpg"/>
+            </image>
+        </ImageView>
+
+        <!-- Right form panel -->
+        <VBox spacing="16" alignment="TOP_LEFT"
+              style="-fx-padding: 48 38 40 38; -fx-background-color: white;">
+
+            <Label text="login Form"
+                   style="-fx-font-size: 26px; -fx-font-weight: bold; -fx-text-fill: #111;"/>
+
+            <!-- Yellow accent bar -->
+            <Region prefWidth="26" prefHeight="4"
+                    style="-fx-background-color: #E6C819; -fx-background-radius: 2;"/>
+
+            <VBox spacing="4">
+                <Label text="playerName"
+                       style="-fx-font-size: 11px; -fx-text-fill: #777;"/>
+                <TextField fx:id="usernameField"
+                           style="-fx-background-color: transparent; -fx-border-color: transparent transparent #bbb transparent; -fx-border-width: 0 0 1.5 0; -fx-padding: 6 0; -fx-font-size: 14px;"/>
+            </VBox>
+
+            <VBox spacing="4">
+                <Label text="Password"
+                       style="-fx-font-size: 11px; -fx-text-fill: #777;"/>
+                <PasswordField fx:id="passwordField"
+                               style="-fx-background-color: transparent; -fx-border-color: transparent transparent #bbb transparent; -fx-border-width: 0 0 1.5 0; -fx-padding: 6 0; -fx-font-size: 14px;"/>
+            </VBox>
+
+            <Button fx:id="loginButton" text="Register"
+                    maxWidth="Infinity" onAction="#handleLogin"
+                    style="-fx-background-color: #5b4cdf; -fx-text-fill: white; -fx-font-size: 15px; -fx-font-weight: bold; -fx-background-radius: 5; -fx-padding: 11 0; -fx-cursor: hand;"/>
+
+            <Hyperlink text="create an account" onAction="#goToRegister"
+                       style="-fx-text-fill: #5b4cdf; -fx-font-size: 12px; -fx-border-color: transparent; -fx-padding: 0;"/>
+
+            <Label fx:id="messageLabel" text=""
+                   style="-fx-font-size: 12px;"/>
+        </VBox>
+    </HBox>
+</AnchorPane>
