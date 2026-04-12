@@ -5,12 +5,30 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.Control;
 import javafx.stage.Stage;
+import tn.esprit.utils.SessionManager;
 
 import java.io.IOException;
 
 public class NavbarController {
+
+    @FXML
+    private Button profileUserButton;
+
+    @FXML
+    public void initialize() {
+        updateProfileButtonVisibility();
+    }
+
+    private void updateProfileButtonVisibility() {
+        if (profileUserButton != null) {
+            boolean isUserLoggedIn = SessionManager.getCurrentUser() != null;
+            profileUserButton.setVisible(isUserLoggedIn);
+            profileUserButton.setManaged(isUserLoggedIn);
+        }
+    }
 
     @FXML
     private void goToHome(ActionEvent event) {
