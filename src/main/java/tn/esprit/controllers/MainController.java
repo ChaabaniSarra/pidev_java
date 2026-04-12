@@ -17,8 +17,9 @@ public class MainController implements Initializable {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         // Affiche les produits par défaut au démarrage
-        showProducts();
     }
+
+
 
     @FXML
     public void showProducts() {

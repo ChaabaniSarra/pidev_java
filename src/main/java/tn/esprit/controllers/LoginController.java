@@ -62,6 +62,14 @@ public class LoginController {
             showMessage("Unable to open register form.", true);
         }
     }
+    @FXML
+    private void goToHome(ActionEvent event) {
+        try {
+            loadScene(event, "/home.fxml", "Home");
+        } catch (IOException e) {
+            showMessage("Unable to open Home page.", true);
+        }
+    }
 
     private void loadScene(ActionEvent event, String resourcePath, String title) throws IOException {
         Parent root = FXMLLoader.load(getClass().getResource(resourcePath));

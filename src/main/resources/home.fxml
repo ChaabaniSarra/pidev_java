@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.shape.*?>
+<?import javafx.scene.text.*?>
+
+<AnchorPane prefHeight="720.0" prefWidth="980.0" style="-fx-background-color: #030712;" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml"
+            fx:controller="tn.esprit.controllers.HomeController">
+
+    <ScrollPane fitToWidth="true" hbarPolicy="NEVER" style="-fx-background: #030712; -fx-background-color: #030712;" vbarPolicy="AS_NEEDED" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+        <content>
+            <VBox fillWidth="true" style="-fx-background-color: #030712;">
+
+                <BorderPane prefHeight="78.0" style="-fx-background-color: linear-gradient(to right, #5b21ff, #2b0b5f 45%, #8b157f); -fx-border-color: rgba(255,255,255,0.18); -fx-border-width: 0 0 1 0;">
+                    <left>
+                        <HBox alignment="CENTER_LEFT" spacing="12" BorderPane.alignment="CENTER">
+                            <padding>
+                                <Insets bottom="0" left="24" right="22" top="0" />
+                            </padding>
+                            <Circle radius="24" style="-fx-fill: white;" />
+                            <VBox spacing="-2">
+                                <Label style="-fx-text-fill: white; -fx-font-size: 18px; -fx-font-weight: bold;" text="ESPORTS" />
+                                <Label style="-fx-text-fill: #d8ccff; -fx-font-size: 10px; -fx-font-weight: bold;" text="COMMUNITY" />
+                            </VBox>
+                        </HBox>
+                    </left>
+                    <center>
+                        <HBox alignment="CENTER" spacing="44">
+                            <Button onAction="#goToHome"
+                                    style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 18px; -fx-font-weight: bold; -fx-cursor: hand;"
+                                    text="HOME" />
+
+                            <Button onAction="#goToAbout"
+                                    style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 18px; -fx-font-weight: bold; -fx-cursor: hand;"
+                                    text="ABOUT" />
+
+                            <Button onAction="#goToTournement"
+                                    style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 18px; -fx-font-weight: bold; -fx-cursor: hand;"
+                                    text="TOURNEMENT" />
+                        </HBox>
+                    </center>
+                </BorderPane>
+
+                <StackPane prefHeight="600.0" style="-fx-background-color: linear-gradient(to right, #d43f78 0%, #2a0712 28%, #021425 65%, #0d5cbc 100%);">
+                    <children>
+                        <Circle radius="220" style="-fx-fill: rgba(255,255,255,0.06);" translateX="-390" translateY="-140" />
+                        <Circle radius="160" style="-fx-fill: rgba(255,255,255,0.05);" translateX="-450" translateY="-90" />
+                        <HBox alignment="CENTER_LEFT" spacing="30" StackPane.alignment="CENTER">
+                            <padding>
+                                <Insets bottom="50" left="28" right="30" top="40" />
+                            </padding>
+                            <VBox prefWidth="430" spacing="24">
+                                <Label style="-fx-text-fill: white;" text="welcome To&#10;Esports world" wrapText="true">
+                                    <font>
+                                        <Font name="Georgia Bold" size="58" />
+                                    </font>
+                                </Label>
+                                <Label style="-fx-text-fill: rgba(255,255,255,0.92); -fx-font-size: 24px;" text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Quis ipsum" wrapText="true" />
+
+                                <Button onAction="#goToRegister" style="-fx-background-color: linear-gradient(to right, #5564ff, #6d52f4); -fx-text-fill: #f2d061; -fx-font-size: 20px; -fx-font-weight: bold; -fx-background-radius: 6; -fx-padding: 14 38; -fx-cursor: hand;" text="Register" />
+                                <Button onAction="#goToMain" style="-fx-background-color: linear-gradient(to right, #5564ff, #6d52f4); -fx-text-fill: #f2d061; -fx-font-size: 20px; -fx-font-weight: bold; -fx-background-radius: 6; -fx-padding: 14 38; -fx-cursor: hand;" text="Dash" />
+
+                            </VBox>
+                            <Region HBox.hgrow="ALWAYS" />
+                            <ImageView fitHeight="480" fitWidth="560" pickOnBounds="true" preserveRatio="true">
+                                <image>
+                                    <Image url="@../../../../Downloads/Red%20Neon%20Dynamic%20Gaming%20YouTube%20Thumbnail.png" />
+                                </image>
+                            </ImageView>
+                        </HBox>
+                    </children>
+                </StackPane>
+
+                <HBox alignment="CENTER_LEFT" prefHeight="560.0" spacing="36" style="-fx-background-color: #000000;">
+                    <padding>
+                        <Insets bottom="60" left="40" right="50" top="50" />
+                    </padding>
+                    <StackPane prefHeight="460" prefWidth="470">
+                        <children>
+                            <Rectangle arcHeight="28" arcWidth="28" height="430" style="-fx-fill: rgba(32,32,32,0.35); -fx-stroke: rgba(255,255,255,0.07);" width="430" />
+                            <ImageView fitHeight="430" fitWidth="430" preserveRatio="true">
+                                <image>
+                                    <Image url="@images/about-controller.png" />
+                                </image>
+                            </ImageView>
+                        </children>
+                    </StackPane>
+                    <VBox prefWidth="390" spacing="22">
+                        <Label style="-fx-text-fill: white;" text="Find out&#10;about us">
+                            <font>
+                                <Font name="Georgia Bold" size="52" />
+                            </font>
+                        </Label>
+                        <Label style="-fx-text-fill: rgba(255,255,255,0.9); -fx-font-size: 18px;" text="Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Quis ipsum" wrapText="true" />
+                        <Button style="-fx-background-color: linear-gradient(to right, #5564ff, #6d52f4); -fx-text-fill: #f2d061; -fx-font-size: 18px; -fx-font-weight: bold; -fx-background-radius: 6; -fx-padding: 14 36; -fx-cursor: hand;" text="ABOUT US" />
+                    </VBox>
+                </HBox>
+
+            </VBox>
+        </content>
+    </ScrollPane>
+</AnchorPane>
