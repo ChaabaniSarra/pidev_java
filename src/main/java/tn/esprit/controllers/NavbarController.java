@@ -60,9 +60,9 @@ public class NavbarController {
     @FXML
     private void goToMain(ActionEvent event) {
         try {
-            loadScene(event, "/main.fxml", "Dashboard");
+            loadScene(event, "/afficherProduits.fxml", "Product");
         } catch (IOException e) {
-            System.out.println("Unable to open dashboard.");
+            System.out.println("Unable to open products.");
         }
     }
 

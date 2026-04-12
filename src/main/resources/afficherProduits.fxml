@@ -3,62 +3,89 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="tn.esprit.controllers.AfficherProduitsController"
-            prefHeight="700.0" prefWidth="1000.0"
-            style="-fx-background-color: #0d1b3e;">
+<VBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="tn.esprit.controllers.AfficherProduitsController"
+      prefHeight="780.0" prefWidth="1280.0"
+      style="-fx-background-color: #0d1b3e;">
 
-    <VBox spacing="20"
-          AnchorPane.topAnchor="20" AnchorPane.leftAnchor="20"
-          AnchorPane.rightAnchor="20" AnchorPane.bottomAnchor="20">
+    <!-- ✅ NAVBAR -->
+    <fx:include source="/Navbar.fxml"/>
 
-        <!-- HEADER -->
-        <VBox spacing="3">
-            <Label text="HARDWARE DEPOT"
-                   style="-fx-text-fill: #7c3aed; -fx-font-size: 13px; -fx-font-weight: bold;"/>
-            <Label text="GAMING GEAR"
-                   style="-fx-text-fill: white; -fx-font-size: 28px; -fx-font-weight: bold;"/>
-        </VBox>
+    <!-- HERO HEADER -->
+    <VBox spacing="5" style="-fx-padding: 30 40 20 40;
+                              -fx-background-color: linear-gradient(to right, #0d1b3e, #1a1040);">
+        <Label text="HARDWARE DEPOT"
+               style="-fx-text-fill: #7c3aed; -fx-font-size: 13px;
+                      -fx-font-weight: bold; -fx-letter-spacing: 3px;"/>
+        <Label text="GAMING GEAR"
+               style="-fx-text-fill: white; -fx-font-size: 32px;
+                      -fx-font-weight: bold;"/>
 
-        <!-- SEARCH -->
-        <HBox spacing="10" alignment="CENTER_LEFT">
+        <!-- SEARCH BAR -->
+        <HBox spacing="0" alignment="CENTER_LEFT" style="-fx-padding: 15 0 0 0;">
             <TextField fx:id="searchField" promptText="Search gear..."
-                       prefWidth="400" prefHeight="42"
-                       style="-fx-background-color: #1e293b; -fx-text-fill: white;
-                              -fx-prompt-text-fill: #64748b;
-                              -fx-background-radius: 8; -fx-font-size: 14px;"/>
+                       prefWidth="450" prefHeight="46"
+                       style="-fx-background-color: #1e2d4a; -fx-text-fill: white;
+                              -fx-prompt-text-fill: #64748b; -fx-font-size: 14px;
+                              -fx-background-radius: 8 0 0 8; -fx-padding: 0 15;"/>
             <Button text="🔍" onAction="#handleSearch"
                     style="-fx-background-color: #f1f5f9; -fx-font-size: 16px;
-                           -fx-pref-height: 42px; -fx-pref-width: 42px;
-                           -fx-cursor: hand; -fx-background-radius: 8;"/>
-        </HBox>
-
-        <!-- CONTENT -->
-        <HBox spacing="20" VBox.vgrow="ALWAYS">
-
-            <!-- CATEGORIES SIDEBAR -->
-            <VBox spacing="10" prefWidth="220" minWidth="220"
-                  style="-fx-background-color: #1e3a5f; -fx-background-radius: 15;
-                         -fx-padding: 20;">
-                <Label text="CATEGORIES"
-                       style="-fx-text-fill: white; -fx-font-size: 16px;
-                              -fx-font-weight: bold;"/>
-                <Button text="Tous" onAction="#showAll" maxWidth="Infinity"
-                        style="-fx-background-color: #7c3aed; -fx-text-fill: white;
-                               -fx-pref-height: 38px; -fx-cursor: hand;
-                               -fx-background-radius: 20; -fx-font-size: 13px;"/>
-                <VBox fx:id="categoriesBox" spacing="8"/>
-            </VBox>
-
-            <!-- PRODUCTS -->
-            <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS" HBox.hgrow="ALWAYS"
-                        style="-fx-background-color: transparent; -fx-background: #0d1b3e;">
-                <FlowPane fx:id="productsContainer" hgap="20" vgap="20"
-                          prefWrapLength="700"
-                          style="-fx-background-color: transparent; -fx-padding: 10;"/>
-            </ScrollPane>
-
+                           -fx-pref-height: 46px; -fx-pref-width: 50px;
+                           -fx-cursor: hand; -fx-background-radius: 0 8 8 0;"/>
         </HBox>
     </VBox>
-</AnchorPane>
+
+    <!-- MAIN CONTENT -->
+    <HBox spacing="0" VBox.vgrow="ALWAYS">
+
+        <!-- SIDEBAR CATEGORIES -->
+        <VBox spacing="12" prefWidth="260" minWidth="260"
+              style="-fx-background-color: #0f2342; -fx-padding: 25 20;
+                     -fx-border-color: rgba(124,58,237,0.2);
+                     -fx-border-width: 0 1 0 0;">
+
+            <Label text="CATEGORIES"
+                   style="-fx-text-fill: white; -fx-font-size: 15px;
+                          -fx-font-weight: bold; -fx-letter-spacing: 2px;
+                          -fx-padding: 0 0 10 0;"/>
+
+            <!-- Bouton Tous -->
+            <Button text="⚡  Tous les produits" onAction="#showAll"
+                    maxWidth="Infinity"
+                    style="-fx-background-color: #7c3aed; -fx-text-fill: white;
+                           -fx-pref-height: 42px; -fx-cursor: hand;
+                           -fx-background-radius: 10; -fx-font-size: 13px;
+                           -fx-font-weight: bold; -fx-alignment: CENTER-LEFT;
+                           -fx-padding: 0 15;"/>
+
+            <Separator style="-fx-background-color: rgba(255,255,255,0.1);
+                              -fx-padding: 5 0;"/>
+
+            <!-- Catégories dynamiques -->
+            <VBox fx:id="categoriesBox" spacing="8"/>
+
+        </VBox>
+
+        <!-- PRODUCTS AREA -->
+        <VBox VBox.vgrow="ALWAYS" HBox.hgrow="ALWAYS"
+              style="-fx-background-color: #0d1b3e;">
+
+            <!-- Barre produits info -->
+            <HBox alignment="CENTER_LEFT"
+                  style="-fx-padding: 15 25; -fx-background-color: #0f1f3d;">
+                <Label fx:id="countLabel" text="Tous les produits"
+                       style="-fx-text-fill: #94a3b8; -fx-font-size: 13px;"/>
+            </HBox>
+
+            <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS"
+                        style="-fx-background-color: transparent;
+                               -fx-background: transparent;">
+                <FlowPane fx:id="productsContainer" hgap="25" vgap="25"
+                          style="-fx-background-color: transparent;
+                                 -fx-padding: 25;"/>
+            </ScrollPane>
+
+        </VBox>
+    </HBox>
+</VBox>
