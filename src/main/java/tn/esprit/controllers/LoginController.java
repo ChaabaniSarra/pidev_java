@@ -14,6 +14,7 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import tn.esprit.entities.User;
 import tn.esprit.services.ServiceUser;
+import tn.esprit.utils.SessionManager;
 
 import java.io.IOException;
 import java.sql.SQLException;
@@ -48,6 +49,7 @@ public class LoginController {
             }
 
             // User exists → navigate to Home
+            SessionManager.setCurrentUser(user);
             showMessage("Welcome, " + user.getNom() + "!", false);
             Parent root = FXMLLoader.load(getClass().getResource("/home.fxml"));
             Stage stage = (Stage) loginButton.getScene().getWindow();
