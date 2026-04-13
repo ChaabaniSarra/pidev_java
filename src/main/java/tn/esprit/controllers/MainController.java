@@ -18,7 +18,7 @@ public class MainController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        // Affiche les produits par défaut au démarrage
+        loadPage("/produits.fxml");
     }
 
     @FXML
@@ -34,6 +34,11 @@ public class MainController implements Initializable {
     @FXML
     public void showCategories() {
         loadPage("/categories.fxml");
+    }
+
+    @FXML
+    public void showBlogs() {
+        loadPage("/Blogs.fxml");
     }
 
     @FXML
@@ -58,5 +63,4 @@ public class MainController implements Initializable {
             e.printStackTrace();
         }
     }
-
 }

@@ -48,12 +48,13 @@ public class NavbarController {
         }
     }
 
+
     @FXML
     private void goToAbout(ActionEvent event) {
         try {
-            loadScene(event, "/about.fxml", "Blog");
+            loadScene(event, "/AfficherBlogs.fxml", "Blogs");
         } catch (IOException e) {
-            System.out.println("Unable to open blog.");
+            System.out.println("Unable to open blogs.");
         }
     }
 

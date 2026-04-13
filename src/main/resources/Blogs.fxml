@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="tn.esprit.controllers.BlogsController"
+            prefHeight="700.0" prefWidth="900.0"
+            style="-fx-background-color: #0f172a;">
+
+    <VBox spacing="20"
+          AnchorPane.topAnchor="20" AnchorPane.leftAnchor="20"
+          AnchorPane.rightAnchor="20" AnchorPane.bottomAnchor="20">
+
+        <!-- HEADER -->
+        <HBox alignment="CENTER_LEFT">
+            <Label text="Blog Management"
+                   style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: white;"/>
+            <Region HBox.hgrow="ALWAYS"/>
+            <Button text="+ New Blog" onAction="#handleNewBlog"
+                    style="-fx-background-color: #7c3aed; -fx-text-fill: white;
+                           -fx-font-size: 14px; -fx-pref-height: 40px;
+                           -fx-pref-width: 150px; -fx-cursor: hand;
+                           -fx-background-radius: 8;"/>
+        </HBox>
+
+        <!-- STATS -->
+        <HBox spacing="15">
+            <VBox alignment="CENTER" prefWidth="200" prefHeight="90"
+                  style="-fx-background-color: #1e293b; -fx-background-radius: 10;">
+                <Label fx:id="totalBlogsLabel" text="0"
+                       style="-fx-font-size: 30px; -fx-font-weight: bold; -fx-text-fill: #7c3aed;"/>
+                <Label text="TOTAL BLOGS"
+                       style="-fx-text-fill: #94a3b8; -fx-font-size: 11px;"/>
+            </VBox>
+            <VBox alignment="CENTER" prefWidth="200" prefHeight="90"
+                  style="-fx-background-color: #1e293b; -fx-background-radius: 10;">
+                <Label fx:id="totalCommentsLabel" text="0"
+                       style="-fx-font-size: 30px; -fx-font-weight: bold; -fx-text-fill: #7c3aed;"/>
+                <Label text="TOTAL COMMENTS"
+                       style="-fx-text-fill: #94a3b8; -fx-font-size: 11px;"/>
+            </VBox>
+        </HBox>
+
+        <!-- SEARCH -->
+        <HBox spacing="10" alignment="CENTER_LEFT">
+            <TextField fx:id="searchField" promptText="Rechercher un blog..."
+                       prefWidth="300" prefHeight="38"
+                       style="-fx-background-color: #1e293b; -fx-text-fill: white;
+                              -fx-prompt-text-fill: #64748b; -fx-background-radius: 8;"/>
+            <Button text="🔍" onAction="#handleSearch"
+                    style="-fx-background-color: #7c3aed; -fx-text-fill: white;
+                           -fx-pref-height: 38px; -fx-cursor: hand;
+                           -fx-background-radius: 8;"/>
+        </HBox>
+
+        <!-- TABLE -->
+        <TableView fx:id="blogsTable" VBox.vgrow="ALWAYS"
+                   style="-fx-background-color: #1e293b;">
+            <columns>
+                <TableColumn fx:id="idCol"       text="ID"          prefWidth="50"/>
+                <TableColumn fx:id="titleCol"    text="TITRE"       prefWidth="200"/>
+                <TableColumn fx:id="categoryCol" text="DESCRIPTION" prefWidth="250"/>
+                <TableColumn fx:id="contentCol"  text="IMAGE"       prefWidth="180"/>
+                <TableColumn fx:id="dateCol"     text="DATE"        prefWidth="130"/>
+                <TableColumn fx:id="actionsCol"  text="ACTIONS"     prefWidth="150"/>
+            </columns>
+        </TableView>
+
+        <Label fx:id="messageLabel" text="" style="-fx-font-size: 13px;"/>
+
+    </VBox>
+</AnchorPane>
