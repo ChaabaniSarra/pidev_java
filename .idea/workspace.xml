@@ -5,11 +5,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="d9361db9-95ef-4837-b2cf-105c08edff2b" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/test/java/CategoryServiceTest.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/test/java/ProductServiceTest.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/tn/esprit/controllers/NavbarController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tn/esprit/controllers/NavbarController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/afficherProduits.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/afficherProduits.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/tn/esprit/services/ServiceBlog.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tn/esprit/services/ServiceBlog.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -51,6 +48,7 @@
   <component name="PropertiesComponent"><![CDATA[{
   "keyToString": {
     "Application.FxLauncher.executor": "Run",
+    "Application.MainBlog.executor": "Run",
     "Application.MainFX.executor": "Run",
     "Application.MainProduitCategorie.executor": "Run",
     "JUnit.CategoryServiceTest.executor": "Run",
@@ -69,7 +67,7 @@
     "ToolWindow.AIAssistant.ShowToolbar": "false",
     "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
     "dart.analysis.tool.window.visible": "false",
-    "git-widget-placeholder": "main",
+    "git-widget-placeholder": "salma",
     "junie.onboarding.icon.badge.shown": "true",
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "C:/Users/MSI/pidev_java/src/main/resources/images",
@@ -94,8 +92,8 @@
   <component name="RunManager" selected="Application.FxLauncher">
     <configuration name="FxLauncher" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="tn.esprit.test.FxLauncher" />
-      <module name="pidev" />
-      <option name="VM_PARAMETERS" value="--module-path &quot;C:\Users\saada\.m2\repository\org\openjfx\javafx-controls\21.0.2\javafx-controls-21.0.2-win.jar;C:\Users\saada\.m2\repository\org\openjfx\javafx-fxml\21.0.2\javafx-fxml-21.0.2-win.jar;C:\Users\saada\.m2\repository\org\openjfx\javafx-graphics\21.0.2\javafx-graphics-21.0.2-win.jar;C:\Users\saada\.m2\repository\org\openjfx\javafx-base\21.0.2\javafx-base-21.0.2-win.jar&quot; --add-modules javafx.controls,javafx.fxml" />
+      <module name="WorkshopJDBC-JavaFX-3A56" />
+      <option name="VM_PARAMETERS" value="--module-path &quot;C:\Users\dot\.m2\repository\org\openjfx\javafx-graphics\21.0.2;C:\Users\dot\.m2\repository\org\openjfx\javafx-base\21.0.2;C:\Users\dot\.m2\repository\org\openjfx\javafx-controls\21.0.2;C:\Users\dot\.m2\repository\org\openjfx\javafx-fxml\21.0.2&quot; --add-modules javafx.controls,javafx.fxml,javafx.graphics" />
       <extension name="coverage">
         <pattern>
           <option name="PATTERN" value="tn.esprit.test.*" />
@@ -184,6 +182,8 @@
       <workItem from="1775917971385" duration="826000" />
       <workItem from="1775998592940" duration="22000" />
       <workItem from="1775998638776" duration="3495000" />
+      <workItem from="1776104113691" duration="2002000" />
+      <workItem from="1776106167594" duration="994000" />
     </task>
     <servers />
   </component>

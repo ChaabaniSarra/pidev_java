@@ -79,13 +79,20 @@ public class ServiceBlog {
     }
 
     // DELETE
+    // DELETE
     public void supprimer(int id) {
-        String sql = "DELETE FROM blog WHERE id=?";
 
-        try (PreparedStatement ps = cnx.prepareStatement(sql)) {
-            ps.setInt(1, id);
-            ps.executeUpdate();
-            System.out.println("✅ Blog supprimé");
+        // 2. Ensuite supprimer le blog
+        String deleteBlog = "DELETE FROM blog WHERE id = ?";
+
+        try {
+
+            try (PreparedStatement ps = cnx.prepareStatement(deleteBlog)) {
+                ps.setInt(1, id);
+                ps.executeUpdate();
+                System.out.println("✅ Blog supprimé");
+            }
+
         } catch (SQLException e) {
             e.printStackTrace();
         }
