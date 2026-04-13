@@ -42,42 +42,42 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "Application.FxLauncher.executor": "Run",
-    "Application.MainBlog.executor": "Run",
-    "Application.MainFX.executor": "Run",
-    "Application.MainProduitCategorie.executor": "Run",
-    "JUnit.CategoryServiceTest.executor": "Run",
-    "JUnit.ProductServiceTest.executor": "Run",
-    "JUnit.ProductServiceTest.testAddProduct.executor": "Run",
-    "JUnit.ProductServiceTest.testDeleteProduct.executor": "Run",
-    "JUnit.ProductServiceTest.testGetAllProducts.executor": "Run",
-    "JUnit.ProductServiceTest.testGetProductById.executor": "Run",
-    "JUnit.ProductServiceTest.testPrixNegatif.executor": "Run",
-    "JUnit.ProductServiceTest.testStockZero.executor": "Run",
-    "JUnit.ProductServiceTest.testUpdateProduct.executor": "Run",
-    "RunOnceActivity.MCP Project settings loaded": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "ToolWindow.AIAssistant.ShowToolbar": "false",
-    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
-    "dart.analysis.tool.window.visible": "false",
-    "git-widget-placeholder": "salma",
-    "junie.onboarding.icon.badge.shown": "true",
-    "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "C:/Users/MSI/pidev_java/src/main/resources/images",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "settings.editor.selected.configurable": "ml.llm.AcpAgentsConfigurable",
-    "to.speed.mode.migration.done": "true",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Application.FxLauncher.executor&quot;: &quot;Run&quot;,
+    &quot;Application.MainBlog.executor&quot;: &quot;Run&quot;,
+    &quot;Application.MainFX.executor&quot;: &quot;Run&quot;,
+    &quot;Application.MainProduitCategorie.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.CategoryServiceTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.ProductServiceTest.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.ProductServiceTest.testAddProduct.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.ProductServiceTest.testDeleteProduct.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.ProductServiceTest.testGetAllProducts.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.ProductServiceTest.testGetProductById.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.ProductServiceTest.testPrixNegatif.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.ProductServiceTest.testStockZero.executor&quot;: &quot;Run&quot;,
+    &quot;JUnit.ProductServiceTest.testUpdateProduct.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.MCP Project settings loaded&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;ToolWindow.AIAssistant.ShowToolbar&quot;: &quot;false&quot;,
+    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
+    &quot;dart.analysis.tool.window.visible&quot;: &quot;false&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;salma&quot;,
+    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/MSI/pidev_java/src/main/resources/images&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;ml.llm.AcpAgentsConfigurable&quot;,
+    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
       <recent name="C:\Users\MSI\pidev_java\src\main\resources\images" />
@@ -86,7 +86,7 @@
       <recent name="C:\Users\rajhi\pidev_java_aziz\src" />
     </key>
   </component>
-  <component name="RunManager" selected="Application.FxLauncher">
+  <component name="RunManager" selected="JUnit.ServiceBlogTest">
     <configuration name="FxLauncher" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="tn.esprit.test.FxLauncher" />
       <module name="WorkshopJDBC-JavaFX-3A56" />
@@ -114,6 +114,15 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <configuration name="CategoryServiceTest (1)" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="WorkshopJDBC-JavaFX-3A56" />
+      <option name="PACKAGE_NAME" value="" />
+      <option name="MAIN_CLASS_NAME" value="CategoryServiceTest" />
+      <option name="TEST_OBJECT" value="class" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="CategoryServiceTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="pidev" />
       <option name="PACKAGE_NAME" value="" />
@@ -123,21 +132,11 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
-    <configuration name="ProductServiceTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="pidev" />
+    <configuration name="ServiceBlogTest" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="WorkshopJDBC-JavaFX-3A56" />
       <option name="PACKAGE_NAME" value="" />
-      <option name="MAIN_CLASS_NAME" value="ProductServiceTest" />
+      <option name="MAIN_CLASS_NAME" value="ServiceBlogTest" />
       <option name="TEST_OBJECT" value="class" />
-      <method v="2">
-        <option name="Make" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="ProductServiceTest.testGetProductById" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
-      <module name="pidev" />
-      <option name="PACKAGE_NAME" value="" />
-      <option name="MAIN_CLASS_NAME" value="ProductServiceTest" />
-      <option name="METHOD_NAME" value="testGetProductById" />
-      <option name="TEST_OBJECT" value="method" />
       <method v="2">
         <option name="Make" enabled="true" />
       </method>
@@ -145,17 +144,17 @@
     <list>
       <item itemvalue="Application.FxLauncher" />
       <item itemvalue="Application.MainFX" />
+      <item itemvalue="JUnit.CategoryServiceTest (1)" />
+      <item itemvalue="JUnit.ServiceBlogTest" />
       <item itemvalue="JUnit.CategoryServiceTest" />
-      <item itemvalue="JUnit.ProductServiceTest" />
-      <item itemvalue="JUnit.ProductServiceTest.testGetProductById" />
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="JUnit.ServiceBlogTest" />
+        <item itemvalue="JUnit.CategoryServiceTest (1)" />
         <item itemvalue="Application.FxLauncher" />
         <item itemvalue="Application.MainFX" />
         <item itemvalue="JUnit.CategoryServiceTest" />
-        <item itemvalue="JUnit.ProductServiceTest" />
-        <item itemvalue="JUnit.ProductServiceTest.testGetProductById" />
       </list>
     </recent_temporary>
   </component>
