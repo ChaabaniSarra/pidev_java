@@ -42,12 +42,6 @@ public class TournoisController implements Initializable {
     @FXML
     private TableColumn<Tournoi, String> statutCol;
     @FXML
-    private TableColumn<Tournoi, String> typeCol;
-    @FXML
-    private TableColumn<Tournoi, Integer> maxCol;
-    @FXML
-    private TableColumn<Tournoi, Double> cagnotteCol;
-    @FXML
     private TableColumn<Tournoi, String> actionsCol;
     @FXML
     private Label messageLabel;
@@ -80,9 +74,6 @@ public class TournoisController implements Initializable {
         idCol.setCellValueFactory(new PropertyValueFactory<>("id"));
         nomCol.setCellValueFactory(new PropertyValueFactory<>("nom"));
         statutCol.setCellValueFactory(new PropertyValueFactory<>("statut"));
-        typeCol.setCellValueFactory(new PropertyValueFactory<>("type"));
-        maxCol.setCellValueFactory(new PropertyValueFactory<>("maxParticipants"));
-        cagnotteCol.setCellValueFactory(new PropertyValueFactory<>("cagnotte"));
 
         jeuCol.setCellValueFactory(c ->
                 new SimpleStringProperty(jeuNoms.getOrDefault(c.getValue().getJeuId(), "—")));

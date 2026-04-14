@@ -6,7 +6,7 @@
 <VBox xmlns="http://javafx.com/javafx"
       xmlns:fx="http://javafx.com/fxml"
       fx:controller="tn.esprit.controllers.JeuxPanelController"
-      spacing="18"
+      spacing="14"
       style="-fx-padding: 20 28 24 28; -fx-background-color: #0d1b3e;"
       VBox.vgrow="ALWAYS">
 
@@ -23,17 +23,51 @@
                        -fx-pref-height: 42px; -fx-pref-width: 160px; -fx-cursor: hand; -fx-background-radius: 8;"/>
     </HBox>
 
-    <HBox spacing="14">
-        <VBox alignment="CENTER" prefWidth="180" prefHeight="88"
+    <HBox spacing="10">
+        <VBox alignment="CENTER" prefWidth="170" prefHeight="78"
               style="-fx-background-color: #1e2d4a; -fx-background-radius: 10;">
             <Label fx:id="totalJeuxLabel" text="0"
                    style="-fx-font-size: 26px; -fx-font-weight: bold; -fx-text-fill: #a78bfa;"/>
             <Label text="JEUX EN BASE"
                    style="-fx-text-fill: #94a3b8; -fx-font-size: 11px;"/>
         </VBox>
+        <VBox alignment="CENTER" prefWidth="170" prefHeight="78"
+              style="-fx-background-color: #1e2d4a; -fx-background-radius: 10;">
+            <Label fx:id="genresCountLabel" text="0"
+                   style="-fx-font-size: 26px; -fx-font-weight: bold; -fx-text-fill: #a78bfa;"/>
+            <Label text="GENRES"
+                   style="-fx-text-fill: #94a3b8; -fx-font-size: 11px;"/>
+        </VBox>
+        <VBox alignment="CENTER" prefWidth="170" prefHeight="78"
+              style="-fx-background-color: #1e2d4a; -fx-background-radius: 10;">
+            <Label fx:id="plateformesCountLabel" text="0"
+                   style="-fx-font-size: 26px; -fx-font-weight: bold; -fx-text-fill: #a78bfa;"/>
+            <Label text="PLATEFORMES"
+                   style="-fx-text-fill: #94a3b8; -fx-font-size: 11px;"/>
+        </VBox>
+        <VBox alignment="CENTER" prefWidth="170" prefHeight="78"
+              style="-fx-background-color: #1e2d4a; -fx-background-radius: 10;">
+            <Label fx:id="actifsCountLabel" text="0"
+                   style="-fx-font-size: 26px; -fx-font-weight: bold; -fx-text-fill: #a78bfa;"/>
+            <Label text="ACTIFS"
+                   style="-fx-text-fill: #94a3b8; -fx-font-size: 11px;"/>
+        </VBox>
     </HBox>
 
-    <ScrollPane fitToWidth="true" hbarPolicy="AS_NEEDED" vbarPolicy="AS_NEEDED" VBox.vgrow="ALWAYS"
+    <HBox spacing="8">
+        <Button fx:id="allFilterBtn" text="Tous" onAction="#filterAll"
+                style="-fx-background-color: #26365f; -fx-text-fill: #e2e8f0; -fx-background-radius: 8; -fx-cursor: hand;"/>
+        <Button fx:id="activeFilterBtn" text="Actifs" onAction="#filterActive"
+                style="-fx-background-color: #26365f; -fx-text-fill: #e2e8f0; -fx-background-radius: 8; -fx-cursor: hand;"/>
+        <Button fx:id="fpsFilterBtn" text="FPS" onAction="#filterFps"
+                style="-fx-background-color: #26365f; -fx-text-fill: #e2e8f0; -fx-background-radius: 8; -fx-cursor: hand;"/>
+        <Button fx:id="brFilterBtn" text="Battle Royale" onAction="#filterBattleRoyale"
+                style="-fx-background-color: #26365f; -fx-text-fill: #e2e8f0; -fx-background-radius: 8; -fx-cursor: hand;"/>
+        <Button fx:id="sportFilterBtn" text="Sport" onAction="#filterSport"
+                style="-fx-background-color: #26365f; -fx-text-fill: #e2e8f0; -fx-background-radius: 8; -fx-cursor: hand;"/>
+    </HBox>
+
+    <ScrollPane fx:id="cardsScrollPane" fitToWidth="true" hbarPolicy="NEVER" vbarPolicy="AS_NEEDED" VBox.vgrow="ALWAYS"
                 style="-fx-background: transparent; -fx-background-color: transparent;">
         <FlowPane fx:id="cardsContainer" hgap="20" vgap="20"
                   prefWrapLength="900"

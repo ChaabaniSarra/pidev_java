@@ -1,5 +1,6 @@
 package tn.esprit.controllers;
 
+import javafx.beans.binding.Bindings;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -11,6 +12,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.FlowPane;
@@ -30,8 +32,15 @@ import tn.esprit.services.ServiceJeu;
 import java.io.IOException;
 import java.net.URL;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.ResourceBundle;
+import java.util.Set;
+import java.util.function.Predicate;
 
 /**
  * Panneau liste des jeux (cartes). CRUD actif sauf si {@link #setReadOnly(boolean)} est appelé avec {@code true}
@@ -39,21 +48,41 @@ import java.util.ResourceBundle;
  */
 public class JeuxPanelController implements Initializable {
 
-    private static final double CARD_W = 286;
+    private static final double CARD_W = 350;
     private static final double IMG_H = 132;
 
     @FXML
     private FlowPane cardsContainer;
     @FXML
+    private ScrollPane cardsScrollPane;
+    @FXML
     private Label messageLabel;
     @FXML
     private Label totalJeuxLabel;
     @FXML
+    private Label genresCountLabel;
+    @FXML
+    private Label plateformesCountLabel;
+    @FXML
+    private Label actifsCountLabel;
+    @FXML
     private Button newGameButton;
+    @FXML
+    private Button allFilterBtn;
+    @FXML
+    private Button activeFilterBtn;
+    @FXML
+    private Button fpsFilterBtn;
+    @FXML
+    private Button brFilterBtn;
+    @FXML
+    private Button sportFilterBtn;
 
     private final ServiceJeu serviceJeu = new ServiceJeu();
     private Image coverPlaceholder;
     private boolean readOnly;
+    private final List<Jeu> allJeux = new ArrayList<>();
+    private final Map<String, Image> imageCache = new HashMap<>();
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -61,6 +90,8 @@ public class JeuxPanelController implements Initializable {
         if (imgUrl != null) {
             coverPlaceholder = new Image(imgUrl.toExternalForm(), CARD_W, IMG_H, false, true);
         }
+        cardsContainer.setAlignment(Pos.TOP_CENTER);
+        cardsContainer.prefWrapLengthProperty().bind(Bindings.min(cardsScrollPane.widthProperty().subtract(40), 1082));
     }
 
     public void setReadOnly(boolean readOnly) {
@@ -74,16 +105,49 @@ public class JeuxPanelController implements Initializable {
 
     private void loadJeux() {
         try {
-            List<Jeu> list = serviceJeu.getAll();
-            totalJeuxLabel.setText(String.valueOf(list.size()));
-            messageLabel.setText("");
-            cardsContainer.getChildren().clear();
-            for (Jeu j : list) {
-                cardsContainer.getChildren().add(buildGameCard(j));
-            }
+            allJeux.clear();
+            allJeux.addAll(serviceJeu.getAll());
+            updateStats(allJeux);
+            setActiveFilterButton(allFilterBtn);
+            showJeux(allJeux);
         } catch (SQLException e) {
             showError("Impossible de charger les jeux : " + e.getMessage());
         }
+    }
+
+    private void showJeux(List<Jeu> list) {
+        messageLabel.setText("");
+        cardsContainer.getChildren().clear();
+        if (list.isEmpty()) {
+            messageLabel.setStyle("-fx-text-fill: #cbd5e1;");
+            messageLabel.setText("Aucun jeu pour ce filtre.");
+            return;
+        }
+        for (Jeu j : list) {
+            cardsContainer.getChildren().add(buildGameCard(j));
+        }
+    }
+
+    private void updateStats(List<Jeu> list) {
+        totalJeuxLabel.setText(String.valueOf(list.size()));
+        Set<String> genres = new HashSet<>();
+        Set<String> plateformes = new HashSet<>();
+        int actifs = 0;
+        for (Jeu j : list) {
+            if (j.getGenre() != null && !j.getGenre().isBlank()) {
+                genres.add(j.getGenre().trim().toLowerCase());
+            }
+            if (j.getPlateforme() != null && !j.getPlateforme().isBlank()) {
+                plateformes.add(j.getPlateforme().trim().toLowerCase());
+            }
+            String statut = j.getStatut() == null ? "" : j.getStatut().toLowerCase();
+            if (statut.contains("actif") || statut.contains("dispo") || statut.contains("ouvert")) {
+                actifs++;
+            }
+        }
+        genresCountLabel.setText(String.valueOf(genres.size()));
+        plateformesCountLabel.setText(String.valueOf(plateformes.size()));
+        actifsCountLabel.setText(String.valueOf(actifs));
     }
 
     private VBox buildGameCard(Jeu jeu) {
@@ -108,7 +172,8 @@ public class JeuxPanelController implements Initializable {
         imgClip.setArcHeight(22);
         imgStack.setClip(imgClip);
 
-        boolean hasCover = coverPlaceholder != null && !coverPlaceholder.isError();
+        Image cover = resolveGameCover(jeu);
+        boolean hasCover = cover != null && !cover.isError();
         if (!hasCover) {
             Rectangle grad = new Rectangle(CARD_W, IMG_H);
             grad.setArcWidth(22);
@@ -119,7 +184,7 @@ public class JeuxPanelController implements Initializable {
                     new Stop(1, Color.web("#3b1022"))));
             imgStack.getChildren().add(grad);
         } else {
-            ImageView iv = new ImageView(coverPlaceholder);
+            ImageView iv = new ImageView(cover);
             iv.setFitWidth(CARD_W);
             iv.setFitHeight(IMG_H);
             iv.setPreserveRatio(false);
@@ -337,5 +402,105 @@ public class JeuxPanelController implements Initializable {
         a.setHeaderText(null);
         a.setContentText(msg);
         a.showAndWait();
+    }
+
+    @FXML
+    private void filterAll() {
+        setActiveFilterButton(allFilterBtn);
+        showJeux(allJeux);
+    }
+
+    @FXML
+    private void filterActive() {
+        setActiveFilterButton(activeFilterBtn);
+        showJeux(filterBy(j -> {
+            String s = j.getStatut() == null ? "" : j.getStatut().toLowerCase();
+            return s.contains("actif") || s.contains("dispo") || s.contains("ouvert");
+        }));
+    }
+
+    @FXML
+    private void filterFps() {
+        setActiveFilterButton(fpsFilterBtn);
+        showJeux(filterBy(j -> containsIgnoreCase(j.getGenre(), "fps")));
+    }
+
+    @FXML
+    private void filterBattleRoyale() {
+        setActiveFilterButton(brFilterBtn);
+        showJeux(filterBy(j -> containsIgnoreCase(j.getGenre(), "battle")));
+    }
+
+    @FXML
+    private void filterSport() {
+        setActiveFilterButton(sportFilterBtn);
+        showJeux(filterBy(j -> containsIgnoreCase(j.getGenre(), "sport")));
+    }
+
+    private List<Jeu> filterBy(Predicate<Jeu> predicate) {
+        List<Jeu> out = new ArrayList<>();
+        for (Jeu j : allJeux) {
+            if (predicate.test(j)) {
+                out.add(j);
+            }
+        }
+        return out;
+    }
+
+    private static boolean containsIgnoreCase(String value, String expected) {
+        return value != null && value.toLowerCase().contains(expected.toLowerCase());
+    }
+
+    private Image resolveGameCover(Jeu jeu) {
+        String nom = jeu.getNom() == null ? "" : jeu.getNom().trim();
+        if (nom.isEmpty()) {
+            return coverPlaceholder;
+        }
+
+        String normalized = normalizeFileName(nom);
+        if (imageCache.containsKey(normalized)) {
+            return imageCache.get(normalized);
+        }
+
+        String[] exts = {".png", ".jpg", ".jpeg", ".webp"};
+        String[] names = {
+                nom,
+                nom.toLowerCase(Locale.ROOT),
+                normalized
+        };
+
+        for (String base : names) {
+            for (String ext : exts) {
+                URL imageUrl = getClass().getResource("/images/jeux/" + base + ext);
+                if (imageUrl != null) {
+                    Image image = new Image(imageUrl.toExternalForm(), CARD_W, IMG_H, false, true);
+                    imageCache.put(normalized, image);
+                    return image;
+                }
+            }
+        }
+
+        imageCache.put(normalized, coverPlaceholder);
+        return coverPlaceholder;
+    }
+
+    private String normalizeFileName(String input) {
+        String cleaned = input.toLowerCase(Locale.ROOT).trim();
+        cleaned = cleaned.replace(':', ' ');
+        cleaned = cleaned.replaceAll("[^a-z0-9\\s-]", "");
+        cleaned = cleaned.replaceAll("\\s+", " ").trim();
+        return cleaned;
+    }
+
+    private void setActiveFilterButton(Button activeButton) {
+        String idle = "-fx-background-color: #26365f; -fx-text-fill: #e2e8f0; -fx-background-radius: 8; -fx-cursor: hand;";
+        String active = "-fx-background-color: #7c3aed; -fx-text-fill: #ffffff; -fx-border-color: #a78bfa; "
+                + "-fx-border-radius: 8; -fx-background-radius: 8; -fx-cursor: hand;";
+        allFilterBtn.setStyle(idle);
+        activeFilterBtn.setStyle(idle);
+        fpsFilterBtn.setStyle(idle);
+        brFilterBtn.setStyle(idle);
+        sportFilterBtn.setStyle(idle);
+        activeButton.setStyle(active);
     }
 }

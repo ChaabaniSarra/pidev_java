@@ -44,9 +44,6 @@
                 <TableColumn fx:id="debutCol" text="Début" prefWidth="95"/>
                 <TableColumn fx:id="finCol" text="Fin" prefWidth="95"/>
                 <TableColumn fx:id="statutCol" text="Statut" prefWidth="90"/>
-                <TableColumn fx:id="typeCol" text="Type" prefWidth="90"/>
-                <TableColumn fx:id="maxCol" text="Max" prefWidth="55"/>
-                <TableColumn fx:id="cagnotteCol" text="Cagnotte" prefWidth="85"/>
                 <TableColumn fx:id="actionsCol" text="Actions" prefWidth="150"/>
             </columns>
         </TableView>

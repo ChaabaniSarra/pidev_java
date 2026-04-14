@@ -44,7 +44,7 @@ public class ServiceUser implements IService<User> {
         try (PreparedStatement ps = getConnectionOrThrow().prepareStatement(sql)) {
             ps.setString(1, user.getEmail());
             ps.setString(2, user.getRoles());
-            ps.setString(3, user.getPassword());
+            ps.setString(3, hashIfNeeded(user.getPassword()));
             ps.setString(4, user.getNom());
             ps.setBoolean(5, user.isActive());
             ps.setString(6, user.getGoogle2faSecret());
@@ -124,7 +124,10 @@ public class ServiceUser implements IService<User> {
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     String hashed = rs.getString("password");
-                    if (hashed != null && BCrypt.checkpw(password, hashed)) {
+                    if (isPasswordMatch(password, hashed)) {
+                        if (!isBcryptHash(hashed)) {
+                            migratePlainPasswordToBcrypt(rs.getInt("id"), password);
+                        }
                         return new User(
                                 rs.getInt("id"),
                                 rs.getString("email"),
@@ -151,5 +154,38 @@ public class ServiceUser implements IService<User> {
             throw new SQLException("Database connection is not available.");
         }
         return conn;
+    }
+
+    private String hashIfNeeded(String password) {
+        if (password == null || password.isEmpty()) {
+            return password;
+        }
+        if (isBcryptHash(password)) {
+            return password;
+        }
+        return BCrypt.hashpw(password, BCrypt.gensalt());
+    }
+
+    private boolean isPasswordMatch(String plainPassword, String storedPassword) {
+        if (plainPassword == null || storedPassword == null) {
+            return false;
+        }
+        if (isBcryptHash(storedPassword)) {
+            return BCrypt.checkpw(plainPassword, storedPassword);
+        }
+        return plainPassword.equals(storedPassword);
+    }
+
+    private boolean isBcryptHash(String value) {
+        return value != null && value.matches("^\\$2[aby]\\$\\d{2}\\$[./A-Za-z0-9]{53}$");
+    }
+
+    private void migratePlainPasswordToBcrypt(int userId, String plainPassword) throws SQLException {
+        String sql = "UPDATE `user` SET password = ? WHERE id = ?";
+        try (PreparedStatement ps = getConnectionOrThrow().prepareStatement(sql)) {
+            ps.setString(1, BCrypt.hashpw(plainPassword, BCrypt.gensalt()));
+            ps.setInt(2, userId);
+            ps.executeUpdate();
+        }
     }
 }

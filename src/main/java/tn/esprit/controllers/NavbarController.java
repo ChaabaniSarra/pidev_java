@@ -42,7 +42,7 @@ public class NavbarController {
     @FXML
     private void goToTournement(ActionEvent event) {
         try {
-            loadScene(event, "/tournement.fxml", "Tournoi");
+            loadScene(event, "/tournoiCatalog.fxml", "Tournoi");
         } catch (IOException e) {
             System.out.println("Unable to open tournement.");
         }
