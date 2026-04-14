@@ -35,11 +35,7 @@
 
                             <Label fx:id="roleBadgeLabel" style="-fx-background-color: linear-gradient(to right, #6f62ff, #9a58ff);                                           -fx-background-radius: 999;                                           -fx-padding: 7 22 7 22;                                           -fx-text-fill: white;                                           -fx-font-size: 13px;                                           -fx-font-weight: bold;" text="USER" />
 
-                            <HBox alignment="CENTER" maxWidth="460.0" spacing="18.0">
-                                <Label fx:id="activeStatusLabel" style="-fx-text-fill: #8d93a8; -fx-font-size: 13px;" text="Online" />
-                                <Label fx:id="securityLabel" style="-fx-text-fill: #8d93a8; -fx-font-size: 13px;" text="2FA disabled" />
-                                <Label fx:id="userIdLabel" style="-fx-text-fill: #8d93a8; -fx-font-size: 13px;" text="ID: --" />
-                            </HBox>
+                            <HBox alignment="CENTER" maxWidth="460.0" spacing="18.0" />
 
                             <VBox maxWidth="460.0" spacing="14.0">
                                 <Separator style="-fx-opacity: 0.32; -fx-background-color: #6a60ff;" />

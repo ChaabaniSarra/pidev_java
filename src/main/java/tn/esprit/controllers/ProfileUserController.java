@@ -92,9 +92,6 @@ public class ProfileUserController {
             nameLabel.setText(safeValue(user.getNom(), "Unknown User"));
             emailLabel.setText(safeValue(user.getEmail(), "No email"));
             roleBadgeLabel.setText(formatRole(user.getRoles()));
-            activeStatusLabel.setText(user.isActive() ? "Active account" : "Inactive account");
-            userIdLabel.setText(String.valueOf(user.getId()));
-            securityLabel.setText(user.isIs2faEnabled() ? "2FA enabled" : "2FA disabled");
             avatarLabel.setText(buildInitials(user.getNom(), user.getEmail()));
         } catch (NullPointerException e) {
             System.out.println("NullPointerException in refreshProfile: " + e.getMessage());
