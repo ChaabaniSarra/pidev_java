@@ -10,6 +10,7 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.List;
+import org.mindrot.jbcrypt.BCrypt;
 
 public class ServiceUser implements IService<User> {
     private Connection conn;
@@ -24,7 +25,7 @@ public class ServiceUser implements IService<User> {
         try (PreparedStatement ps = getConnectionOrThrow().prepareStatement(sql)) {
             ps.setString(1, user.getEmail());
             ps.setString(2, user.getRoles());
-            ps.setString(3, user.getPassword());
+            ps.setString(3, BCrypt.hashpw(user.getPassword(), BCrypt.gensalt()));
             ps.setString(4, user.getNom());
             ps.setBoolean(5, user.isActive());
             ps.setString(6, user.getGoogle2faSecret());
@@ -117,26 +118,28 @@ public class ServiceUser implements IService<User> {
     }
 
     public User authenticate(String email, String password) throws SQLException {
-        String sql = "SELECT * FROM `user` WHERE email = ? AND password = ? LIMIT 1";
+        String sql = "SELECT * FROM `user` WHERE email = ? LIMIT 1";
         try (PreparedStatement ps = getConnectionOrThrow().prepareStatement(sql)) {
             ps.setString(1, email);
-            ps.setString(2, password);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    return new User(
-                            rs.getInt("id"),
-                            rs.getString("email"),
-                            rs.getString("roles"),
-                            rs.getString("password"),
-                            rs.getString("nom"),
-                            rs.getBoolean("is_active"),
-                            rs.getString("google2fa_secret"),
-                            rs.getBoolean("is_2fa_enabled"),
-                            rs.getString("google_oauth_id"),
-                            rs.getString("oauth_provider"),
-                            rs.getString("face_encoding"),
-                            rs.getBoolean("is_face_enabled")
-                    );
+                    String hashed = rs.getString("password");
+                    if (hashed != null && BCrypt.checkpw(password, hashed)) {
+                        return new User(
+                                rs.getInt("id"),
+                                rs.getString("email"),
+                                rs.getString("roles"),
+                                rs.getString("password"),
+                                rs.getString("nom"),
+                                rs.getBoolean("is_active"),
+                                rs.getString("google2fa_secret"),
+                                rs.getBoolean("is_2fa_enabled"),
+                                rs.getString("google_oauth_id"),
+                                rs.getString("oauth_provider"),
+                                rs.getString("face_encoding"),
+                                rs.getBoolean("is_face_enabled")
+                        );
+                    }
                 }
             }
         }
