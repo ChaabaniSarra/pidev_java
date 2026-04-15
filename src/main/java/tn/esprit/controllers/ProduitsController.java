@@ -46,7 +46,7 @@ public class ProduitsController implements Initializable {
         priceCol.setCellValueFactory(new PropertyValueFactory<>("price"));
         stockCol.setCellValueFactory(new PropertyValueFactory<>("stock"));
 
-        // Affiche le nom de la catégorie
+
         catCol.setCellValueFactory(cellData -> {
             Category cat = categoryService.getCategoryById(
                     cellData.getValue().getCategoryId()
@@ -54,7 +54,7 @@ public class ProduitsController implements Initializable {
             return new SimpleStringProperty(cat != null ? cat.getName() : "N/A");
         });
 
-        // Boutons Edit + Delete
+
         actionsCol.setCellFactory(col -> new TableCell<>() {
             private final Button editBtn = new Button("✏️");
             private final Button deleteBtn = new Button("🗑");

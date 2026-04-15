@@ -1,8 +1,10 @@
 package tn.esprit.controllers;
 
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
+import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -36,7 +38,7 @@ public class AfficherProduitsController implements Initializable {
         displayProducts(allProducts);
     }
 
-    // ✅ Boutons catégories dynamiques
+
     private void loadCategoryButtons() {
         categoriesBox.getChildren().clear();
         for (Category cat : allCategories) {
@@ -70,7 +72,7 @@ public class AfficherProduitsController implements Initializable {
         }
     }
 
-    // ✅ Afficher les cartes
+
     private void displayProducts(List<Product> products) {
         productsContainer.getChildren().clear();
         for (Product p : products) {
@@ -78,9 +80,10 @@ public class AfficherProduitsController implements Initializable {
         }
     }
 
-    // ✅ Créer une carte produit
+
     private VBox createProductCard(Product p) {
         VBox card = new VBox(10);
+        card.setOnMouseClicked(event -> openProductDetails(p));
         card.setPrefWidth(220);
         card.setMaxWidth(220);
         card.setStyle(
@@ -89,7 +92,7 @@ public class AfficherProduitsController implements Initializable {
                         "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 10, 0, 0, 3);"
         );
 
-        // Image
+
         ImageView imageView = new ImageView();
         imageView.setFitWidth(190);
         imageView.setFitHeight(150);
@@ -100,24 +103,24 @@ public class AfficherProduitsController implements Initializable {
             imageView.setImage(new Image(imgFile.toURI().toString()));
         }
 
-        // Nom
+
         Label nameLabel = new Label(p.getName());
         nameLabel.setStyle(
                 "-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #1e293b;"
         );
         nameLabel.setWrapText(true);
 
-        // Description
+
         Label descLabel = new Label(p.getDescription());
         descLabel.setStyle("-fx-text-fill: #64748b; -fx-font-size: 12px;");
         descLabel.setWrapText(true);
 
-        // Catégorie
+
         Category cat = categoryService.getCategoryById(p.getCategoryId());
         Label catLabel = new Label("Category: " + (cat != null ? cat.getName() : "N/A"));
         catLabel.setStyle("-fx-text-fill: #94a3b8; -fx-font-size: 11px;");
 
-        // Prix + ADD
+
         HBox footer = new HBox(10);
         footer.setAlignment(Pos.CENTER_LEFT);
 
@@ -139,7 +142,7 @@ public class AfficherProduitsController implements Initializable {
         return card;
     }
 
-    // ✅ Filtre par catégorie
+
     private void filterByCategory(int categoryId) {
         List<Product> filtered = allProducts.stream()
                 .filter(p -> p.getCategoryId() == categoryId)
@@ -147,13 +150,13 @@ public class AfficherProduitsController implements Initializable {
         displayProducts(filtered);
     }
 
-    // ✅ Afficher tout
+
     @FXML
     private void showAll() {
         displayProducts(allProducts);
     }
 
-    // ✅ Recherche
+
     @FXML
     private void handleSearch() {
         String keyword = searchField.getText().toLowerCase();
@@ -166,5 +169,21 @@ public class AfficherProduitsController implements Initializable {
                         || p.getDescription().toLowerCase().contains(keyword))
                 .toList();
         displayProducts(filtered);
+    }
+    private void openProductDetails(Product product) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/ProductDetails.fxml"));
+            Parent root = loader.load();
+
+
+            ProductDetailsController controller = loader.getController();
+            controller.setProduct(product);
+
+
+            productsContainer.getScene().setRoot(root);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 }

@@ -9,10 +9,10 @@
       prefHeight="780.0" prefWidth="1280.0"
       style="-fx-background-color: #0d1b3e;">
 
-    <!-- ✅ NAVBAR -->
+
     <fx:include source="/Navbar.fxml"/>
 
-    <!-- HERO HEADER -->
+
     <VBox spacing="5" style="-fx-padding: 30 40 20 40;
                               -fx-background-color: linear-gradient(to right, #0d1b3e, #1a1040);">
         <Label text="HARDWARE DEPOT"
@@ -22,7 +22,7 @@
                style="-fx-text-fill: white; -fx-font-size: 32px;
                       -fx-font-weight: bold;"/>
 
-        <!-- SEARCH BAR -->
+
         <HBox spacing="0" alignment="CENTER_LEFT" style="-fx-padding: 15 0 0 0;">
             <TextField fx:id="searchField" promptText="Search gear..."
                        prefWidth="450" prefHeight="46"
@@ -36,10 +36,10 @@
         </HBox>
     </VBox>
 
-    <!-- MAIN CONTENT -->
+
     <HBox spacing="0" VBox.vgrow="ALWAYS">
 
-        <!-- SIDEBAR CATEGORIES -->
+
         <VBox spacing="12" prefWidth="260" minWidth="260"
               style="-fx-background-color: #0f2342; -fx-padding: 25 20;
                      -fx-border-color: rgba(124,58,237,0.2);
@@ -50,7 +50,7 @@
                           -fx-font-weight: bold; -fx-letter-spacing: 2px;
                           -fx-padding: 0 0 10 0;"/>
 
-            <!-- Bouton Tous -->
+
             <Button text="⚡  Tous les produits" onAction="#showAll"
                     maxWidth="Infinity"
                     style="-fx-background-color: #7c3aed; -fx-text-fill: white;
@@ -62,16 +62,16 @@
             <Separator style="-fx-background-color: rgba(255,255,255,0.1);
                               -fx-padding: 5 0;"/>
 
-            <!-- Catégories dynamiques -->
+
             <VBox fx:id="categoriesBox" spacing="8"/>
 
         </VBox>
 
-        <!-- PRODUCTS AREA -->
+
         <VBox VBox.vgrow="ALWAYS" HBox.hgrow="ALWAYS"
               style="-fx-background-color: #0d1b3e;">
 
-            <!-- Barre produits info -->
+
             <HBox alignment="CENTER_LEFT"
                   style="-fx-padding: 15 25; -fx-background-color: #0f1f3d;">
                 <Label fx:id="countLabel" text="Tous les produits"

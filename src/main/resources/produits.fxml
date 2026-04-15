@@ -13,7 +13,7 @@
           AnchorPane.topAnchor="20" AnchorPane.leftAnchor="20"
           AnchorPane.rightAnchor="20" AnchorPane.bottomAnchor="20">
 
-        <!-- HEADER -->
+
         <HBox alignment="CENTER_LEFT">
             <Label text="Products Management"
                    style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: white;"/>
@@ -25,7 +25,7 @@
                            -fx-background-radius: 8;"/>
         </HBox>
 
-        <!-- STATS -->
+
         <HBox spacing="15">
             <VBox alignment="CENTER" prefWidth="180" prefHeight="90"
                   style="-fx-background-color: #1e293b; -fx-background-radius: 10;">
@@ -57,7 +57,7 @@
             </VBox>
         </HBox>
 
-        <!-- SEARCH -->
+
         <HBox spacing="10" alignment="CENTER_LEFT">
             <TextField fx:id="searchField" promptText="Search gear..."
                        prefWidth="300" prefHeight="38"
@@ -69,7 +69,7 @@
                            -fx-background-radius: 8;"/>
         </HBox>
 
-        <!-- TABLE -->
+
         <TableView fx:id="produitsTable" VBox.vgrow="ALWAYS"
                    style="-fx-background-color: #1e293b;">
             <columns>

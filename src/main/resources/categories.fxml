@@ -13,7 +13,6 @@
           AnchorPane.topAnchor="20" AnchorPane.leftAnchor="20"
           AnchorPane.rightAnchor="20" AnchorPane.bottomAnchor="20">
 
-        <!-- HEADER -->
         <HBox alignment="CENTER_LEFT">
             <Label text="Categories Management"
                    style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: white;"/>
@@ -25,7 +24,7 @@
                            -fx-background-radius: 8;"/>
         </HBox>
 
-        <!-- STATS -->
+
         <HBox spacing="15">
             <VBox alignment="CENTER" prefWidth="200" prefHeight="90"
                   style="-fx-background-color: #1e293b; -fx-background-radius: 10;">
@@ -50,7 +49,7 @@
             </VBox>
         </HBox>
 
-        <!-- TABLE -->
+
         <TableView fx:id="categoriesTable" VBox.vgrow="ALWAYS"
                    style="-fx-background-color: #1e293b;">
             <columns>

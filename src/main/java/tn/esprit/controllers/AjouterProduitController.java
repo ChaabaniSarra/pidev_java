@@ -55,7 +55,7 @@ public class AjouterProduitController implements Initializable {
             }
         });
 
-        // Validation en temps réel à chaque frappe
+
         nameField.textProperty().addListener((obs, old, val) -> validateName());
         descriptionField.textProperty().addListener((obs, old, val) -> validateDescription());
         priceField.textProperty().addListener((obs, old, val) -> validatePrice());
@@ -63,7 +63,6 @@ public class AjouterProduitController implements Initializable {
         categoryCombo.valueProperty().addListener((obs, old, val) -> validateCategory());
     }
 
-    // ─── Règles de validation ───────────────────────────────────────────
 
     private boolean validateName() {
         String val = nameField.getText().trim();
@@ -71,18 +70,15 @@ public class AjouterProduitController implements Initializable {
             setError(nameField, nameError, "Le nom est obligatoire.");
             return false;
         }
-        if (val.length() < 2) {
-            setError(nameField, nameError, "Minimum 2 caractères.");
+        if (val.length() < 3) {
+            setError(nameField, nameError, "Minimum 3 caractères.");
             return false;
         }
         if (val.length() > 100) {
             setError(nameField, nameError, "Maximum 100 caractères.");
             return false;
         }
-        if (!val.matches("[a-zA-ZÀ-ÿ0-9 \\-_']+")) {
-            setError(nameField, nameError, "Caractères spéciaux non autorisés.");
-            return false;
-        }
+
         clearError(nameField, nameError);
         return true;
     }
@@ -167,25 +163,23 @@ public class AjouterProduitController implements Initializable {
         return true;
     }
 
-    // ─── Helpers visuels ────────────────────────────────────────────────
 
-    // ─── Helpers visuels ────────────────────────────────────────────────
 
     private void setError(TextField field, Label errorLabel, String message) {
         field.setStyle("-fx-border-color: red; -fx-border-radius: 5;");
         errorLabel.setText("⚠ " + message);
         errorLabel.setVisible(true);
-        errorLabel.setManaged(true);   // ← prend de la place
+        errorLabel.setManaged(true);
     }
 
     private void clearError(TextField field, Label errorLabel) {
         field.setStyle("-fx-border-color: #27ae60; -fx-border-radius: 5;");
         errorLabel.setText("");
         errorLabel.setVisible(false);
-        errorLabel.setManaged(false);  // ← ne prend plus de place
+        errorLabel.setManaged(false);
     }
 
-    // ─── Choisir image ──────────────────────────────────────────────────
+
 
     @FXML
     private void handleChooseImage() {
@@ -198,7 +192,7 @@ public class AjouterProduitController implements Initializable {
         File selectedFile = fileChooser.showOpenDialog(imageField.getScene().getWindow());
 
         if (selectedFile != null) {
-            // Vérifier taille max (2 MB)
+
             if (selectedFile.length() > 2 * 1024 * 1024) {
                 setError(imageField, imageError, "Image trop lourde (max 2 MB).");
                 return;
@@ -227,11 +221,11 @@ public class AjouterProduitController implements Initializable {
         }
     }
 
-    // ─── Submit ─────────────────────────────────────────────────────────
+
 
     @FXML
     private void handleSubmit() {
-        // Déclencher toutes les validations
+
         boolean ok = validateName()
                 & validateDescription()
                 & validatePrice()
@@ -241,7 +235,7 @@ public class AjouterProduitController implements Initializable {
 
         if (!ok) {
             messageLabel.setStyle("-fx-text-fill: red;");
-            messageLabel.setText("❌ Corrigez les erreurs avant de continuer.");
+            messageLabel.setText(" Corrigez les erreurs avant de continuer.");
             return;
         }
 

@@ -5,9 +5,16 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="d9361db9-95ef-4837-b2cf-105c08edff2b" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/src/main/java/tn/esprit/controllers/ProductDetailsController.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/src/main/resources/ProductDetails.fxml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/tn/esprit/controllers/ProfileUserController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tn/esprit/controllers/ProfileUserController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/ProfileUser.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/ProfileUser.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/tn/esprit/controllers/AfficherProduitsController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tn/esprit/controllers/AfficherProduitsController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/tn/esprit/controllers/AjouterProduitController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tn/esprit/controllers/AjouterProduitController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/tn/esprit/controllers/ProduitsController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tn/esprit/controllers/ProduitsController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/afficherProduits.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/afficherProduits.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/ajouterProduit.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/ajouterProduit.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/categories.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/categories.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/produits.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/produits.fxml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -20,8 +27,8 @@
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
-        <option value="FxmlFile" />
         <option value="Class" />
+        <option value="FxmlFile" />
       </list>
     </option>
   </component>
@@ -71,7 +78,7 @@
     "codeWithMe.voiceChat.enabledByDefault": "false",
     "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
     "dart.analysis.tool.window.visible": "false",
-    "git-widget-placeholder": "sarra",
+    "git-widget-placeholder": "main",
     "junie.onboarding.icon.badge.shown": "true",
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "C:/Users/MSI/pidev_java/src/main/resources/images",
@@ -93,11 +100,11 @@
       <recent name="C:\Users\rajhi\pidev_java_aziz\src" />
     </key>
   </component>
-  <component name="RunManager" selected="Application.MainFX">
+  <component name="RunManager" selected="Application.FxLauncher">
     <configuration name="FxLauncher" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="tn.esprit.test.FxLauncher" />
-      <module name="WorkshopJDBC-JavaFX-3A56" />
-      <option name="VM_PARAMETERS" value="--module-path &quot;C:\Users\medam\.m2\repository\org\openjfx\javafx-controls\21.0.2\javafx-controls-21.0.2-win.jar;C:\Users\medam\.m2\repository\org\openjfx\javafx-fxml\21.0.2\javafx-fxml-21.0.2-win.jar;C:\Users\medam\.m2\repository\org\openjfx\javafx-graphics\21.0.2\javafx-graphics-21.0.2-win.jar;C:\Users\medam\.m2\repository\org\openjfx\javafx-base\21.0.2\javafx-base-21.0.2-win.jar&quot; --add-modules javafx.controls,javafx.fxml" />
+      <module name="pidev" />
+      <option name="VM_PARAMETERS" value="--module-path &quot;C:\Users\saada\.m2\repository\org\openjfx\javafx-base\21.0.2;C:\Users\saada\.m2\repository\org\openjfx\javafx-controls\21.0.2;C:\Users\saada\.m2\repository\org\openjfx\javafx-fxml\21.0.2;C:\Users\saada\.m2\repository\org\openjfx\javafx-graphics\21.0.2&quot; --add-modules javafx.controls,javafx.fxml" />
       <extension name="coverage">
         <pattern>
           <option name="PATTERN" value="tn.esprit.test.*" />
@@ -158,8 +165,8 @@
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="Application.MainFX" />
         <item itemvalue="Application.FxLauncher" />
+        <item itemvalue="Application.MainFX" />
         <item itemvalue="JUnit.ProductServiceTest" />
         <item itemvalue="JUnit.ServiceUserTest" />
         <item itemvalue="JUnit.ServiceBlogTest" />
@@ -169,7 +176,8 @@
   <component name="SharedIndexes">
     <attachedChunks>
       <set>
-        <option value="bundled-jdk-30f59d01ecdd-2fc7cc6b9a17-intellij.indexing.shared.core-IU-253.31033.145" />
+        <option value="bundled-jdk-9823dce3aa75-bf35d07a577b-intellij.indexing.shared.core-IU-252.25557.131" />
+        <option value="bundled-js-predefined-d6986cc7102b-b598e85cdad2-JavaScript-IU-252.25557.131" />
       </set>
     </attachedChunks>
   </component>
@@ -190,6 +198,7 @@
       <workItem from="1776126702741" duration="1533000" />
       <workItem from="1776128852842" duration="1269000" />
       <workItem from="1776170825743" duration="7074000" />
+      <workItem from="1776266895271" duration="12248000" />
     </task>
     <servers />
   </component>
