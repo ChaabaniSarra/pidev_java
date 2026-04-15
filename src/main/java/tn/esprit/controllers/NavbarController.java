@@ -86,9 +86,18 @@ public class NavbarController {
 
     private void loadScene(ActionEvent event, String fxml, String title) throws IOException {
         Parent root = FXMLLoader.load(getClass().getResource(fxml));
-        Stage stage = (Stage) ((Control) event.getSource()).getScene().getWindow();
+        Stage stage = (Stage) ((javafx.scene.Node) event.getSource()).getScene().getWindow();
         stage.setScene(new Scene(root));
         stage.setTitle(title);
         stage.show();
+    }
+    @FXML
+    private void goToLive(ActionEvent event) {
+        try {
+            loadScene(event, "/stream.fxml", "Live Stream");
+        } catch (IOException e) {
+            e.printStackTrace(); // 🔥 IMPORTANT pour voir l’erreur réelle
+            System.out.println("❌ Unable to open stream.");
+        }
     }
 }

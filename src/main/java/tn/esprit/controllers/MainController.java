@@ -63,12 +63,27 @@ public class MainController implements Initializable {
             e.printStackTrace();
         }
     }
-
+    @FXML
+    private void showStream() {
+        loadPage("/stream.fxml");
+    }
     private void loadPage(String fxmlPath) {
         try {
-            Parent page = FXMLLoader.load(getClass().getResource(fxmlPath));
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
+            Parent page = loader.load();
+
             contentArea.getChildren().clear();
             contentArea.getChildren().add(page);
+
+            // FIX SAFE
+            if (page instanceof javafx.scene.layout.Region region) {
+                region.setPrefWidth(contentArea.getWidth());
+                region.setPrefHeight(contentArea.getHeight());
+
+                region.prefWidthProperty().bind(contentArea.widthProperty());
+                region.prefHeightProperty().bind(contentArea.heightProperty());
+            }
+
         } catch (IOException e) {
             e.printStackTrace();
         }

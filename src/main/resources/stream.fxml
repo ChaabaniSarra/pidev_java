@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+
+<AnchorPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="tn.esprit.controllers.StreamController"
+            style="-fx-background-color: #0f172a;">
+
+    <Label text="🎥 Live Stream"
+           layoutX="20" layoutY="20"
+           style="-fx-text-fill: white; -fx-font-size: 20px;"/>
+
+    <Pane fx:id="videoPane"
+          layoutX="20" layoutY="60"
+          prefWidth="900" prefHeight="500"/>
+</AnchorPane>

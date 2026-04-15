@@ -27,7 +27,10 @@
             <Button style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 15px; -fx-font-weight: bold; -fx-cursor: hand;" text="Team" />
             <Button onAction="#goToTournement" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 15px; -fx-font-weight: bold; -fx-cursor: hand;" text="Tournoi" />
             <Button onAction="#goToAbout" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 15px; -fx-font-weight: bold; -fx-cursor: hand;" text="Blog" />
-            <Button style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 15px; -fx-font-weight: bold; -fx-cursor: hand;" text="LIVE" />
+            <Button onAction="#goToLive"
+                    style="-fx-background-color: transparent; -fx-text-fill: white;
+               -fx-font-size: 15px; -fx-font-weight: bold; -fx-cursor: hand;"
+                    text="LIVE" />
             <Button onAction="#goToMain" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 15px; -fx-font-weight: bold; -fx-cursor: hand;" text="Products" />
         </HBox>
     </center>
