@@ -343,13 +343,10 @@ public class JeuxPanelController implements Initializable {
         row.setPadding(new Insets(12, 14, 14, 14));
         row.setSpacing(10);
 
-        Label idLab = new Label("ID · " + jeu.getId());
-        idLab.setStyle("-fx-text-fill: #64748b; -fx-font-size: 11px;");
-        Region spacer = new Region();
-        HBox.setHgrow(spacer, Priority.ALWAYS);
-        row.getChildren().add(idLab);
-
         if (!readOnly) {
+            Region spacer = new Region();
+            HBox.setHgrow(spacer, Priority.ALWAYS);
+
             Button editBtn = new Button("Modifier");
             editBtn.setStyle(
                     "-fx-background-color: #f59e0b; -fx-text-fill: white; -fx-font-size: 11px;"
@@ -365,8 +362,6 @@ public class JeuxPanelController implements Initializable {
             deleteBtn.setOnAction(e -> confirmDelete(jeu));
 
             row.getChildren().addAll(spacer, editBtn, deleteBtn);
-        } else {
-            HBox.setHgrow(idLab, Priority.NEVER);
         }
 
         return row;

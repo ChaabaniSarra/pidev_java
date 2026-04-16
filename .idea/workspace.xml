@@ -5,36 +5,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="d9361db9-95ef-4837-b2cf-105c08edff2b" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/main/java/tn/esprit/controllers/StreamController.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/tn/esprit/entities/Stream.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/java/tn/esprit/services/ServiceStream.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/main/resources/stream.fxml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/test/java/ServiceJeuTest.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/test/java/ServiceTournoiTest.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/create_tables.sql" beforeDir="false" afterPath="$PROJECT_DIR$/create_tables.sql" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/tn/esprit/controllers/AjouterMatchGameController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tn/esprit/controllers/AjouterMatchGameController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/tn/esprit/controllers/AjouterUserController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tn/esprit/controllers/AjouterUserController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/tn/esprit/controllers/JeuxPanelController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tn/esprit/controllers/JeuxPanelController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/tn/esprit/controllers/LoginController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tn/esprit/controllers/LoginController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/tn/esprit/controllers/MainController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tn/esprit/controllers/MainController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/tn/esprit/controllers/NavbarController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tn/esprit/controllers/NavbarController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/tn/esprit/controllers/RegisterController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tn/esprit/controllers/RegisterController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/tn/esprit/controllers/TournoiCatalogController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tn/esprit/controllers/TournoiCatalogController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/tn/esprit/controllers/TournoisController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tn/esprit/controllers/TournoiDashboardController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/tn/esprit/services/ServiceBlog.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tn/esprit/services/ServiceBlog.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/AfficherBlogs.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/AfficherBlogs.fxml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/AjouterBlog.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/AjouterBlog.fxml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/Blogs.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/Blogs.fxml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/Login.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/Login.fxml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/Navbar.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/Navbar.fxml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/Register.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/Register.fxml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/ajouterMatchGame.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/ajouterMatchGame.fxml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/ajouterUser.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/ajouterUser.fxml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/main.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/main.fxml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/tournoiDashboard.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/tournoiDashboard.fxml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/test/java/ServiceBlogTest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/test/java/ServiceBlogTest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/tn/esprit/utils/MyDatabase.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tn/esprit/utils/MyDatabase.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -100,7 +73,7 @@
     "codeWithMe.voiceChat.enabledByDefault": "false",
     "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
     "dart.analysis.tool.window.visible": "false",
-    "git-widget-placeholder": "Merging main",
+    "git-widget-placeholder": "main",
     "junie.onboarding.icon.badge.shown": "true",
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "C:/xampp2/htdocs/pidev_java/src/main/resources",
@@ -128,7 +101,7 @@
       <recent name="tn.esprit.controllers" />
     </key>
   </component>
-  <component name="RunManager" selected="JUnit.MatchGameTest">
+  <component name="RunManager" selected="Application.FxLauncher">
     <configuration name="FxLauncher" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="tn.esprit.test.FxLauncher" />
       <module name="WorkshopJDBC-JavaFX-3A56" />
@@ -193,11 +166,11 @@
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Application.FxLauncher" />
         <item itemvalue="JUnit.MatchGameTest" />
         <item itemvalue="JUnit.EquipeTest" />
         <item itemvalue="Application.MainFX" />
         <item itemvalue="JUnit.ServiceUserTest (1)" />
-        <item itemvalue="Application.FxLauncher" />
       </list>
     </recent_temporary>
   </component>
@@ -227,6 +200,7 @@
       <workItem from="1776170825743" duration="7074000" />
       <workItem from="1776198515867" duration="4705000" />
       <workItem from="1776277936512" duration="12463000" />
+      <workItem from="1776300550172" duration="384000" />
     </task>
     <servers />
   </component>

@@ -51,7 +51,6 @@
         <TableView fx:id="jeuxTable" VBox.vgrow="ALWAYS"
                    style="-fx-background-color: #1e293b;">
             <columns>
-                <TableColumn fx:id="idCol" text="ID" prefWidth="50"/>
                 <TableColumn fx:id="nomCol" text="NAME" prefWidth="160"/>
                 <TableColumn fx:id="genreCol" text="GENRE" prefWidth="120"/>
                 <TableColumn fx:id="plateformeCol" text="PLATFORM" prefWidth="120"/>

@@ -32,8 +32,6 @@ public class JeuxDashboardController implements Initializable {
     @FXML
     private TableView<Jeu> jeuxTable;
     @FXML
-    private TableColumn<Jeu, Integer> idCol;
-    @FXML
     private TableColumn<Jeu, String> nomCol;
     @FXML
     private TableColumn<Jeu, String> genreCol;
@@ -61,7 +59,6 @@ public class JeuxDashboardController implements Initializable {
     }
 
     private void setupColumns() {
-        idCol.setCellValueFactory(new PropertyValueFactory<>("id"));
         nomCol.setCellValueFactory(new PropertyValueFactory<>("nom"));
         genreCol.setCellValueFactory(new PropertyValueFactory<>("genre"));
         plateformeCol.setCellValueFactory(new PropertyValueFactory<>("plateforme"));

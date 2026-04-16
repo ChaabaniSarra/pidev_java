@@ -30,8 +30,6 @@ public class TournoiDashboardController implements Initializable {
     @FXML
     private TableView<Tournoi> tournoisTable;
     @FXML
-    private TableColumn<Tournoi, Integer> idCol;
-    @FXML
     private TableColumn<Tournoi, String> nomCol;
     @FXML
     private TableColumn<Tournoi, String> jeuCol;
@@ -71,7 +69,6 @@ public class TournoiDashboardController implements Initializable {
     }
 
     private void setupColumns() {
-        idCol.setCellValueFactory(new PropertyValueFactory<>("id"));
         nomCol.setCellValueFactory(new PropertyValueFactory<>("nom"));
         statutCol.setCellValueFactory(new PropertyValueFactory<>("statut"));
 

@@ -38,7 +38,6 @@
         <TableView fx:id="tournoisTable" VBox.vgrow="ALWAYS"
                    style="-fx-background-color: #1e2d4a;">
             <columns>
-                <TableColumn fx:id="idCol" text="ID" prefWidth="45"/>
                 <TableColumn fx:id="nomCol" text="Nom" prefWidth="160"/>
                 <TableColumn fx:id="jeuCol" text="Jeu" prefWidth="130"/>
                 <TableColumn fx:id="debutCol" text="Début" prefWidth="95"/>
