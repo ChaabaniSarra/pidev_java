@@ -28,22 +28,6 @@ public class HomeController {
 
     @FXML
     public void initialize() {
-        // Page is ready
-    }
-
-    @FXML
-    private void goToHome() {
-        System.out.println("Home clicked");
-    }
-
-    @FXML
-    private void goToAbout() {
-        System.out.println("About clicked");
-    }
-
-    @FXML
-    private void goToTournement() {
-        System.out.println("Tournement clicked");
     }
 
     @FXML
@@ -55,19 +39,6 @@ public class HomeController {
         }
     }
 
-    @FXML
-    private void goToMain(ActionEvent event) {
-        try {
-            loadScene(event, "/Main.fxml", "Dash");
-        } catch (IOException e) {
-            showMessage("Unable to open Dash.", true);
-        }
-    }
-
-
-
-
-    // ── helpers ──────────────────────────────────────────
 
     private void loadScene(ActionEvent event, String fxml, String title) throws IOException {
         Parent root = FXMLLoader.load(getClass().getResource(fxml));

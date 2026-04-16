@@ -41,7 +41,6 @@ public class AjouterUserController implements Initializable {
         rolesField.setText("[\"ROLE_USER\"]");
         activeCheckBox.setSelected(true);
 
-        // Ajout des listeners pour les validations en temps réel
         nomField.textProperty().addListener((obs, old, val) -> validateNom());
         emailField.textProperty().addListener((obs, old, val) -> validateEmail());
         passwordField.textProperty().addListener((obs, old, val) -> validatePassword());
@@ -66,27 +65,26 @@ public class AjouterUserController implements Initializable {
         String password = passwordField.getText();
         String roles = rolesField.getText().trim();
 
-        // Valider tous les champs
         boolean nomOk = validateNom();
         boolean emailOk = validateEmail();
         boolean passwordOk = validatePassword();
         boolean rolesOk = validateRoles();
 
         if (!nomOk || !emailOk || !passwordOk || !rolesOk) {
-            showMessage("❌ Corrigez les erreurs avant de continuer.", true);
+            showMessage(" Corrigez les erreurs avant de continuer.", true);
             return;
         }
 
         try {
             if (userToEdit == null && serviceUser.emailExists(email)) {
                 setError(emailField, emailError, "Cet email existe déjà.");
-                showMessage("❌ Cet email existe déjà.", true);
+                showMessage("Cet email existe déjà.", true);
                 return;
             }
 
             if (userToEdit != null && serviceUser.emailExistsForOtherUser(email, userToEdit.getId())) {
                 setError(emailField, emailError, "Cet email est déjà utilisé par un autre utilisateur.");
-                showMessage("❌ Cet email est déjà utilisé par un autre utilisateur.", true);
+                showMessage(" Cet email est déjà utilisé par un autre utilisateur.", true);
                 return;
             }
 
@@ -105,7 +103,7 @@ public class AjouterUserController implements Initializable {
                         false
                 );
                 serviceUser.ajouter(user);
-                showMessage("✅ Utilisateur ajouté avec succès.", false);
+                showMessage(" Utilisateur ajouté avec succès.", false);
             } else {
                 userToEdit.setNom(nom);
                 userToEdit.setEmail(email);
@@ -113,12 +111,12 @@ public class AjouterUserController implements Initializable {
                 userToEdit.setRoles(roles);
                 userToEdit.setActive(activeCheckBox.isSelected());
                 serviceUser.modifier(userToEdit);
-                showMessage("✅ Utilisateur modifié avec succès.", false);
+                showMessage(" Utilisateur modifié avec succès.", false);
             }
 
             closeAfterDelay();
         } catch (SQLException e) {
-            showMessage("❌ Erreur base de données : " + e.getMessage(), true);
+            showMessage(" Erreur base de données : " + e.getMessage(), true);
         }
     }
 

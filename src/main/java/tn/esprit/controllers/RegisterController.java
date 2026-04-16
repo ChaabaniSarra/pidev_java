@@ -35,7 +35,6 @@ public class RegisterController {
 
     @FXML
     private void initialize() {
-        // Ajout des listeners pour les validations en temps réel
         nomField.textProperty().addListener((obs, old, val) -> validateNom());
         emailField.textProperty().addListener((obs, old, val) -> validateEmail());
         passwordField.textProperty().addListener((obs, old, val) -> validatePassword());
@@ -49,7 +48,7 @@ public class RegisterController {
         String password = passwordField.getText();
         String confirmPassword = confirmPasswordField.getText();
 
-        // Valider tous les champs
+        // bech nValidi les champs
         boolean nomOk = validateNom();
         boolean emailOk = validateEmail();
         boolean passwordOk = validatePassword();
@@ -57,7 +56,7 @@ public class RegisterController {
 
         if (!nomOk || !emailOk || !passwordOk || !confirmPasswordOk) {
             messageLabel.setTextFill(Color.RED);
-            messageLabel.setText("❌ Corrigez les erreurs avant de continuer.");
+            messageLabel.setText("Corrigez les erreurs avant de continuer.");
             return;
         }
 
@@ -65,7 +64,7 @@ public class RegisterController {
             if (serviceUser.emailExists(email)) {
                 setError(emailField, emailError, "Cet email est déjà utilisé.");
                 messageLabel.setTextFill(Color.RED);
-                messageLabel.setText("❌ Cet email est déjà utilisé.");
+                messageLabel.setText(" Cet email est déjà utilisé.");
                 return;
             }
 
@@ -85,7 +84,7 @@ public class RegisterController {
 
             serviceUser.ajouter(user);
             messageLabel.setTextFill(Color.web("#27ae60"));
-            messageLabel.setText("✅ Compte créé avec succès ! Vous pouvez maintenant vous connecter.");
+            messageLabel.setText("Compte créé avec succès ! Vous pouvez maintenant vous connecter.");
             clearFields();
 
             // Fermer après 2 secondes et retourner au login
@@ -104,7 +103,7 @@ public class RegisterController {
 
         } catch (SQLException e) {
             messageLabel.setTextFill(Color.RED);
-            messageLabel.setText("❌ Erreur base de données : " + e.getMessage());
+            messageLabel.setText(" Erreur base de données : " + e.getMessage());
         }
     }
 
@@ -207,7 +206,7 @@ public class RegisterController {
             loadScene(event, "/Login.fxml", "Login");
         } catch (IOException e) {
             messageLabel.setTextFill(Color.RED);
-            messageLabel.setText("❌ Impossible d'ouvrir le formulaire de connexion.");
+            messageLabel.setText(" Impossible d'ouvrir le formulaire de connexion.");
         }
     }
 

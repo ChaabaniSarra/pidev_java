@@ -32,7 +32,6 @@ public class LoginController {
 
     @FXML
     public void initialize() {
-        // Ajout des listeners pour les validations en temps réel
         usernameField.textProperty().addListener((obs, old, val) -> validateEmail());
         passwordField.textProperty().addListener((obs, old, val) -> validatePassword());
     }
@@ -42,13 +41,12 @@ public class LoginController {
         String username = usernameField.getText().trim();
         String password = passwordField.getText();
 
-        // Valider les champs
         boolean emailOk = validateEmail();
         boolean passwordOk = validatePassword();
 
         if (!emailOk || !passwordOk) {
             messageLabel.setTextFill(Color.RED);
-            messageLabel.setText("❌ Corrigez les erreurs avant de continuer.");
+            messageLabel.setText("Corrigez les erreurs avant de continuer.");
             return;
         }
 
@@ -56,14 +54,13 @@ public class LoginController {
             User user = serviceUser.authenticate(username, password);
             if (user == null) {
                 messageLabel.setTextFill(Color.RED);
-                messageLabel.setText("❌ Identifiants invalides.");
+                messageLabel.setText(" Identifiants invalides.");
                 return;
             }
 
-            // User exists → navigate to Home or admin dashboard
             SessionManager.setCurrentUser(user);
             messageLabel.setTextFill(Color.web("#5b4cdf"));
-            messageLabel.setText("✅ Bienvenue, " + user.getNom() + "!");
+            messageLabel.setText(" Bienvenue, " + user.getNom() + "!");
             String fxml = "/home.fxml";
             if ("admin@gmail.com".equalsIgnoreCase(user.getEmail())) {
                 fxml = "/main.fxml";
@@ -76,10 +73,10 @@ public class LoginController {
 
         } catch (SQLException e) {
             messageLabel.setTextFill(Color.RED);
-            messageLabel.setText("❌ Erreur base de données : " + e.getMessage());
+            messageLabel.setText("Erreur base de données : " + e.getMessage());
         } catch (IOException e) {
             messageLabel.setTextFill(Color.RED);
-            messageLabel.setText("❌ Impossible d'ouvrir la page d'accueil.");
+            messageLabel.setText("Impossible d'ouvrir la page d'accueil.");
         }
     }
 
@@ -137,7 +134,7 @@ public class LoginController {
             loadScene(event, "/Register.fxml", "Register");
         } catch (IOException e) {
             messageLabel.setTextFill(Color.RED);
-            messageLabel.setText("❌ Impossible d'ouvrir le formulaire d'inscription.");
+            messageLabel.setText("Impossible d'ouvrir le formulaire d'inscription.");
         }
     }
 
