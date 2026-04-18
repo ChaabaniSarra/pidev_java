@@ -37,7 +37,6 @@ public class CategoriesController implements Initializable {
     }
 
     private void setupColumns() {
-        idCol.setCellValueFactory(new PropertyValueFactory<>("id"));
         nameCol.setCellValueFactory(new PropertyValueFactory<>("name"));
 
         actionsCol.setCellFactory(col -> new TableCell<>() {

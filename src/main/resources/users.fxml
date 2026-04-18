@@ -3,64 +3,42 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<AnchorPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="tn.esprit.controllers.UsersController"
-            prefHeight="600.0" prefWidth="900.0"
-            style="-fx-background-color: #0f172a;">
+<AnchorPane prefHeight="600.0" prefWidth="900.0" style="-fx-background-color: #0f172a;" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tn.esprit.controllers.UsersController">
 
-    <VBox spacing="20"
-          AnchorPane.topAnchor="20" AnchorPane.leftAnchor="20"
-          AnchorPane.rightAnchor="20" AnchorPane.bottomAnchor="20">
+    <VBox spacing="20" AnchorPane.bottomAnchor="20" AnchorPane.leftAnchor="20" AnchorPane.rightAnchor="20" AnchorPane.topAnchor="20">
 
         <HBox alignment="CENTER_LEFT">
-            <Label text="Users Management"
-                   style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: white;"/>
-            <Region HBox.hgrow="ALWAYS"/>
-            <Button text="+ New User" onAction="#handleNewUser"
-                    style="-fx-background-color: #7c3aed; -fx-text-fill: white;
-                           -fx-font-size: 14px; -fx-pref-height: 40px;
-                           -fx-pref-width: 160px; -fx-cursor: hand;
-                           -fx-background-radius: 8;"/>
+            <Label style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: white;" text="Users Management" />
+            <Region HBox.hgrow="ALWAYS" />
+            <Button onAction="#handleNewUser" style="-fx-background-color: #7c3aed; -fx-text-fill: white;                            -fx-font-size: 14px; -fx-pref-height: 40px;                            -fx-pref-width: 160px; -fx-cursor: hand;                            -fx-background-radius: 8;" text="+ New User" />
         </HBox>
 
         <HBox spacing="15">
-            <VBox alignment="CENTER" prefWidth="200" prefHeight="90"
-                  style="-fx-background-color: #1e293b; -fx-background-radius: 10;">
-                <Label fx:id="totalUsersLabel" text="0"
-                       style="-fx-font-size: 30px; -fx-font-weight: bold; -fx-text-fill: #7c3aed;"/>
-                <Label text="TOTAL USERS"
-                       style="-fx-text-fill: #94a3b8; -fx-font-size: 12px;"/>
+            <VBox alignment="CENTER" prefHeight="90" prefWidth="200" style="-fx-background-color: #1e293b; -fx-background-radius: 10;">
+                <Label fx:id="totalUsersLabel" style="-fx-font-size: 30px; -fx-font-weight: bold; -fx-text-fill: #7c3aed;" text="0" />
+                <Label style="-fx-text-fill: #94a3b8; -fx-font-size: 12px;" text="TOTAL USERS" />
             </VBox>
-            <VBox alignment="CENTER" prefWidth="200" prefHeight="90"
-                  style="-fx-background-color: #1e293b; -fx-background-radius: 10;">
-                <Label fx:id="activeUsersLabel" text="0"
-                       style="-fx-font-size: 30px; -fx-font-weight: bold; -fx-text-fill: #7c3aed;"/>
-                <Label text="ACTIVE USERS"
-                       style="-fx-text-fill: #94a3b8; -fx-font-size: 12px;"/>
+            <VBox alignment="CENTER" prefHeight="90" prefWidth="200" style="-fx-background-color: #1e293b; -fx-background-radius: 10;">
+                <Label fx:id="activeUsersLabel" style="-fx-font-size: 30px; -fx-font-weight: bold; -fx-text-fill: #7c3aed;" text="0" />
+                <Label style="-fx-text-fill: #94a3b8; -fx-font-size: 12px;" text="ACTIVE USERS" />
             </VBox>
-            <VBox alignment="CENTER" prefWidth="200" prefHeight="90"
-                  style="-fx-background-color: #1e293b; -fx-background-radius: 10;">
-                <Label fx:id="inactiveUsersLabel" text="0"
-                       style="-fx-font-size: 30px; -fx-font-weight: bold; -fx-text-fill: #7c3aed;"/>
-                <Label text="INACTIVE USERS"
-                       style="-fx-text-fill: #94a3b8; -fx-font-size: 12px;"/>
+            <VBox alignment="CENTER" prefHeight="90" prefWidth="200" style="-fx-background-color: #1e293b; -fx-background-radius: 10;">
+                <Label fx:id="inactiveUsersLabel" style="-fx-font-size: 30px; -fx-font-weight: bold; -fx-text-fill: #7c3aed;" text="0" />
+                <Label style="-fx-text-fill: #94a3b8; -fx-font-size: 12px;" text="INACTIVE USERS" />
             </VBox>
         </HBox>
 
-        <TableView fx:id="usersTable" VBox.vgrow="ALWAYS"
-                   style="-fx-background-color: #1e293b;">
+        <TableView fx:id="usersTable" style="-fx-background-color: #1e293b;" VBox.vgrow="ALWAYS">
             <columns>
-                <TableColumn fx:id="idCol" text="ID" prefWidth="60"/>
-                <TableColumn fx:id="nomCol" text="NAME" prefWidth="170"/>
-                <TableColumn fx:id="emailCol" text="EMAIL" prefWidth="240"/>
-                <TableColumn fx:id="roleCol" text="ROLES" prefWidth="150"/>
-                <TableColumn fx:id="activeCol" text="STATUS" prefWidth="100"/>
-                <TableColumn fx:id="actionsCol" text="ACTIONS" prefWidth="160"/>
+                <TableColumn fx:id="nomCol" prefWidth="170" text="NAME" />
+                <TableColumn fx:id="emailCol" prefWidth="240" text="EMAIL" />
+                <TableColumn fx:id="roleCol" prefWidth="150" text="ROLES" />
+                <TableColumn fx:id="activeCol" prefWidth="100" text="STATUS" />
+                <TableColumn fx:id="actionsCol" prefWidth="160" text="ACTIONS" />
             </columns>
         </TableView>
 
-        <Label fx:id="messageLabel" text="" style="-fx-font-size: 13px;"/>
+        <Label fx:id="messageLabel" style="-fx-font-size: 13px;" text="" />
 
     </VBox>
 </AnchorPane>

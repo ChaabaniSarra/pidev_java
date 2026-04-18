@@ -41,7 +41,6 @@ public class BlogsController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
-        idCol.setCellValueFactory(new PropertyValueFactory<>("id"));
         titleCol.setCellValueFactory(new PropertyValueFactory<>("title"));
         categoryCol.setCellValueFactory(new PropertyValueFactory<>("category"));
         contentCol.setCellValueFactory(new PropertyValueFactory<>("content"));
