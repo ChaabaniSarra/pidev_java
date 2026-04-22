@@ -6,15 +6,8 @@
   <component name="ChangeListManager">
     <list default="true" id="d9361db9-95ef-4837-b2cf-105c08edff2b" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/tn/esprit/controllers/BlogsController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tn/esprit/controllers/BlogsController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/tn/esprit/controllers/CategoriesController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tn/esprit/controllers/CategoriesController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/tn/esprit/controllers/ProduitsController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tn/esprit/controllers/ProduitsController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/tn/esprit/controllers/UsersController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tn/esprit/controllers/UsersController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/tn/esprit/utils/MyDatabase.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tn/esprit/utils/MyDatabase.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/Blogs.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/Blogs.fxml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/categories.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/categories.fxml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/produits.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/produits.fxml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/users.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/users.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Login.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/Login.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/Register.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/Register.fxml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -22,7 +15,7 @@
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
   <component name="EmbeddingIndexingInfo">
-    <option name="cachedIndexableFilesCount" value="119" />
+    <option name="cachedIndexableFilesCount" value="117" />
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
