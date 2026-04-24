@@ -1,8 +1,10 @@
 package tn.esprit.controllers;
 
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
+import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -152,8 +154,13 @@ public class CartController implements Initializable {
 
     @FXML
     private void handleOrder() {
-        totalLabel.setText("✅ Commande passée !");
-        subtotalLabel.setText("✅");
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/checkout.fxml"));
+            Parent root = loader.load();
+            cartItemsBox.getScene().setRoot(root);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     @FXML

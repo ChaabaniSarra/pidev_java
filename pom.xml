@@ -77,7 +77,11 @@
             <artifactId>jbcrypt</artifactId>
             <version>0.4</version>
         </dependency>
-
+        <dependency>
+            <groupId>com.stripe</groupId>
+            <artifactId>stripe-java</artifactId>
+            <version>24.3.0</version>
+        </dependency>
     </dependencies>
 
     <build>
