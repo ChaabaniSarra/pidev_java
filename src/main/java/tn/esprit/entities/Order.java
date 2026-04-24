@@ -15,6 +15,8 @@ public class Order {
     private String postalCode;
     private String phone;
     private int userId;
+    private java.sql.Timestamp createdAt;
+
 
     public Order() {}
 
@@ -47,4 +49,6 @@ public class Order {
     public void setPhone(String phone) { this.phone = phone; }
     public int getUserId() { return userId; }
     public void setUserId(int userId) { this.userId = userId; }
+    public java.sql.Timestamp getCreatedAt() { return createdAt; }
+    public void setCreatedAt(java.sql.Timestamp createdAt) { this.createdAt = createdAt; }
 }

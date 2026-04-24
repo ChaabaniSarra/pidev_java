@@ -74,6 +74,10 @@ public class MainController implements Initializable {
         }
     }
     @FXML
+    public void showOrders() {
+        loadPage("/orders.fxml");
+    }
+    @FXML
     private void showStream() {
         loadPage("/stream.fxml");
     }

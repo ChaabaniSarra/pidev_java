@@ -3,7 +3,8 @@ package tn.esprit.services;
 import tn.esprit.entities.Order;
 import tn.esprit.entities.OrderItem;
 import tn.esprit.utils.MyDatabase;
-
+import java.util.ArrayList;
+import java.util.List;
 import java.sql.*;
 import java.util.UUID;
 
@@ -76,5 +77,34 @@ public class OrderService {
         } catch (SQLException e) {
             System.out.println("Erreur updateStripe: " + e.getMessage());
         }
+    }
+    public List<Order> getAllOrders() {
+        List<Order> orders = new ArrayList<>();
+        try {
+            PreparedStatement ps = conn.prepareStatement(
+                    "SELECT * FROM `order` ORDER BY created_at DESC"
+            );
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                Order o = new Order();
+                o.setId(rs.getInt("id"));
+                o.setOrderNumber(rs.getString("order_number"));
+                o.setTotalPrice(rs.getDouble("total_price"));
+                o.setStatus(rs.getString("status"));
+                o.setFirstName(rs.getString("first_name"));
+                o.setLastName(rs.getString("last_name"));
+                o.setEmail(rs.getString("email"));
+                o.setAddress(rs.getString("address"));
+                o.setCity(rs.getString("city"));
+                o.setPostalCode(rs.getString("postal_code"));
+                o.setPhone(rs.getString("phone"));
+                o.setCreatedAt(rs.getTimestamp("created_at"));
+                o.setUserId(rs.getInt("user_id"));
+                orders.add(o);
+            }
+        } catch (SQLException e) {
+            System.out.println("Erreur getAllOrders: " + e.getMessage());
+        }
+        return orders;
     }
 }
