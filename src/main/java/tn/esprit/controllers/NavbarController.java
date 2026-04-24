@@ -109,4 +109,13 @@ public class NavbarController {
             System.out.println("❌ Unable to open stream.");
         }
     }
+    @FXML
+    private void goToCart(ActionEvent event) {
+        try {
+            loadScene(event, "/cart.fxml", "Mon Panier");
+        } catch (IOException e) {
+            e.printStackTrace(); // ← changez ça
+            System.out.println("Erreur: " + e.getMessage());
+        }
+    }
 }

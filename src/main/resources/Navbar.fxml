@@ -38,6 +38,11 @@
     <right>
         <HBox alignment="CENTER_RIGHT" spacing="16.0" BorderPane.alignment="CENTER">
             <padding><Insets right="34.0" /></padding>
+            <Button onAction="#goToCart"
+                    style="-fx-background-color: transparent; -fx-text-fill: white;
+                       -fx-font-size: 20px; -fx-cursor: hand;"
+                    text="🛒" />
+
             <Button fx:id="profileUserButton" onAction="#goToUser" style="-fx-background-color: transparent; -fx-text-fill: white; -fx-font-size: 15px; -fx-font-weight: bold; -fx-cursor: hand;" text="Profile User" />
         </HBox>
     </right>

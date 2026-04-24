@@ -9,8 +9,10 @@ import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
+import tn.esprit.entities.Cart;
 import tn.esprit.entities.Category;
 import tn.esprit.entities.Product;
+import tn.esprit.services.CartService;
 import tn.esprit.services.CategoryService;
 import tn.esprit.services.ProductService;
 
@@ -29,6 +31,8 @@ public class AfficherProduitsController implements Initializable {
     private CategoryService categoryService = new CategoryService();
     private List<Product> allProducts;
     private List<Category> allCategories;
+    private CartService cartService = new CartService();
+    private int currentUserId = 1;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -37,7 +41,6 @@ public class AfficherProduitsController implements Initializable {
         loadCategoryButtons();
         displayProducts(allProducts);
     }
-
 
     private void loadCategoryButtons() {
         categoriesBox.getChildren().clear();
@@ -72,7 +75,6 @@ public class AfficherProduitsController implements Initializable {
         }
     }
 
-
     private void displayProducts(List<Product> products) {
         productsContainer.getChildren().clear();
         for (Product p : products) {
@@ -80,10 +82,8 @@ public class AfficherProduitsController implements Initializable {
         }
     }
 
-
     private VBox createProductCard(Product p) {
         VBox card = new VBox(10);
-        card.setOnMouseClicked(event -> openProductDetails(p));
         card.setPrefWidth(220);
         card.setMaxWidth(220);
         card.setStyle(
@@ -92,34 +92,32 @@ public class AfficherProduitsController implements Initializable {
                         "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.3), 10, 0, 0, 3);"
         );
 
-
         ImageView imageView = new ImageView();
         imageView.setFitWidth(190);
         imageView.setFitHeight(150);
         imageView.setPreserveRatio(true);
+        imageView.setStyle("-fx-cursor: hand;");
+        imageView.setOnMouseClicked(event -> openProductDetails(p));
 
         File imgFile = new File("C:/wamp64/www/uploads/" + p.getImage());
         if (imgFile.exists()) {
             imageView.setImage(new Image(imgFile.toURI().toString()));
         }
 
-
         Label nameLabel = new Label(p.getName());
         nameLabel.setStyle(
-                "-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #1e293b;"
+                "-fx-font-size: 15px; -fx-font-weight: bold; -fx-text-fill: #1e293b; -fx-cursor: hand;"
         );
         nameLabel.setWrapText(true);
-
+        nameLabel.setOnMouseClicked(event -> openProductDetails(p));
 
         Label descLabel = new Label(p.getDescription());
         descLabel.setStyle("-fx-text-fill: #64748b; -fx-font-size: 12px;");
         descLabel.setWrapText(true);
 
-
         Category cat = categoryService.getCategoryById(p.getCategoryId());
         Label catLabel = new Label("Category: " + (cat != null ? cat.getName() : "N/A"));
         catLabel.setStyle("-fx-text-fill: #94a3b8; -fx-font-size: 11px;");
-
 
         HBox footer = new HBox(10);
         footer.setAlignment(Pos.CENTER_LEFT);
@@ -137,11 +135,45 @@ public class AfficherProduitsController implements Initializable {
                         "-fx-pref-height: 35px; -fx-font-size: 12px; -fx-padding: 0 15;"
         );
 
+        addBtn.setOnMouseClicked(event -> event.consume());
+
+        addBtn.setOnAction(e -> {
+            System.out.println("=== ADD CLICKED ===");
+            System.out.println("Product ID: " + p.getId());
+            System.out.println("User ID: " + currentUserId);
+
+            Cart cart = cartService.getOrCreateCart(currentUserId);
+            System.out.println("Cart: " + (cart == null ? "NULL ❌" : "ID=" + cart.getId() + " ✅"));
+
+            if (cart != null) {
+                cartService.addToCart(cart.getId(), p.getId(), 1);
+                System.out.println("addToCart appelé ✅");
+
+                addBtn.setText("✅ Ajouté !");
+                addBtn.setStyle(
+                        "-fx-background-color: #27ae60; -fx-text-fill: white;" +
+                                "-fx-cursor: hand; -fx-background-radius: 20;" +
+                                "-fx-pref-height: 35px; -fx-font-size: 12px; -fx-padding: 0 15;"
+                );
+
+                new Thread(() -> {
+                    try { Thread.sleep(2000); } catch (InterruptedException ignored) {}
+                    javafx.application.Platform.runLater(() -> {
+                        addBtn.setText("🛒 ADD");
+                        addBtn.setStyle(
+                                "-fx-background-color: #7c3aed; -fx-text-fill: white;" +
+                                        "-fx-cursor: hand; -fx-background-radius: 20;" +
+                                        "-fx-pref-height: 35px; -fx-font-size: 12px; -fx-padding: 0 15;"
+                        );
+                    });
+                }).start();
+            }
+        });
+
         footer.getChildren().addAll(priceLabel, addBtn);
         card.getChildren().addAll(imageView, nameLabel, descLabel, catLabel, footer);
         return card;
     }
-
 
     private void filterByCategory(int categoryId) {
         List<Product> filtered = allProducts.stream()
@@ -150,12 +182,10 @@ public class AfficherProduitsController implements Initializable {
         displayProducts(filtered);
     }
 
-
     @FXML
     private void showAll() {
         displayProducts(allProducts);
     }
-
 
     @FXML
     private void handleSearch() {
@@ -170,15 +200,14 @@ public class AfficherProduitsController implements Initializable {
                 .toList();
         displayProducts(filtered);
     }
+
     private void openProductDetails(Product product) {
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/ProductDetails.fxml"));
             Parent root = loader.load();
 
-
             ProductDetailsController controller = loader.getController();
             controller.setProduct(product);
-
 
             productsContainer.getScene().setRoot(root);
 
