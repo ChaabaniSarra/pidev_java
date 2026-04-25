@@ -14,7 +14,7 @@
           AnchorPane.rightAnchor="0" AnchorPane.bottomAnchor="0">
 
 
-        <fx:include source="/navbar.fxml"/>
+        <fx:include source="/Navbar.fxml"/>
 
 
         <VBox spacing="24" style="-fx-padding: 32 40 32 40;">
