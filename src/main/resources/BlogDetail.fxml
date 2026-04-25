@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="tn.esprit.controllers.BlogDetailController"
+            prefHeight="720.0" prefWidth="1280.0"
+            style="-fx-background-color: #05070f;">
+
+    <VBox spacing="0" AnchorPane.topAnchor="0" AnchorPane.leftAnchor="0"
+          AnchorPane.rightAnchor="0" AnchorPane.bottomAnchor="0">
+
+        <fx:include source="/Navbar.fxml"/>
+
+        <ScrollPane fitToWidth="true" style="-fx-background: transparent; -fx-background-color: transparent;">
+            <VBox spacing="30" style="-fx-padding: 40 100 40 100;">
+                
+                <!-- Back Button -->
+                <Button text="← Retour aux blogs" onAction="#handleBack"
+                        style="-fx-background-color: transparent; -fx-text-fill: #94a3b8; -fx-cursor: hand; -fx-font-size: 14px;"/>
+
+                <!-- Blog Content -->
+                <VBox spacing="20" style="-fx-background-color: #0f172a; -fx-background-radius: 15; -fx-padding: 30;">
+                    <StackPane fx:id="imageContainer" prefHeight="400" style="-fx-background-color: #1e293b; -fx-background-radius: 10;">
+                        <ImageView fx:id="blogImage" fitWidth="1000" fitHeight="400" preserveRatio="false"/>
+                    </StackPane>
+
+                    <HBox alignment="CENTER_LEFT" spacing="15">
+                        <Label fx:id="categoryBadge" style="-fx-background-color: #7c3aed; -fx-text-fill: white; -fx-padding: 5 15; -fx-background-radius: 20; -fx-font-weight: bold;"/>
+                        <Label fx:id="dateLabel" style="-fx-text-fill: #64748b; -fx-font-size: 14px;"/>
+                    </HBox>
+
+                    <Label fx:id="blogTitle" wrapText="true"
+                           style="-fx-text-fill: white; -fx-font-size: 36px; -fx-font-weight: bold;"/>
+
+                    <Label fx:id="blogContent" wrapText="true"
+                           style="-fx-text-fill: #cbd5e1; -fx-font-size: 18px; -fx-line-spacing: 5;"/>
+                </VBox>
+
+                <!-- Comments Section Header -->
+                <VBox spacing="10">
+                    <Label fx:id="commentHeaderLabel" text="Commentaires"
+                           style="-fx-text-fill: white; -fx-font-size: 24px; -fx-font-weight: bold;"/>
+                    <Separator style="-fx-background-color: #1e293b;"/>
+                </VBox>
+
+                <!-- Add Comment Zone -->
+                <VBox spacing="15" style="-fx-background-color: #0f172a; -fx-background-radius: 12; -fx-padding: 20;">
+                    <TextArea fx:id="newCommentArea" promptText="Ajouter un commentaire..."
+                              prefHeight="100" wrapText="true"
+                              style="-fx-control-inner-background: #1e293b; -fx-text-fill: white; -fx-prompt-text-fill: #64748b; -fx-background-radius: 8; -fx-border-color: #334155; -fx-border-radius: 8;"/>
+                    <HBox alignment="CENTER_RIGHT">
+                        <Button text="Publier le commentaire" onAction="#handleAddComment"
+                                style="-fx-background-color: #7c3aed; -fx-text-fill: white; -fx-font-weight: bold; -fx-padding: 10 25; -fx-background-radius: 8; -fx-cursor: hand;"/>
+                    </HBox>
+                </VBox>
+
+                <!-- Comments List -->
+                <VBox fx:id="commentsContainer" spacing="15"/>
+            </VBox>
+        </ScrollPane>
+    </VBox>
+</AnchorPane>

@@ -1,9 +1,12 @@
 package tn.esprit.controllers;
 
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.TextField;
@@ -11,10 +14,12 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.shape.Circle;
+import javafx.stage.Stage;
 import tn.esprit.entities.Blog;
 import tn.esprit.services.ServiceBlog;
 
 import java.io.File;
+import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
@@ -100,6 +105,11 @@ public class AfficherBlogsController implements Initializable {
 
         body.getChildren().addAll(featuredBadge, tag, title, desc, spacer, footer);
         card.getChildren().addAll(imgPane, body);
+
+        // Navigation vers les détails
+        card.setCursor(javafx.scene.Cursor.HAND);
+        card.setOnMouseClicked(e -> openBlogDetail(blog));
+
         return card;
     }
 
@@ -150,6 +160,11 @@ public class AfficherBlogsController implements Initializable {
         );
 
         card.getChildren().addAll(imgPane, body, footer);
+
+        // Navigation vers les détails
+        card.setCursor(javafx.scene.Cursor.HAND);
+        card.setOnMouseClicked(e -> openBlogDetail(blog));
+
         return card;
     }
 
@@ -240,6 +255,21 @@ public class AfficherBlogsController implements Initializable {
                             && b.getCategory().toLowerCase().contains(query)))
                     .collect(Collectors.toList());
             displayBlogs(filtered);
+        }
+    }
+
+    private void openBlogDetail(Blog blog) {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/BlogDetail.fxml"));
+            Parent root = loader.load();
+
+            BlogDetailController controller = loader.getController();
+            controller.setBlog(blog);
+
+            Stage stage = (Stage) blogsContainer.getScene().getWindow();
+            stage.setScene(new Scene(root));
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }
