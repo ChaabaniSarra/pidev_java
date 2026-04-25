@@ -1,7 +1,7 @@
 package tn.esprit.services;
 
-import  tn.esprit.entities.Product;
-import  tn.esprit.utils.MyDatabase;
+import tn.esprit.entities.Product;
+import tn.esprit.utils.MyDatabase;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -9,6 +9,8 @@ import java.util.List;
 
 public class ProductService {
     private Connection connection;
+    private EmailService emailService = new EmailService();
+    private static final String ADMIN_EMAIL = "saadamaryem776@gmail.com"; // ← ton email admin
 
     public ProductService() {
         connection = MyDatabase.getInstance().getConnection();
@@ -27,6 +29,10 @@ public class ProductService {
             ps.setInt(6, product.getCategoryId());
             ps.executeUpdate();
             System.out.println("Produit ajouté : " + product.getName());
+
+            // ✅ Vérifier stock faible
+            checkLowStock(product.getName(), product.getStock());
+
         } catch (SQLException e) {
             System.out.println("Erreur ajout : " + e.getMessage());
         }
@@ -73,7 +79,7 @@ public class ProductService {
                 );
             }
         } catch (SQLException e) {
-            System.out.println(" Erreur : " + e.getMessage());
+            System.out.println("Erreur : " + e.getMessage());
         }
         return null;
     }
@@ -92,12 +98,16 @@ public class ProductService {
             ps.setInt(7, product.getId());
             ps.executeUpdate();
             System.out.println("Produit mis à jour : " + product.getId());
+
+            // ✅ Vérifier stock faible
+            checkLowStock(product.getName(), product.getStock());
+
         } catch (SQLException e) {
             System.out.println("Erreur mise à jour : " + e.getMessage());
         }
     }
 
-
+    // 🗑️ DELETE
     public void deleteProduct(int id) {
         String sql = "DELETE FROM product WHERE id = ?";
         try (PreparedStatement ps = connection.prepareStatement(sql)) {
@@ -106,6 +116,16 @@ public class ProductService {
             System.out.println("Produit supprimé : " + id);
         } catch (SQLException e) {
             System.out.println("Erreur suppression : " + e.getMessage());
+        }
+    }
+
+    // ✅ Vérification stock faible
+    private void checkLowStock(String productName, int stock) {
+        if (stock < 5) {
+            System.out.println("⚠️ Stock faible : " + productName + " (stock=" + stock + ")");
+            new Thread(() ->
+                    emailService.sendLowStockAlert(productName, stock, ADMIN_EMAIL)
+            ).start();
         }
     }
 }

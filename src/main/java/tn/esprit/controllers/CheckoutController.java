@@ -4,9 +4,7 @@ import com.stripe.Stripe;
 import com.stripe.model.checkout.Session;
 import com.stripe.param.checkout.SessionCreateParams;
 import javafx.fxml.FXML;
-import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
-import javafx.scene.Parent;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import tn.esprit.entities.*;
@@ -34,7 +32,6 @@ public class CheckoutController implements Initializable {
     private List<CartItem> cartItems;
     private Cart cart;
 
-    // ✅ Votre clé Stripe TEST
     private static final String STRIPE_KEY = "sk_test_51SyCQpLoei8vIeaG2Gs3Zsqdv6RrmlC0ihbhVF45DeiPV38SBYxRqEtBwhu1iGofLC4m9v6aeDzAJvkX5qPWxGM300YCM1X4nq";
 
     @Override
@@ -108,14 +105,21 @@ public class CheckoutController implements Initializable {
             return;
         }
 
-        // Sauvegarder les order items
+        // ✅ Sauvegarder order items + réduire stock
         for (CartItem item : cartItems) {
             Product p = productService.getProductById(item.getProductId());
             if (p != null) {
+                System.out.println("📦 Stock avant: " + p.getName() + " = " + p.getStock());
+
                 orderService.addOrderItem(new OrderItem(
                         p.getName(), p.getPrice(), item.getQuantity(),
                         savedOrder.getId(), p.getId()
                 ));
+
+                orderService.reduceStock(p.getId(), item.getQuantity());
+
+                Product updated = productService.getProductById(p.getId());
+                System.out.println("📦 Stock après: " + updated.getName() + " = " + updated.getStock());
             }
         }
 
@@ -148,16 +152,12 @@ public class CheckoutController implements Initializable {
 
             Session session = Session.create(paramsBuilder.build());
 
-            // Mettre à jour la commande avec la session Stripe
             orderService.updateStripeSession(savedOrder.getId(), session.getId(), "");
 
-            // Ouvrir le navigateur avec Stripe Checkout
             Desktop.getDesktop().browse(new URI(session.getUrl()));
 
-            // Vider le panier
             cartService.clearCart(cart.getId());
 
-            // Afficher succès
             errorLabel.setStyle("-fx-text-fill: #27ae60;");
             errorLabel.setText("✅ Redirecting to payment...");
             placeOrderBtn.setText("✅ Order Placed!");

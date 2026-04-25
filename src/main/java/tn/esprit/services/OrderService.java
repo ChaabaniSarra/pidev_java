@@ -3,9 +3,10 @@ package tn.esprit.services;
 import tn.esprit.entities.Order;
 import tn.esprit.entities.OrderItem;
 import tn.esprit.utils.MyDatabase;
+
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.sql.*;
 import java.util.UUID;
 
 public class OrderService {
@@ -78,6 +79,21 @@ public class OrderService {
             System.out.println("Erreur updateStripe: " + e.getMessage());
         }
     }
+
+    public void updateOrderStatus(int orderId, String status) {
+        try {
+            PreparedStatement ps = conn.prepareStatement(
+                    "UPDATE `order` SET status = ? WHERE id = ?"
+            );
+            ps.setString(1, status);
+            ps.setInt(2, orderId);
+            ps.executeUpdate();
+            System.out.println("✅ Order " + orderId + " status → " + status);
+        } catch (SQLException e) {
+            System.out.println("Erreur updateOrderStatus: " + e.getMessage());
+        }
+    }
+
     public List<Order> getAllOrders() {
         List<Order> orders = new ArrayList<>();
         try {
@@ -106,5 +122,47 @@ public class OrderService {
             System.out.println("Erreur getAllOrders: " + e.getMessage());
         }
         return orders;
+    }
+
+    public void reduceStock(int productId, int quantity) {
+        try {
+            // ✅ Réduire le stock
+            PreparedStatement ps = conn.prepareStatement(
+                    "UPDATE product SET stock = stock - ? WHERE id = ? AND stock >= ?"
+            );
+            ps.setInt(1, quantity);
+            ps.setInt(2, productId);
+            ps.setInt(3, quantity);
+            int rows = ps.executeUpdate();
+
+            if (rows == 0) {
+                System.out.println("❌ Stock insuffisant pour product ID: " + productId);
+            } else {
+                System.out.println("✅ Stock réduit pour product ID: " + productId + " (-" + quantity + ")");
+
+                // ✅ Vérifier le nouveau stock
+                PreparedStatement check = conn.prepareStatement(
+                        "SELECT name, stock FROM product WHERE id = ?"
+                );
+                check.setInt(1, productId);
+                ResultSet rs = check.executeQuery();
+                if (rs.next()) {
+                    String name = rs.getString("name");
+                    int newStock = rs.getInt("stock");
+                    System.out.println("📦 Nouveau stock: " + name + " = " + newStock);
+
+                    // ✅ Envoyer email si stock faible
+                    if (newStock < 5) {
+                        System.out.println("⚠️ Stock faible détecté — envoi email !");
+                        EmailService emailService = new EmailService();
+                        new Thread(() ->
+                                emailService.sendLowStockAlert(name, newStock, "saadamaryem776@gmail.com")
+                        ).start();
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Erreur reduceStock: " + e.getMessage());
+        }
     }
 }
