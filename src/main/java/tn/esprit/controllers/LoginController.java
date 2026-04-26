@@ -181,6 +181,7 @@ public class LoginController {
                 loadHomePage();
             }
 
+
         } catch (IOException e) {
             messageLabel.setTextFill(Color.RED);
             messageLabel.setText("Erreur lors de l'authentification Google : " + e.getMessage());
@@ -192,6 +193,14 @@ public class LoginController {
             messageLabel.setText("Erreur lors de l'authentification Google : " + e.getMessage());
         }
     }
+
+
+    public void handleFaceRecognition(ActionEvent actionEvent) {
+    }
+
+    public void handleForgotPassword(ActionEvent actionEvent) {
+    }
+
 
     private void loadHomePage() {
         try {
@@ -210,4 +219,6 @@ public class LoginController {
             messageLabel.setText("Impossible d'ouvrir la page d'accueil.");
         }
     }
+
+
 }
