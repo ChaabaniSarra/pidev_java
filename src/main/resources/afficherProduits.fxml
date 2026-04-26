@@ -85,7 +85,23 @@
                           style="-fx-background-color: transparent;
                                  -fx-padding: 25;"/>
             </ScrollPane>
-
+            <!-- PAGINATION -->
+            <HBox alignment="CENTER" spacing="10"
+                  style="-fx-padding: 15 0; -fx-background-color: #0d1b3e;">
+                <Button text="◀ Précédent" onAction="#handlePrevious"
+                        fx:id="prevBtn"
+                        style="-fx-background-color: #1e293b; -fx-text-fill: white;
+                   -fx-pref-height: 35px; -fx-cursor: hand;
+                   -fx-background-radius: 8;"/>
+                <Label fx:id="pageLabel" text="Page 1 / 1"
+                       style="-fx-text-fill: white; -fx-font-size: 13px;
+                  -fx-padding: 0 15;"/>
+                <Button text="Suivant ▶" onAction="#handleNext"
+                        fx:id="nextBtn"
+                        style="-fx-background-color: #1e293b; -fx-text-fill: white;
+                   -fx-pref-height: 35px; -fx-cursor: hand;
+                   -fx-background-radius: 8;"/>
+            </HBox>
         </VBox>
     </HBox>
 </VBox>

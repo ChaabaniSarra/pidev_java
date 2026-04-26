@@ -7,7 +7,7 @@ import java.util.Properties;
 public class EmailService {
 
     private static final String FROM_EMAIL = "saadamaryem776@gmail.com"; // ← ton email
-    private static final String PASSWORD = "kgvz ieki eycd djmv";     // ← mot de passe app Gmail
+    private static final String PASSWORD = "dtwl bzpv zzmx mcjm";     // ← mot de passe app Gmail
 
     public void sendLowStockAlert(String productName, int stock, String toEmail) {
         Properties props = new Properties();

@@ -55,6 +55,7 @@
     "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
     "RunOnceActivity.git.unshallow": "true",
     "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
+    "git-widget-placeholder": "maryem",
     "git-widget-placeholder": "sarrra",
     "junie.onboarding.icon.badge.shown": "true",
     "kotlin-language-version-configured": "true",
@@ -96,6 +97,7 @@
     <configuration name="MainFX" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="tn.esprit.test.MainFX" />
       <module name="pidev" />
+      <option name="VM_PARAMETERS" value="--module-path &quot;C:\Users\saada\.m2\repository\org\openjfx\javafx-controls\21.0.2\javafx-controls-21.0.2-win.jar;C:\Users\saada\.m2\repository\org\openjfx\javafx-fxml\21.0.2\javafx-fxml-21.0.2-win.jar;C:\Users\saada\.m2\repository\org\openjfx\javafx-graphics\21.0.2\javafx-graphics-21.0.2-win.jar;C:\Users\saada\.m2\repository\org\openjfx\javafx-base\21.0.2\javafx-base-21.0.2-win.jar&quot; --add-modules javafx.controls,javafx.fxml" />
       <option name="VM_PARAMETERS" value="--module-path &quot;C:\Users\MSI\.m2\repository\org\openjfx\javafx-controls\21.0.2;C:\Users\MSI\.m2\repository\org\openjfx\javafx-fxml\21.0.2;C:\Users\MSI\.m2\repository\org\openjfx\javafx-graphics\21.0.2;C:\Users\MSI\.m2\repository\org\openjfx\javafx-base\21.0.2&quot; --add-modules javafx.controls,javafx.fxml" />
       <extension name="coverage">
         <pattern>
@@ -135,6 +137,7 @@
       <workItem from="1777069406113" duration="5191000" />
       <workItem from="1777130740655" duration="5556000" />
       <workItem from="1777155649846" duration="2024000" />
+      <workItem from="1777216536009" duration="1626000" />
     </task>
     <servers />
   </component>
