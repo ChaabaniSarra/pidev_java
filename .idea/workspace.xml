@@ -4,10 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="884cf7d6-6a9e-4e69-a425-b844a341d249" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/tn/esprit/services/EmailService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tn/esprit/services/EmailService.java" afterDir="false" />
-    </list>
+    <list default="true" id="884cf7d6-6a9e-4e69-a425-b844a341d249" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -49,7 +46,7 @@
     "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
     "RunOnceActivity.git.unshallow": "true",
     "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
-    "git-widget-placeholder": "main",
+    "git-widget-placeholder": "maryem",
     "junie.onboarding.icon.badge.shown": "true",
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "C:/Users/saada/pidev_java",
@@ -130,7 +127,7 @@
       <workItem from="1777069406113" duration="5191000" />
       <workItem from="1777130740655" duration="5556000" />
       <workItem from="1777155649846" duration="2024000" />
-      <workItem from="1777216536009" duration="1272000" />
+      <workItem from="1777216536009" duration="1626000" />
     </task>
     <servers />
   </component>
