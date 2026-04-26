@@ -239,4 +239,32 @@ public class ServiceUser implements IService<User> {
         }
         return user;
     }
+
+    public List<User> getUsersWithFaceEnabled() throws SQLException {
+        String sql = "SELECT * FROM `user` WHERE is_face_enabled = true";
+        List<User> users = new ArrayList<>();
+
+        try (Statement stmt = getConnectionOrThrow().createStatement();
+             ResultSet rs = stmt.executeQuery(sql)) {
+            while (rs.next()) {
+                User user = new User(
+                        rs.getInt("id"),
+                        rs.getString("email"),
+                        rs.getString("roles"),
+                        rs.getString("password"),
+                        rs.getString("nom"),
+                        rs.getBoolean("is_active"),
+                        rs.getString("google2fa_secret"),
+                        rs.getBoolean("is_2fa_enabled"),
+                        rs.getString("google_oauth_id"),
+                        rs.getString("oauth_provider"),
+                        rs.getString("face_encoding"),
+                        rs.getBoolean("is_face_enabled")
+                );
+                users.add(user);
+            }
+        }
+
+        return users;
+    }
 }

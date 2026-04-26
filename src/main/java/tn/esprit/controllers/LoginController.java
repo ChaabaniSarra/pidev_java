@@ -12,13 +12,22 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
+import org.opencv.core.*;
+import org.opencv.imgcodecs.Imgcodecs;
+import org.opencv.imgproc.Imgproc;
+import org.opencv.objdetect.CascadeClassifier;
+import org.opencv.videoio.VideoCapture;
 import tn.esprit.entities.User;
 import tn.esprit.services.GoogleOAuthService;
 import tn.esprit.services.ServiceUser;
+import tn.esprit.services.FaceRecognitionService;
 import tn.esprit.utils.SessionManager;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.List;
+import java.net.URL;
+import java.io.File;
 
 public class LoginController {
 
@@ -55,13 +64,14 @@ public class LoginController {
             User user = serviceUser.authenticate(username, password);
             if (user == null) {
                 messageLabel.setTextFill(Color.RED);
-                messageLabel.setText(" Identifiants invalides.");
+                messageLabel.setText("Identifiants invalides.");
                 return;
             }
 
             SessionManager.setCurrentUser(user);
             messageLabel.setTextFill(Color.web("#5b4cdf"));
-            messageLabel.setText(" Bienvenue, " + user.getNom() + "!");
+            messageLabel.setText("Bienvenue, " + user.getNom() + "!");
+
             String fxml = "/home.fxml";
             if ("admin@gmail.com".equalsIgnoreCase(user.getEmail())) {
                 fxml = "/main.fxml";
@@ -81,36 +91,214 @@ public class LoginController {
         }
     }
 
+    // ── Face Recognition Login ───────────────────────────────────────────────
+    @FXML
+    private void handleFaceRecognition(ActionEvent event) {
+        messageLabel.setTextFill(Color.web("#5b4cdf"));
+        messageLabel.setText("📷 Opening camera for face login...");
+
+        new Thread(() -> {
+            try {
+                nu.pattern.OpenCV.loadLocally();
+
+                VideoCapture capture = new VideoCapture(0, org.opencv.videoio.Videoio.CAP_DSHOW);
+                if (!capture.isOpened()) {
+                    capture = new VideoCapture(1, org.opencv.videoio.Videoio.CAP_DSHOW);
+                }
+                
+                if (!capture.isOpened()) {
+                    javafx.application.Platform.runLater(() -> {
+                        messageLabel.setTextFill(Color.RED);
+                        messageLabel.setText("❌ Camera not found!");
+                    });
+                    return;
+                }
+
+                // Capture a frame after camera warms up
+                Mat frame = new Mat();
+                for (int i = 0; i < 10; i++) {
+                    capture.read(frame);
+                    Thread.sleep(50);
+                }
+                capture.read(frame);
+                capture.release();
+
+                if (frame.empty()) {
+                    javafx.application.Platform.runLater(() -> {
+                        messageLabel.setTextFill(Color.RED);
+                        messageLabel.setText("❌ Could not read camera frame!");
+                    });
+                    return;
+                }
+
+                // Get all users with face enabled
+                ServiceUser serviceUser = new ServiceUser();
+                java.util.List<User> usersWithFace = serviceUser.getUsersWithFaceEnabled();
+
+                if (usersWithFace.isEmpty()) {
+                    javafx.application.Platform.runLater(() -> {
+                        messageLabel.setTextFill(Color.RED);
+                        messageLabel.setText("❌ No users with face recognition enrolled!");
+                    });
+                    return;
+                }
+
+                // Try to match face with enrolled users
+                Mat capturedGray = new Mat();
+                org.opencv.imgproc.Imgproc.cvtColor(frame, capturedGray, org.opencv.imgproc.Imgproc.COLOR_BGR2GRAY);
+
+                User matchedUser = null;
+                double bestMatch = 0.0;
+
+                for (User user : usersWithFace) {
+                    String facePath = user.getFaceEncoding();
+                    if (facePath == null || facePath.isEmpty()) continue;
+
+                    Mat enrolledMat = org.opencv.imgcodecs.Imgcodecs.imread(facePath, 0);
+                    if (enrolledMat.empty()) continue;
+
+                    // Compare images using template matching
+                    Mat resized = new Mat();
+                    org.opencv.imgproc.Imgproc.resize(capturedGray, resized, enrolledMat.size());
+
+                    Mat result = new Mat();
+                    org.opencv.imgproc.Imgproc.matchTemplate(resized, enrolledMat, result, org.opencv.imgproc.Imgproc.TM_CCOEFF_NORMED);
+
+                    double similarity = org.opencv.core.Core.minMaxLoc(result).maxVal;
+                    System.out.println("User: " + user.getNom() + " similarity: " + similarity);
+
+                    if (similarity > bestMatch) {
+                        bestMatch = similarity;
+                        matchedUser = user;
+                    }
+                }
+
+                final User finalMatchedUser = matchedUser;
+                final double finalBestMatch = bestMatch;
+
+                javafx.application.Platform.runLater(() -> {
+                    if (finalMatchedUser != null && finalBestMatch >= 0.4) {
+                        SessionManager.setCurrentUser(finalMatchedUser);
+                        messageLabel.setTextFill(Color.GREEN);
+                        messageLabel.setText("✅ Face recognized! Logging in as " + finalMatchedUser.getNom() + "...");
+                        loadHomePage();
+                    } else {
+                        messageLabel.setTextFill(Color.RED);
+                        messageLabel.setText("❌ Face not recognized! Please enroll first or use email login.");
+                    }
+                });
+
+            } catch (Exception e) {
+                System.out.println("Face recognition error: " + e.getMessage());
+                e.printStackTrace();
+                javafx.application.Platform.runLater(() -> {
+                    messageLabel.setTextFill(Color.RED);
+                    messageLabel.setText("❌ Error: " + e.getMessage());
+                });
+            }
+        }).start();
+    }
+
+    // Load home after face login — gets user from SessionManager or loads as guest
+    private void loadFaceLoginUser() {
+        try {
+            // Since face recognition doesn't have email/password,
+            // load the last logged-in user from SessionManager
+            // OR you can store the user ID alongside the face data
+            User user = SessionManager.getCurrentUser();
+            if (user == null) {
+                messageLabel.setTextFill(Color.RED);
+                messageLabel.setText("❌ No session found. Please login with email first.");
+                return;
+            }
+            loadHomePage();
+        } catch (Exception e) {
+            messageLabel.setTextFill(Color.RED);
+            messageLabel.setText("❌ Error loading home: " + e.getMessage());
+        }
+    }
+
+    // ── Forgot Password ──────────────────────────────────────────────────────
+    @FXML
+    public void handleForgotPassword(ActionEvent actionEvent) {
+        try {
+            Parent root = FXMLLoader.load(getClass().getResource("/ForgotPassword.fxml"));
+            Stage stage = (Stage) loginButton.getScene().getWindow();
+            stage.setScene(new Scene(root));
+            stage.setTitle("Forgot Password");
+            stage.show();
+        } catch (IOException e) {
+            messageLabel.setTextFill(Color.RED);
+            messageLabel.setText("Impossible d'ouvrir la page.");
+        }
+    }
+
+    // ── Google OAuth ─────────────────────────────────────────────────────────
+    @FXML
+    private void handleGoogleSignUp() {
+        try {
+            String clientId = "460245401741-m94mns2ae0675cvo0fsiiahrr9qqbagu.apps.googleusercontent.com";
+            String clientSecret = "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";
+
+            GoogleOAuthService oauthService = new GoogleOAuthService(clientId, clientSecret);
+            User googleUser = oauthService.authenticateAndGetUser();
+
+            User existingUser = serviceUser.findByGoogleOauthId(googleUser.getGoogleOauthId());
+            if (existingUser != null) {
+                SessionManager.setCurrentUser(existingUser);
+                messageLabel.setTextFill(Color.web("#5b4cdf"));
+                messageLabel.setText("Bienvenue, " + existingUser.getNom() + "!");
+                loadHomePage();
+            } else {
+                if (serviceUser.emailExists(googleUser.getEmail())) {
+                    messageLabel.setTextFill(Color.RED);
+                    messageLabel.setText("Un compte avec cet email existe déjà.");
+                    return;
+                }
+                User newUser = serviceUser.createOAuthUser(googleUser);
+                SessionManager.setCurrentUser(newUser);
+                messageLabel.setTextFill(Color.web("#27ae60"));
+                messageLabel.setText("Compte créé ! Bienvenue, " + newUser.getNom() + "!");
+                loadHomePage();
+            }
+
+        } catch (IOException e) {
+            messageLabel.setTextFill(Color.RED);
+            messageLabel.setText("Erreur Google Auth : " + e.getMessage());
+        } catch (SQLException e) {
+            messageLabel.setTextFill(Color.RED);
+            messageLabel.setText("Erreur base de données : " + e.getMessage());
+        } catch (Exception e) {
+            messageLabel.setTextFill(Color.RED);
+            messageLabel.setText("Erreur : " + e.getMessage());
+        }
+    }
+
+    // ── Validation ───────────────────────────────────────────────────────────
     private boolean validateEmail() {
         String email = usernameField.getText().trim();
-        
         if (email.isEmpty()) {
             setError(usernameField, emailError, "L'email est obligatoire.");
             return false;
         }
-        
         if (!email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")) {
             setError(usernameField, emailError, "Veuillez entrer un email valide.");
             return false;
         }
-        
         clearError(usernameField, emailError);
         return true;
     }
 
     private boolean validatePassword() {
         String password = passwordField.getText();
-        
         if (password.isEmpty()) {
             setError(passwordField, passwordError, "Le mot de passe est obligatoire.");
             return false;
         }
-        
         if (password.length() < 6) {
-            setError(passwordField, passwordError, "Le mot de passe doit contenir au moins 6 caractères.");
+            setError(passwordField, passwordError, "Au moins 6 caractères.");
             return false;
         }
-        
         clearError(passwordField, passwordError);
         return true;
     }
@@ -129,6 +317,7 @@ public class LoginController {
         errorLabel.setManaged(false);
     }
 
+    // ── Navigation ───────────────────────────────────────────────────────────
     @FXML
     private void goToRegister(ActionEvent event) {
         try {
@@ -147,61 +336,6 @@ public class LoginController {
         stage.show();
     }
 
-    @FXML
-    private void handleGoogleSignUp() {
-        try {
-            // Google OAuth credentials from user input
-            String clientId = "460245401741-m94mns2ae0675cvo0fsiiahrr9qqbagu.apps.googleusercontent.com";
-            String clientSecret = "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";
-
-            GoogleOAuthService oauthService = new GoogleOAuthService(clientId, clientSecret);
-            User googleUser = oauthService.authenticateAndGetUser();
-
-            // Check if user already exists
-            User existingUser = serviceUser.findByGoogleOauthId(googleUser.getGoogleOauthId());
-            if (existingUser != null) {
-                // User exists, log them in
-                SessionManager.setCurrentUser(existingUser);
-                messageLabel.setTextFill(Color.web("#5b4cdf"));
-                messageLabel.setText("Bienvenue, " + existingUser.getNom() + "!");
-                loadHomePage();
-            } else {
-                // Check if email is already registered with regular account
-                if (serviceUser.emailExists(googleUser.getEmail())) {
-                    messageLabel.setTextFill(Color.RED);
-                    messageLabel.setText("Un compte avec cet email existe déjà. Veuillez vous connecter normalement.");
-                    return;
-                }
-
-                // Create new user
-                User newUser = serviceUser.createOAuthUser(googleUser);
-                SessionManager.setCurrentUser(newUser);
-                messageLabel.setTextFill(Color.web("#27ae60"));
-                messageLabel.setText("Compte créé avec succès ! Bienvenue, " + newUser.getNom() + "!");
-                loadHomePage();
-            }
-
-
-        } catch (IOException e) {
-            messageLabel.setTextFill(Color.RED);
-            messageLabel.setText("Erreur lors de l'authentification Google : " + e.getMessage());
-        } catch (SQLException e) {
-            messageLabel.setTextFill(Color.RED);
-            messageLabel.setText("Erreur base de données : " + e.getMessage());
-        } catch (Exception e) {
-            messageLabel.setTextFill(Color.RED);
-            messageLabel.setText("Erreur lors de l'authentification Google : " + e.getMessage());
-        }
-    }
-
-
-    public void handleFaceRecognition(ActionEvent actionEvent) {
-    }
-
-    public void handleForgotPassword(ActionEvent actionEvent) {
-    }
-
-
     private void loadHomePage() {
         try {
             User user = SessionManager.getCurrentUser();
@@ -219,6 +353,4 @@ public class LoginController {
             messageLabel.setText("Impossible d'ouvrir la page d'accueil.");
         }
     }
-
-
 }

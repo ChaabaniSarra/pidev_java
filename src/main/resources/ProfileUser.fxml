@@ -2,6 +2,7 @@
 
 <?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.shape.*?>
 
@@ -11,90 +12,105 @@
 
         <fx:include source="Navbar.fxml" />
 
-        <StackPane style="-fx-background-color: linear-gradient(to bottom, #111427 0%, #0a0d17 100%);" VBox.vgrow="ALWAYS">
+        <StackPane VBox.vgrow="ALWAYS">
             <children>
 
-                <VBox alignment="CENTER" spacing="26.0" StackPane.alignment="CENTER">
-                    <padding>
-                        <Insets bottom="46.0" left="20.0" right="20.0" top="46.0" />
-                    </padding>
+                <ScrollPane style="-fx-background: linear-gradient(to bottom, #111427 0%, #0a0d17 100%); -fx-background-color: transparent;" fitToWidth="true" pannable="true">
+                    <content>
+                        <VBox alignment="CENTER" spacing="26.0">
+                            <padding>
+                                <Insets bottom="46.0" left="20.0" right="20.0" top="46.0" />
+                            </padding>
 
-                    <Label style="-fx-text-fill: white; -fx-font-size: 44px; -fx-font-weight: 800;" text="My Profile" />
+                            <Label style="-fx-text-fill: white; -fx-font-size: 44px; -fx-font-weight: 800;" text="My Profile" />
 
-                    <AnchorPane maxWidth="560.0" prefWidth="560.0" style="-fx-background-color: rgba(16,19,36,0.96);
-                                           -fx-background-radius: 34;
-                                           -fx-border-color: rgba(104,94,255,0.9);
-                                           -fx-border-width: 1.5;
-                                           -fx-border-radius: 34;
-                                           -fx-effect: dropshadow(gaussian, rgba(93,56,255,0.46), 45, 0.35, 0, 0);">
-                        <VBox alignment="CENTER" spacing="18.0" AnchorPane.bottomAnchor="34.0" AnchorPane.leftAnchor="40.0" AnchorPane.rightAnchor="40.0" AnchorPane.topAnchor="34.0">
+                            <AnchorPane maxWidth="560.0" prefWidth="560.0" style="-fx-background-color: rgba(16,19,36,0.96);
+                                                   -fx-background-radius: 34;
+                                                   -fx-border-color: rgba(104,94,255,0.9);
+                                                   -fx-border-width: 1.5;
+                                                   -fx-border-radius: 34;
+                                                   -fx-effect: dropshadow(gaussian, rgba(93,56,255,0.46), 45, 0.35, 0, 0);">
+                                <VBox alignment="CENTER" spacing="18.0" AnchorPane.bottomAnchor="34.0" AnchorPane.leftAnchor="40.0" AnchorPane.rightAnchor="40.0" AnchorPane.topAnchor="34.0">
 
-                            <!-- Avatar -->
-                            <StackPane prefHeight="140.0" prefWidth="140.0">
-                                <Circle fill="transparent" radius="56.0" stroke="#6e5cff" strokeWidth="4.0" />
-                                <Circle fill="#111427" radius="44.0" />
-                                <Label fx:id="avatarLabel" style="-fx-text-fill: white; -fx-font-size: 28px; -fx-font-weight: bold;" text="UP" />
-                            </StackPane>
+                                    <!-- Avatar -->
+                                    <StackPane prefHeight="140.0" prefWidth="140.0">
+                                        <Circle fill="transparent" radius="56.0" stroke="#6e5cff" strokeWidth="4.0" />
+                                        <Circle fill="#111427" radius="44.0" />
+                                        <Label fx:id="avatarLabel" style="-fx-text-fill: white; -fx-font-size: 28px; -fx-font-weight: bold;" text="UP" />
+                                    </StackPane>
 
-                            <Label fx:id="nameLabel" style="-fx-text-fill: white; -fx-font-size: 28px; -fx-font-weight: 800;" text="User Name" />
+                                    <Label fx:id="nameLabel" style="-fx-text-fill: white; -fx-font-size: 28px; -fx-font-weight: 800;" text="User Name" />
 
-                            <Label fx:id="emailLabel" style="-fx-text-fill: #8d93a8; -fx-font-size: 17px;" text="user@email.com" />
+                                    <Label fx:id="emailLabel" style="-fx-text-fill: #8d93a8; -fx-font-size: 17px;" text="user@email.com" />
 
-                            <Label fx:id="roleBadgeLabel" style="-fx-background-color: linear-gradient(to right, #6f62ff, #9a58ff);
-                                               -fx-background-radius: 999;
-                                               -fx-padding: 7 22 7 22;
-                                               -fx-text-fill: white;
-                                               -fx-font-size: 13px;
-                                               -fx-font-weight: bold;" text="USER" />
+                                    <Label fx:id="roleBadgeLabel" style="-fx-background-color: linear-gradient(to right, #6f62ff, #9a58ff);
+                                                       -fx-background-radius: 999;
+                                                       -fx-padding: 7 22 7 22;
+                                                       -fx-text-fill: white;
+                                                       -fx-font-size: 13px;
+                                                       -fx-font-weight: bold;" text="USER" />
 
-                            <HBox alignment="CENTER" maxWidth="460.0" spacing="18.0" />
+                                    <HBox alignment="CENTER" maxWidth="460.0" spacing="18.0" />
 
-                            <VBox maxWidth="460.0" spacing="14.0">
-                                <Separator style="-fx-opacity: 0.32; -fx-background-color: #6a60ff;" />
+                                    <VBox maxWidth="460.0" spacing="14.0">
+                                        <Separator style="-fx-opacity: 0.32; -fx-background-color: #6a60ff;" />
 
-                                <!-- Edit Profile Button -->
-                                <Button fx:id="editProfileButton" maxWidth="1.7976931348623157E308" onAction="#handleEditProfile"
-                                        style="-fx-background-color: linear-gradient(to right, #6860ff, #ff274f);
-                                               -fx-background-radius: 16;
-                                               -fx-text-fill: white;
-                                               -fx-font-size: 20px;
-                                               -fx-font-weight: 800;
-                                               -fx-padding: 14 18 14 18;
-                                               -fx-cursor: hand;
-                                               -fx-effect: dropshadow(gaussian, rgba(255,40,82,0.34), 20, 0.2, 0, 8);" text="EDIT PROFILE" />
+                                        <!-- Edit Profile Button -->
+                                        <Button fx:id="editProfileButton" maxWidth="1.7976931348623157E308" onAction="#handleEditProfile"
+                                                style="-fx-background-color: linear-gradient(to right, #6860ff, #ff274f);
+                                                       -fx-background-radius: 16;
+                                                       -fx-text-fill: white;
+                                                       -fx-font-size: 20px;
+                                                       -fx-font-weight: 800;
+                                                       -fx-padding: 14 18 14 18;
+                                                       -fx-cursor: hand;
+                                                       -fx-effect: dropshadow(gaussian, rgba(255,40,82,0.34), 20, 0.2, 0, 8);" text="EDIT PROFILE" />
 
-                                <!-- Logout Button -->
-                                <Button maxWidth="1.7976931348623157E308" onAction="#handleLogout"
-                                        style="-fx-background-color: linear-gradient(to right, #5f56f4, #f32045);
-                                               -fx-background-radius: 16;
-                                               -fx-text-fill: white;
-                                               -fx-font-size: 20px;
-                                               -fx-font-weight: 800;
-                                               -fx-padding: 14 18 14 18;
-                                               -fx-cursor: hand;
-                                               -fx-effect: dropshadow(gaussian, rgba(111,86,255,0.3), 20, 0.2, 0, 8);" text="LOGOUT" />
+                                        <!-- Logout Button -->
+                                        <Button maxWidth="1.7976931348623157E308" onAction="#handleLogout"
+                                                style="-fx-background-color: linear-gradient(to right, #5f56f4, #f32045);
+                                                       -fx-background-radius: 16;
+                                                       -fx-text-fill: white;
+                                                       -fx-font-size: 20px;
+                                                       -fx-font-weight: 800;
+                                                       -fx-padding: 14 18 14 18;
+                                                       -fx-cursor: hand;
+                                                       -fx-effect: dropshadow(gaussian, rgba(111,86,255,0.3), 20, 0.2, 0, 8);" text="LOGOUT" />
 
-                                <Separator style="-fx-opacity: 0.32; -fx-background-color: #6a60ff;" />
+                                        <Separator style="-fx-opacity: 0.32; -fx-background-color: #6a60ff;" />
 
 
 
-                                <!-- Face Recognition Section -->
-                                <Label style="-fx-text-fill: white; -fx-font-size: 18px; -fx-font-weight: 700;" text="Face Recognition" />
-                                <Label fx:id="faceRecognitionStatusLabel" style="-fx-text-fill: #f5a623; -fx-font-size: 14px;" text="⚠  Face recognition is not enabled" />
-                                <Button fx:id="enableFaceRecognitionButton" maxWidth="1.7976931348623157E308" onAction="#handleEnableFaceRecognition"
-                                        style="-fx-background-color: linear-gradient(to right, #6860ff, #ff274f);
-                                               -fx-background-radius: 16;
-                                               -fx-text-fill: white;
-                                               -fx-font-size: 20px;
-                                               -fx-font-weight: 800;
-                                               -fx-padding: 14 18 14 18;
-                                               -fx-cursor: hand;
-                                               -fx-effect: dropshadow(gaussian, rgba(255,40,82,0.34), 20, 0.2, 0, 8);" text="ENABLE FACE RECOGNITION" />
+                                        <!-- Face Recognition Section -->
+                                        <Label style="-fx-text-fill: white; -fx-font-size: 18px; -fx-font-weight: 700;" text="Face Recognition" />
+                                        <Label fx:id="faceRecognitionStatusLabel" style="-fx-text-fill: #f5a623; -fx-font-size: 14px;" text="⚠  Face recognition is not enabled" />
+                                        <Button fx:id="enableFaceRecognitionButton" maxWidth="1.7976931348623157E308" onAction="#handleEnableFaceRecognition"
+                                                style="-fx-background-color: linear-gradient(to right, #6860ff, #ff274f);
+                                                       -fx-background-radius: 16;
+                                                       -fx-text-fill: white;
+                                                       -fx-font-size: 20px;
+                                                       -fx-font-weight: 800;
+                                                       -fx-padding: 14 18 14 18;
+                                                       -fx-cursor: hand;
+                                                       -fx-effect: dropshadow(gaussian, rgba(255,40,82,0.34), 20, 0.2, 0, 8);" text="ENABLE FACE RECOGNITION" />
 
-                            </VBox>
+                                        <!-- Camera Section -->
+                                        <VBox fx:id="cameraSection" spacing="10.0" visible="false" managed="false">
+                                            <ImageView fx:id="cameraView" fitHeight="200.0" fitWidth="300.0" preserveRatio="true" />
+                                            <Label fx:id="cameraStatusLabel" style="-fx-text-fill: white; -fx-font-size: 14px;" text="Initializing camera..." />
+                                            <HBox spacing="10.0" alignment="CENTER">
+                                                <Button fx:id="captureFaceButton" onAction="#handleCaptureFace" text="Capture Face"
+                                                        style="-fx-background-color: #22aa44; -fx-text-fill: white; -fx-padding: 10;" />
+                                                <Button fx:id="disableFaceButton" onAction="#handleDisableFace" text="Disable Face Recognition"
+                                                        style="-fx-background-color: #e8314a; -fx-text-fill: white; -fx-padding: 10;" visible="false" managed="false" />
+                                            </HBox>
+                                        </VBox>
+                                    </VBox>
+                                </VBox>
+                            </AnchorPane>
                         </VBox>
-                    </AnchorPane>
-                </VBox>
+                    </content>
+                </ScrollPane>
             </children>
         </StackPane>
 

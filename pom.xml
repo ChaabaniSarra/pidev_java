@@ -17,7 +17,12 @@
     </properties>
 
     <dependencies>
-
+            <!-- OpenCV -->
+            <dependency>
+                <groupId>org.openpnp</groupId>
+                <artifactId>opencv</artifactId>
+                <version>4.7.0-0</version>
+            </dependency>
         <!-- ================= TEST ================= -->
         <dependency>
             <groupId>org.junit.jupiter</groupId>

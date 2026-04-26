@@ -89,6 +89,7 @@ public class NavbarController {
         try {
             loadScene(event, "/ProfileUser.fxml", "Profile User");
         } catch (IOException e) {
+            e.printStackTrace();
             System.out.println("Unable to open profile.");
         }
     }
