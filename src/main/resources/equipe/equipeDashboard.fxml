@@ -32,6 +32,29 @@
                                -fx-background-radius: 8;"/>
             </HBox>
 
+                  <HBox spacing="10" alignment="CENTER_LEFT">
+                     <Button text="Classement Global" onAction="#handleClassementGlobal"
+                            style="-fx-background-color: #0ea5e9; -fx-text-fill: white;
+                                   -fx-font-size: 13px; -fx-pref-height: 36px;
+                                   -fx-pref-width: 150px; -fx-cursor: hand;
+                                   -fx-background-radius: 8;"/>
+                     <Button text="Owner Dashboard" onAction="#handleOwnerDashboard"
+                            style="-fx-background-color: #22c55e; -fx-text-fill: white;
+                                   -fx-font-size: 13px; -fx-pref-height: 36px;
+                                   -fx-pref-width: 150px; -fx-cursor: hand;
+                                   -fx-background-radius: 8;"/>
+                     <Button text="Demander Adhesion" onAction="#handleDemanderAdhesion"
+                            style="-fx-background-color: #f59e0b; -fx-text-fill: white;
+                                   -fx-font-size: 13px; -fx-pref-height: 36px;
+                                   -fx-pref-width: 160px; -fx-cursor: hand;
+                                   -fx-background-radius: 8;"/>
+                     <Button text="Traiter Pending" onAction="#handleTraiterDemandes"
+                            style="-fx-background-color: #ef4444; -fx-text-fill: white;
+                                   -fx-font-size: 13px; -fx-pref-height: 36px;
+                                   -fx-pref-width: 140px; -fx-cursor: hand;
+                                   -fx-background-radius: 8;"/>
+                  </HBox>
+
             <HBox spacing="15">
                 <VBox alignment="CENTER" prefWidth="200" prefHeight="90"
                       style="-fx-background-color: #1e293b; -fx-background-radius: 10;">

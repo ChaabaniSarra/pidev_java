@@ -25,6 +25,16 @@
             <Label text="Match Games Management"
                    style="-fx-font-size: 24px; -fx-font-weight: bold; -fx-text-fill: white;"/>
             <Region HBox.hgrow="ALWAYS"/>
+             <Button text="Generate RR" onAction="#handleGenerateRoundRobin"
+                  style="-fx-background-color: #0ea5e9; -fx-text-fill: white;
+                      -fx-font-size: 13px; -fx-pref-height: 40px;
+                      -fx-pref-width: 130px; -fx-cursor: hand;
+                      -fx-background-radius: 8;"/>
+             <Button text="Regenerate RR" onAction="#handleRegenerateRoundRobin"
+                  style="-fx-background-color: #f59e0b; -fx-text-fill: white;
+                      -fx-font-size: 13px; -fx-pref-height: 40px;
+                      -fx-pref-width: 140px; -fx-cursor: hand;
+                      -fx-background-radius: 8;"/>
             <Button text="+ New Match" onAction="#handleNewMatch"
                     style="-fx-background-color: #7c3aed; -fx-text-fill: white;
                            -fx-font-size: 14px; -fx-pref-height: 40px;

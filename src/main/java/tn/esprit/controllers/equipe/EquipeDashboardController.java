@@ -219,4 +219,54 @@ public class EquipeDashboardController implements Initializable {
             }
         });
     }
+
+    @FXML
+    private void handleDemanderAdhesion() {
+        try {
+            openWindow("/equipe/demandeAdhesion.fxml", "Demande d'adhesion");
+        } catch (IOException e) {
+            messageLabel.setStyle("-fx-text-fill: #e74c3c;");
+            messageLabel.setText("Ouverture impossible : " + e.getMessage());
+        }
+    }
+
+    @FXML
+    private void handleTraiterDemandes() {
+        try {
+            openWindow("/equipe/pendingDemandes.fxml", "Demandes pending owner");
+            loadEquipes();
+        } catch (IOException e) {
+            messageLabel.setStyle("-fx-text-fill: #e74c3c;");
+            messageLabel.setText("Ouverture impossible : " + e.getMessage());
+        }
+    }
+
+    @FXML
+    private void handleOwnerDashboard() {
+        try {
+            openWindow("/equipe/ownerDashboardView.fxml", "Dashboard Owner");
+        } catch (IOException e) {
+            messageLabel.setStyle("-fx-text-fill: #e74c3c;");
+            messageLabel.setText("Ouverture impossible : " + e.getMessage());
+        }
+    }
+
+    @FXML
+    private void handleClassementGlobal() {
+        try {
+            openWindow("/equipe/classementGlobal.fxml", "Classement Global Equipes");
+        } catch (IOException e) {
+            messageLabel.setStyle("-fx-text-fill: #e74c3c;");
+            messageLabel.setText("Ouverture impossible : " + e.getMessage());
+        }
+    }
+
+    private void openWindow(String fxmlPath, String title) throws IOException {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
+        Parent root = loader.load();
+        Stage stage = new Stage();
+        stage.setTitle(title);
+        stage.setScene(new Scene(root));
+        stage.showAndWait();
+    }
 }

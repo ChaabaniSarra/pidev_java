@@ -8,7 +8,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class ServiceMatchGame implements IService<MatchGame> {
@@ -16,6 +18,11 @@ public class ServiceMatchGame implements IService<MatchGame> {
 
     public ServiceMatchGame() {
         conn = MyDatabase.getInstance().getConnection();
+        try {
+            ensureRoundRobinTables();
+        } catch (SQLException e) {
+            throw new RuntimeException("Initialisation de la table tournoi_equipe impossible: " + e.getMessage(), e);
+        }
     }
 
     @Override
@@ -81,5 +88,135 @@ public class ServiceMatchGame implements IService<MatchGame> {
         }
 
         return matchGames;
+    }
+
+    public void registerEquipeToTournoi(int tournoiId, int equipeId) throws SQLException {
+        String sql = "INSERT IGNORE INTO tournoi_equipe(tournoi_id, equipe_id) VALUES (?, ?)";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, tournoiId);
+            ps.setInt(2, equipeId);
+            ps.executeUpdate();
+        }
+    }
+
+    public int registerAllEquipesToTournoi(int tournoiId) throws SQLException {
+        List<Integer> ids = new ArrayList<>();
+        String read = "SELECT id FROM equipe ORDER BY id ASC";
+        try (Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(read)) {
+            while (rs.next()) {
+                ids.add(rs.getInt("id"));
+            }
+        }
+
+        int inserted = 0;
+        for (Integer teamId : ids) {
+            String sql = "INSERT IGNORE INTO tournoi_equipe(tournoi_id, equipe_id) VALUES (?, ?)";
+            try (PreparedStatement ps = conn.prepareStatement(sql)) {
+                ps.setInt(1, tournoiId);
+                ps.setInt(2, teamId);
+                inserted += ps.executeUpdate();
+            }
+        }
+        return inserted;
+    }
+
+    public List<Integer> getRegisteredEquipeIds(int tournoiId) throws SQLException {
+        List<Integer> equipeIds = new ArrayList<>();
+        String sql = "SELECT equipe_id FROM tournoi_equipe WHERE tournoi_id = ? ORDER BY equipe_id ASC";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, tournoiId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    equipeIds.add(rs.getInt("equipe_id"));
+                }
+            }
+        }
+        return equipeIds;
+    }
+
+    public int countMatchesByTournoi(int tournoiId) throws SQLException {
+        String sql = "SELECT COUNT(*) AS c FROM match_game WHERE tournoi_id = ?";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, tournoiId);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("c");
+                }
+            }
+        }
+        return 0;
+    }
+
+    public int generateRoundRobinMatches(int tournoiId, boolean regenerate) throws SQLException {
+        List<Integer> equipeIds = getRegisteredEquipeIds(tournoiId);
+        if (equipeIds.size() < 2) {
+            throw new SQLException("Generation impossible: minimum 2 equipes inscrites.");
+        }
+
+        int existing = countMatchesByTournoi(tournoiId);
+        if (existing > 0 && !regenerate) {
+            throw new SQLException("Generation bloquee: des matchs existent deja pour ce tournoi.");
+        }
+
+        boolean initialAutoCommit = conn.getAutoCommit();
+        try {
+            conn.setAutoCommit(false);
+
+            if (regenerate && existing > 0) {
+                try (PreparedStatement delete = conn.prepareStatement("DELETE FROM match_game WHERE tournoi_id = ?")) {
+                    delete.setInt(1, tournoiId);
+                    delete.executeUpdate();
+                }
+            }
+
+            Collections.sort(equipeIds);
+            int created = 0;
+            Timestamp now = new Timestamp(System.currentTimeMillis());
+            long base = now.getTime();
+
+            String insert = "INSERT INTO match_game(date_match, score_team1, score_team2, statut, equipe1_id, equipe2_id, tournoi_id) "
+                    + "VALUES (?, ?, ?, ?, ?, ?, ?)";
+
+            for (int i = 0; i < equipeIds.size(); i++) {
+                for (int j = i + 1; j < equipeIds.size(); j++) {
+                    Timestamp matchDate = new Timestamp(base + (created * 3600_000L));
+                    try (PreparedStatement ps = conn.prepareStatement(insert)) {
+                        ps.setTimestamp(1, matchDate);
+                        ps.setInt(2, 0);
+                        ps.setInt(3, 0);
+                        ps.setString(4, "Scheduled");
+                        ps.setInt(5, equipeIds.get(i));
+                        ps.setInt(6, equipeIds.get(j));
+                        ps.setInt(7, tournoiId);
+                        ps.executeUpdate();
+                    }
+                    created++;
+                }
+            }
+
+            conn.commit();
+            return created;
+        } catch (SQLException e) {
+            conn.rollback();
+            throw e;
+        } finally {
+            conn.setAutoCommit(initialAutoCommit);
+        }
+    }
+
+    private void ensureRoundRobinTables() throws SQLException {
+        String sql = "CREATE TABLE IF NOT EXISTS tournoi_equipe ("
+                + "id INT AUTO_INCREMENT PRIMARY KEY, "
+                + "tournoi_id INT NOT NULL, "
+                + "equipe_id INT NOT NULL, "
+                + "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, "
+                + "UNIQUE KEY uq_tournoi_equipe (tournoi_id, equipe_id), "
+                + "CONSTRAINT fk_tournoi_equipe_tournoi FOREIGN KEY (tournoi_id) REFERENCES tournoi(id) ON DELETE CASCADE, "
+                + "CONSTRAINT fk_tournoi_equipe_equipe FOREIGN KEY (equipe_id) REFERENCES equipe(id) ON DELETE CASCADE"
+                + ")";
+        try (Statement stmt = conn.createStatement()) {
+            stmt.execute(sql);
+        }
     }
 }

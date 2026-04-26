@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.VBox?>
+
+<AnchorPane xmlns="http://javafx.com/javafx"
+            xmlns:fx="http://javafx.com/fxml"
+            fx:controller="tn.esprit.controllers.equipe.OwnerDashboardViewController"
+            prefHeight="520.0" prefWidth="820.0"
+            style="-fx-background-color: #0f172a;">
+
+    <VBox spacing="16"
+          AnchorPane.topAnchor="20" AnchorPane.leftAnchor="20"
+          AnchorPane.rightAnchor="20" AnchorPane.bottomAnchor="20">
+
+        <Label text="Dashboard Owner Equipe"
+               style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: white;"/>
+
+        <HBox spacing="12">
+            <VBox prefWidth="180" style="-fx-background-color: #1e293b; -fx-padding: 10; -fx-background-radius: 8;">
+                <Label text="Possedees" style="-fx-text-fill: #94a3b8;"/>
+                <Label fx:id="ownedTeamsLabel" text="0" style="-fx-text-fill: white; -fx-font-size: 24px;"/>
+            </VBox>
+            <VBox prefWidth="180" style="-fx-background-color: #1e293b; -fx-padding: 10; -fx-background-radius: 8;">
+                <Label text="Rejointes" style="-fx-text-fill: #94a3b8;"/>
+                <Label fx:id="joinedTeamsLabel" text="0" style="-fx-text-fill: white; -fx-font-size: 24px;"/>
+            </VBox>
+            <VBox prefWidth="180" style="-fx-background-color: #1e293b; -fx-padding: 10; -fx-background-radius: 8;">
+                <Label text="Pending" style="-fx-text-fill: #94a3b8;"/>
+                <Label fx:id="pendingRequestsLabel" text="0" style="-fx-text-fill: white; -fx-font-size: 24px;"/>
+            </VBox>
+            <VBox prefWidth="180" style="-fx-background-color: #1e293b; -fx-padding: 10; -fx-background-radius: 8;">
+                <Label text="Matchs termines" style="-fx-text-fill: #94a3b8;"/>
+                <Label fx:id="finishedMatchesLabel" text="0" style="-fx-text-fill: white; -fx-font-size: 24px;"/>
+            </VBox>
+        </HBox>
+
+        <VBox spacing="10" style="-fx-background-color: #1e293b; -fx-padding: 14; -fx-background-radius: 8;">
+            <Label text="Performance" style="-fx-text-fill: #94a3b8;"/>
+            <Label fx:id="resultsLabel" text="V: 0 N: 0 P: 0" style="-fx-text-fill: white; -fx-font-size: 16px;"/>
+            <HBox spacing="8">
+                <Label text="Win Rate:" style="-fx-text-fill: #94a3b8;"/>
+                <Label fx:id="winRateLabel" text="0%" style="-fx-text-fill: #22c55e; -fx-font-size: 16px; -fx-font-weight: bold;"/>
+                <Region HBox.hgrow="ALWAYS"/>
+            </HBox>
+        </VBox>
+
+        <VBox spacing="6" style="-fx-background-color: #1e293b; -fx-padding: 14; -fx-background-radius: 8;">
+            <Label text="Alertes" style="-fx-text-fill: #94a3b8;"/>
+            <Label fx:id="alertsLabel" text="Aucune alerte" style="-fx-text-fill: #f59e0b;"/>
+        </VBox>
+
+        <Label fx:id="messageLabel" text="" style="-fx-font-size: 13px;"/>
+    </VBox>
+</AnchorPane>

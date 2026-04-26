@@ -5,6 +5,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.geometry.Pos;
 import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
@@ -19,6 +20,7 @@ import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
 import tn.esprit.entities.Equipe;
 import tn.esprit.services.ServiceEquipe;
+import tn.esprit.utils.SessionManager;
 
 import java.io.File;
 import java.net.URL;
@@ -121,7 +123,7 @@ public class AfficherEquipeController implements Initializable {
     private VBox buildCard(Equipe equipe, int rank) {
         VBox card = new VBox(8);
         card.setPrefWidth(270);
-        card.setPrefHeight(250);
+        card.setPrefHeight(305);
         card.setStyle("-fx-padding: 12; -fx-background-color: #111b3e;"
             + "-fx-background-radius: 12; -fx-border-color: rgba(255,255,255,0.1); -fx-border-radius: 12;");
 
@@ -142,8 +144,104 @@ public class AfficherEquipeController implements Initializable {
         VBox body = new VBox(10, avatarPane, nomLabel, subtitle);
         body.setAlignment(Pos.CENTER);
 
-        card.getChildren().addAll(header, body);
+        VBox actions = buildActions(equipe, card);
+        card.getChildren().addAll(header, body, actions);
         return card;
+    }
+
+    private VBox buildActions(Equipe equipe, VBox card) {
+        VBox box = new VBox(8);
+        box.setAlignment(Pos.CENTER);
+
+        if (SessionManager.getCurrentUser() == null || SessionManager.getCurrentUser().getId() <= 0) {
+            Label guestLabel = new Label("Connectez-vous pour interagir");
+            guestLabel.setStyle("-fx-text-fill: #94a3b8; -fx-font-size: 12px;");
+            box.getChildren().add(guestLabel);
+            return box;
+        }
+
+        try {
+            boolean isOwner = serviceEquipe.isCurrentUserOwnerOfEquipe(equipe.getId());
+            if (isOwner) {
+                Label ownerLabel = new Label("OWNER - Cliquez la carte pour ouvrir le dashboard");
+                ownerLabel.setStyle("-fx-text-fill: #f59e0b; -fx-font-size: 12px; -fx-font-weight: 700;");
+                box.getChildren().add(ownerLabel);
+
+                card.setOnMouseClicked(evt -> openOwnerDashboard());
+                card.setStyle(card.getStyle() + "-fx-cursor: hand;");
+                return box;
+            }
+
+            if (serviceEquipe.isCurrentUserMemberOfEquipe(equipe.getId())) {
+                Label memberLabel = new Label("Vous etes deja membre");
+                memberLabel.setStyle("-fx-text-fill: #22c55e; -fx-font-size: 12px; -fx-font-weight: 700;");
+                box.getChildren().add(memberLabel);
+                return box;
+            }
+
+            boolean pending = serviceEquipe.hasPendingRequestForCurrentUser(equipe.getId());
+            if (pending) {
+                Button cancelBtn = new Button("Supprimer invite");
+                cancelBtn.setStyle("-fx-background-color: #ef4444; -fx-text-fill: white; -fx-font-weight: 700; -fx-pref-width: 180;");
+                cancelBtn.setOnAction(evt -> {
+                    evt.consume();
+                    handleCancelInvite(equipe.getId());
+                });
+                box.getChildren().add(cancelBtn);
+            } else {
+                Button joinBtn = new Button("Demander a joindre");
+                joinBtn.setStyle("-fx-background-color: #22c55e; -fx-text-fill: white; -fx-font-weight: 700; -fx-pref-width: 180;");
+                joinBtn.setOnAction(evt -> {
+                    evt.consume();
+                    handleJoinRequest(equipe.getId());
+                });
+                box.getChildren().add(joinBtn);
+            }
+        } catch (SQLException e) {
+            Label errLabel = new Label("Etat indisponible");
+            errLabel.setStyle("-fx-text-fill: #ef4444; -fx-font-size: 12px;");
+            box.getChildren().add(errLabel);
+        }
+
+        return box;
+    }
+
+    private void handleJoinRequest(int equipeId) {
+        try {
+            serviceEquipe.createJoinRequest(equipeId);
+            messageLabel.setText("Demande envoyee en statut pending.");
+            messageLabel.setStyle("-fx-text-fill: #22c55e;");
+            renderCards();
+        } catch (SQLException e) {
+            messageLabel.setText("Demande impossible : " + e.getMessage());
+            messageLabel.setStyle("-fx-text-fill: #f87171;");
+        }
+    }
+
+    private void handleCancelInvite(int equipeId) {
+        try {
+            serviceEquipe.cancelPendingJoinRequestForCurrentUser(equipeId);
+            messageLabel.setText("Invite supprimee (pending annule).");
+            messageLabel.setStyle("-fx-text-fill: #22c55e;");
+            renderCards();
+        } catch (SQLException e) {
+            messageLabel.setText("Suppression invite impossible : " + e.getMessage());
+            messageLabel.setStyle("-fx-text-fill: #f87171;");
+        }
+    }
+
+    private void openOwnerDashboard() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/equipe/ownerDashboardView.fxml"));
+            Parent root = loader.load();
+            Stage stage = new Stage();
+            stage.setTitle("Owner Dashboard");
+            stage.setScene(new Scene(root));
+            stage.showAndWait();
+        } catch (Exception e) {
+            messageLabel.setText("Ouverture Owner Dashboard impossible : " + e.getMessage());
+            messageLabel.setStyle("-fx-text-fill: #f87171;");
+        }
     }
 
     @FXML

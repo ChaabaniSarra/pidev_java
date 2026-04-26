@@ -9,6 +9,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableCell;
@@ -28,6 +29,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 public class MatchGameDashboardController implements Initializable {
@@ -237,5 +239,68 @@ public class MatchGameDashboardController implements Initializable {
                 }
             }
         });
+    }
+
+    @FXML
+    private void handleGenerateRoundRobin() {
+        handleRoundRobin(false);
+    }
+
+    @FXML
+    private void handleRegenerateRoundRobin() {
+        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION);
+        confirm.setTitle("Confirmation regeneration");
+        confirm.setHeaderText(null);
+        confirm.setContentText("Regenerer supprimera les matchs existants du tournoi cible. Continuer ?");
+        confirm.showAndWait().ifPresent(btn -> {
+            if (btn == ButtonType.OK) {
+                handleRoundRobin(true);
+            }
+        });
+    }
+
+    private void handleRoundRobin(boolean regenerate) {
+        TextInputDialog dialog = new TextInputDialog();
+        dialog.setTitle(regenerate ? "Regenerer Round-Robin" : "Generer Round-Robin");
+        dialog.setHeaderText("Saisir l'ID du tournoi");
+        dialog.setContentText("Tournoi ID:");
+
+        Optional<String> input = dialog.showAndWait();
+        if (input.isEmpty()) {
+            return;
+        }
+
+        int tournoiId;
+        try {
+            tournoiId = Integer.parseInt(input.get().trim());
+        } catch (NumberFormatException e) {
+            messageLabel.setStyle("-fx-text-fill: #e74c3c;");
+            messageLabel.setText("ID tournoi invalide.");
+            return;
+        }
+
+        try {
+            List<Integer> registered = serviceMatchGame.getRegisteredEquipeIds(tournoiId);
+            if (registered.size() < 2) {
+                Alert ask = new Alert(Alert.AlertType.CONFIRMATION);
+                ask.setTitle("Inscription automatique");
+                ask.setHeaderText(null);
+                ask.setContentText("Moins de 2 equipes inscrites. Inscrire toutes les equipes existantes a ce tournoi ?");
+                Optional<ButtonType> answer = ask.showAndWait();
+                if (answer.isPresent() && answer.get() == ButtonType.OK) {
+                    int inserted = serviceMatchGame.registerAllEquipesToTournoi(tournoiId);
+                    messageLabel.setStyle("-fx-text-fill: #22c55e;");
+                    messageLabel.setText(inserted + " equipes inscrites automatiquement.");
+                }
+            }
+
+            int created = serviceMatchGame.generateRoundRobinMatches(tournoiId, regenerate);
+            messageLabel.setStyle("-fx-text-fill: #27ae60;");
+            messageLabel.setText(created + " matchs round-robin crees pour le tournoi #" + tournoiId + ".");
+            loadMatchs();
+        } catch (SQLException e) {
+            messageLabel.setStyle("-fx-text-fill: #e74c3c;");
+            messageLabel.setText("Generation impossible : " + e.getMessage());
+        }
     }
 }
