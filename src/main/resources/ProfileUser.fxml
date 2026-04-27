@@ -12,10 +12,10 @@
 
         <fx:include source="Navbar.fxml" />
 
-        <StackPane VBox.vgrow="ALWAYS">
+        <StackPane VBox.vgrow="ALWAYS" style="-fx-background-color: linear-gradient(to bottom, #111427 0%, #0a0d17 100%);">
             <children>
 
-                <ScrollPane style="-fx-background: linear-gradient(to bottom, #111427 0%, #0a0d17 100%); -fx-background-color: transparent;" fitToWidth="true" pannable="true">
+                <ScrollPane style="-fx-background-color: transparent;" fitToWidth="true" pannable="true">
                     <content>
                         <VBox alignment="CENTER" spacing="26.0">
                             <padding>
@@ -53,7 +53,7 @@
                                     <HBox alignment="CENTER" maxWidth="460.0" spacing="18.0" />
 
                                     <VBox maxWidth="460.0" spacing="14.0">
-                                        <Separator style="-fx-opacity: 0.32; -fx-background-color: #6a60ff;" />
+                                        <Region maxWidth="1.7976931348623157E308" prefHeight="1.0" style="-fx-background-color: rgba(106,96,255,0.32);" />
 
                                         <!-- Edit Profile Button -->
                                         <Button fx:id="editProfileButton" maxWidth="1.7976931348623157E308" onAction="#handleEditProfile"
@@ -77,7 +77,7 @@
                                                        -fx-cursor: hand;
                                                        -fx-effect: dropshadow(gaussian, rgba(111,86,255,0.3), 20, 0.2, 0, 8);" text="LOGOUT" />
 
-                                        <Separator style="-fx-opacity: 0.32; -fx-background-color: #6a60ff;" />
+                                        <Region maxWidth="1.7976931348623157E308" prefHeight="1.0" style="-fx-background-color: rgba(106,96,255,0.32);" />
 
                                         <!-- Two-Factor Authentication Section -->
                                         <Label style="-fx-text-fill: white; -fx-font-size: 18px; -fx-font-weight: 700;" text="Two-Factor Authentication" />
@@ -91,8 +91,16 @@
                                                -fx-padding: 14 18 14 18;
                                                -fx-cursor: hand;
                                                -fx-effect: dropshadow(gaussian, rgba(255,40,82,0.34), 20, 0.2, 0, 8);" text="ENABLE 2FA" />
+                                        <Button fx:id="disable2FAButton" managed="false" maxWidth="1.7976931348623157E308" onAction="#handleDisable2FA"
+                                                style="-fx-background-color: #e8314a;
+                                               -fx-background-radius: 16;
+                                               -fx-text-fill: white;
+                                               -fx-font-size: 20px;
+                                               -fx-font-weight: 800;
+                                               -fx-padding: 14 18 14 18;
+                                               -fx-cursor: hand;" text="DISABLE 2FA" visible="false" />
 
-                                        <Separator style="-fx-opacity: 0.32; -fx-background-color: #6a60ff;" />
+                                        <Region maxWidth="1.7976931348623157E308" prefHeight="1.0" style="-fx-background-color: rgba(106,96,255,0.32);" />
 
                                         <!-- Face Recognition Section -->
                                         <Label style="-fx-text-fill: white; -fx-font-size: 18px; -fx-font-weight: 700;" text="Face Recognition" />
@@ -106,6 +114,14 @@
                                                        -fx-padding: 14 18 14 18;
                                                        -fx-cursor: hand;
                                                        -fx-effect: dropshadow(gaussian, rgba(255,40,82,0.34), 20, 0.2, 0, 8);" text="ENABLE FACE RECOGNITION" />
+                                        <Button fx:id="profileDisableFaceButton" managed="false" maxWidth="1.7976931348623157E308" onAction="#handleDisableFace"
+                                                style="-fx-background-color: #e8314a;
+                                                       -fx-background-radius: 16;
+                                                       -fx-text-fill: white;
+                                                       -fx-font-size: 20px;
+                                                       -fx-font-weight: 800;
+                                                       -fx-padding: 14 18 14 18;
+                                                       -fx-cursor: hand;" text="DISABLE FACE RECOGNITION" visible="false" />
 
                                         <!-- Camera Section -->
                                         <VBox fx:id="cameraSection" spacing="10.0" visible="false" managed="false">

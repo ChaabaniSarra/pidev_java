@@ -7,9 +7,6 @@
     <list default="true" id="884cf7d6-6a9e-4e69-a425-b844a341d249" name="Changes" comment="">
 <<<<<<< HEAD
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/face_data/user_2.jpg" beforeDir="false" afterPath="$PROJECT_DIR$/face_data/user_2.jpg" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/pom.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/tn/esprit/controllers/LoginController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tn/esprit/controllers/LoginController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/tn/esprit/controllers/ProfileUserController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tn/esprit/controllers/ProfileUserController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/ProfileUser.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/ProfileUser.fxml" afterDir="false" />
 =======
@@ -66,7 +63,7 @@
     "RunOnceActivity.git.unshallow": "true",
 <<<<<<< HEAD
     "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
-    "git-widget-placeholder": "main",
+    "git-widget-placeholder": "sarrra",
     "junie.onboarding.icon.badge.shown": "true",
 =======
     "git-widget-placeholder": "salma",

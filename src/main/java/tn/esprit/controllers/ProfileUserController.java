@@ -10,24 +10,17 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.image.PixelWriter;
-import javafx.scene.image.WritableImage;
-import javafx.scene.layout.VBox;
-import javafx.scene.paint.Color;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import nu.pattern.OpenCV;
-import org.opencv.core.*;
-import org.opencv.imgcodecs.Imgcodecs;
-import org.opencv.imgproc.Imgproc;
+import org.opencv.core.Mat;
+import org.opencv.core.MatOfByte;
 import org.opencv.objdetect.CascadeClassifier;
 import org.opencv.videoio.VideoCapture;
-import tn.esprit.entities.Product;
 import tn.esprit.entities.User;
-import tn.esprit.utils.SessionManager;
 import tn.esprit.services.ServiceUser;
+import tn.esprit.services.TwoFactorService;
+import tn.esprit.utils.SessionManager;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
@@ -36,6 +29,8 @@ import java.nio.file.Paths;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+
+import org.opencv.imgcodecs.Imgcodecs;
 
 public class ProfileUserController {
 
@@ -47,8 +42,11 @@ public class ProfileUserController {
     @FXML private Label twoFAStatusLabel;
     @FXML private Label avatarLabel;
     @FXML private Button editProfileButton;
+    @FXML private Button enable2FAButton;
+    @FXML private Button disable2FAButton;
     @FXML private Label faceRecognitionStatusLabel;
     @FXML private Button enableFaceRecognitionButton;
+    @FXML private Button profileDisableFaceButton;
     @FXML private javafx.scene.layout.VBox cameraSection;
     @FXML private ImageView cameraView;
     @FXML private Label cameraStatusLabel;
@@ -59,19 +57,15 @@ public class ProfileUserController {
     private CascadeClassifier faceDetector;
     private ScheduledExecutorService timer;
     private Mat lastDetectedFace;
-    private boolean faceDetected = false;
-    private ServiceUser serviceUser = new ServiceUser();
+    private final ServiceUser serviceUser = new ServiceUser();
+    private final TwoFactorService twoFactorService = new TwoFactorService();
 
     @FXML
     public void initialize() {
         try {
-            // Load OpenCV
             nu.pattern.OpenCV.loadLocally();
             System.out.println("OpenCV loaded successfully");
-
-            // Skip cascade loading for now - causing issues
             System.out.println("Face detector initialization skipped (cascade issues)");
-
             refreshProfile();
         } catch (Exception e) {
             System.out.println("Error initializing profile: " + e.getMessage());
@@ -81,14 +75,12 @@ public class ProfileUserController {
 
     private String loadCascadePath() {
         try {
-            // Try to get the cascade file from resources
             URL resource = getClass().getResource("/haarcascade_frontalface_default.xml");
             if (resource == null) {
                 System.out.println("Cascade file not found in resources!");
                 return null;
             }
 
-            // For JAR files, extract to temp location
             if (resource.getProtocol().equals("jar")) {
                 try (java.io.InputStream is = resource.openStream()) {
                     File temp = File.createTempFile("cascade", ".xml");
@@ -97,21 +89,19 @@ public class ProfileUserController {
                     System.out.println("Cascade extracted to temp: " + temp.getAbsolutePath());
                     return temp.getAbsolutePath();
                 }
-            } else {
-                // For regular file system
-                String path = resource.getPath();
-                path = java.net.URLDecoder.decode(path, "UTF-8");
-                // Remove leading slash on Windows if present
-                if (path.startsWith("/") && path.charAt(2) == ':') {
-                    path = path.substring(1);
-                }
-                System.out.println("Cascade path: " + path);
-                if (!new File(path).exists()) {
-                    System.out.println("Cascade file does not exist at: " + path);
-                    return null;
-                }
-                return path;
             }
+
+            String path = resource.getPath();
+            path = java.net.URLDecoder.decode(path, "UTF-8");
+            if (path.startsWith("/") && path.length() > 2 && path.charAt(2) == ':') {
+                path = path.substring(1);
+            }
+            System.out.println("Cascade path: " + path);
+            if (!new File(path).exists()) {
+                System.out.println("Cascade file does not exist at: " + path);
+                return null;
+            }
+            return path;
         } catch (Exception e) {
             System.out.println("Error loading cascade: " + e.getMessage());
             e.printStackTrace();
@@ -172,6 +162,12 @@ public class ProfileUserController {
                 if (twoFAStatusLabel != null) {
                     twoFAStatusLabel.setText("2FA not configured");
                 }
+                updateTwoFactorButtons(false);
+                updateFaceRecognitionButtons(false);
+                if (cameraSection != null) {
+                    cameraSection.setVisible(false);
+                    cameraSection.setManaged(false);
+                }
                 avatarLabel.setText("GU");
                 return;
             }
@@ -181,30 +177,9 @@ public class ProfileUserController {
             roleBadgeLabel.setText(formatRole(user.getRoles()));
             avatarLabel.setText(buildInitials(user.getNom(), user.getEmail()));
             updateTwoFactorStatus(user);
+            updateFaceRecognitionStatus(user);
 
-            // Update face recognition status
-            if (user.isFaceEnabled()) {
-                faceRecognitionStatusLabel.setText("✅ Face recognition is enabled");
-                faceRecognitionStatusLabel.setStyle("-fx-text-fill: #22aa44;");
-                enableFaceRecognitionButton.setText("MANAGE FACE RECOGNITION");
-                // disableFaceButton.setVisible(true);
-                // disableFaceButton.setManaged(true);
-            } else {
-                faceRecognitionStatusLabel.setText("⚠ Face recognition is not enabled");
-                faceRecognitionStatusLabel.setStyle("-fx-text-fill: #f5a623;");
-                enableFaceRecognitionButton.setText("ENABLE FACE RECOGNITION");
-                // disableFaceButton.setVisible(false);
-                // disableFaceButton.setManaged(false);
-            }
-            // Hide camera section
-            // cameraSection.setVisible(false);
-            // cameraSection.setManaged(false);
-            enableFaceRecognitionButton.setVisible(true);
-            enableFaceRecognitionButton.setManaged(true);
-
-            // Load and display user's face image
             if (user.isFaceEnabled() && user.getFaceEncoding() != null) {
-                // Face is enabled, no need to display it in profile
                 System.out.println("User has face recognition enabled");
             }
         } catch (NullPointerException e) {
@@ -256,14 +231,61 @@ public class ProfileUserController {
             return;
         }
 
-        if (user.isIs2faEnabled()
+        boolean enabled = user.isIs2faEnabled()
                 && user.getGoogle2faSecret() != null
-                && !user.getGoogle2faSecret().isBlank()) {
+                && !user.getGoogle2faSecret().isBlank();
+
+        if (enabled) {
             twoFAStatusLabel.setText("2FA is enabled");
             twoFAStatusLabel.setStyle("-fx-text-fill: #22aa44; -fx-font-size: 14px;");
         } else {
             twoFAStatusLabel.setText("2FA is not enabled");
             twoFAStatusLabel.setStyle("-fx-text-fill: #f5a623; -fx-font-size: 14px;");
+        }
+
+        updateTwoFactorButtons(enabled);
+    }
+
+    private void updateTwoFactorButtons(boolean enabled) {
+        if (enable2FAButton != null) {
+            enable2FAButton.setVisible(!enabled);
+            enable2FAButton.setManaged(!enabled);
+        }
+        if (disable2FAButton != null) {
+            disable2FAButton.setVisible(enabled);
+            disable2FAButton.setManaged(enabled);
+        }
+    }
+
+    private void updateFaceRecognitionStatus(User user) {
+        boolean enabled = user.isFaceEnabled();
+
+        if (faceRecognitionStatusLabel != null) {
+            if (enabled) {
+                faceRecognitionStatusLabel.setText("Face recognition is enabled");
+                faceRecognitionStatusLabel.setStyle("-fx-text-fill: #22aa44; -fx-font-size: 14px;");
+            } else {
+                faceRecognitionStatusLabel.setText("Face recognition is not enabled");
+                faceRecognitionStatusLabel.setStyle("-fx-text-fill: #f5a623; -fx-font-size: 14px;");
+            }
+        }
+
+        updateFaceRecognitionButtons(enabled);
+
+        if (cameraSection != null) {
+            cameraSection.setVisible(false);
+            cameraSection.setManaged(false);
+        }
+    }
+
+    private void updateFaceRecognitionButtons(boolean enabled) {
+        if (enableFaceRecognitionButton != null) {
+            enableFaceRecognitionButton.setVisible(!enabled);
+            enableFaceRecognitionButton.setManaged(!enabled);
+        }
+        if (profileDisableFaceButton != null) {
+            profileDisableFaceButton.setVisible(enabled);
+            profileDisableFaceButton.setManaged(enabled);
         }
     }
 
@@ -276,18 +298,21 @@ public class ProfileUserController {
 
         System.out.println("Enabling face recognition for user: " + currentUser.getNom());
 
-        // Show camera section
         cameraSection.setVisible(true);
         cameraSection.setManaged(true);
         enableFaceRecognitionButton.setVisible(false);
         enableFaceRecognitionButton.setManaged(false);
+        if (profileDisableFaceButton != null) {
+            profileDisableFaceButton.setVisible(false);
+            profileDisableFaceButton.setManaged(false);
+        }
 
         startCamera();
     }
 
     private void startCamera() {
         System.out.println("Starting camera...");
-        
+
         if (faceDetector == null || faceDetector.empty()) {
             System.out.println("Warning: Face detector not loaded, but continuing with camera...");
         }
@@ -307,8 +332,7 @@ public class ProfileUserController {
 
         System.out.println("Camera opened successfully, starting frame capture...");
         updateCameraStatus("Camera initialized, waiting for face...", "#888888");
-        
-        // Grab frame every 33ms (~30 FPS)
+
         timer = Executors.newSingleThreadScheduledExecutor();
         timer.scheduleAtFixedRate(this::grabFrame, 0, 33, TimeUnit.MILLISECONDS);
     }
@@ -320,24 +344,17 @@ public class ProfileUserController {
                 return;
             }
 
-            // Display the frame first - NO face detection for now
             Image imageToShow = matToImage(frame);
             if (imageToShow != null) {
-                Platform.runLater(() -> {
-                    cameraView.setImage(imageToShow);
-                });
+                Platform.runLater(() -> cameraView.setImage(imageToShow));
             }
 
-            // For now, simulate face detection - user can capture any frame
-            // This is a workaround while we fix the cascade issue
-            faceDetected = true;
             lastDetectedFace = frame.clone();
 
             Platform.runLater(() -> {
-                updateCameraStatus("✅ Ready to capture! Click Capture Face to save.", "#22aa44");
+                updateCameraStatus("Ready to capture. Click Capture Face to save.", "#22aa44");
                 captureFaceButton.setStyle("-fx-background-color: #22aa44; -fx-text-fill: white; -fx-padding: 10; -fx-font-weight: bold;");
             });
-
         } catch (Exception e) {
             System.out.println("Error in grabFrame: " + e.getMessage());
             e.printStackTrace();
@@ -348,44 +365,38 @@ public class ProfileUserController {
     private void handleCaptureFace(ActionEvent event) {
         User currentUser = SessionManager.getCurrentUser();
         if (lastDetectedFace == null || lastDetectedFace.empty() || currentUser == null) {
-            updateCameraStatus("No valid face detected! Please look at the camera.", "#e8314a");
+            updateCameraStatus("No valid face detected. Please look at the camera.", "#e8314a");
             return;
         }
 
-        // Show processing state
-        captureFaceButton.setText("⏳ Processing...");
+        captureFaceButton.setText("Processing...");
         captureFaceButton.setDisable(true);
 
         new Thread(() -> {
             try {
-                // Create directory if not exists
                 Files.createDirectories(Paths.get("face_data"));
 
-                // Save face image to disk
                 String path = "face_data/user_" + currentUser.getId() + ".jpg";
                 Imgcodecs.imwrite(path, lastDetectedFace);
 
                 System.out.println("Face saved to: " + path);
 
-                // Update user in database
                 currentUser.setFaceEncoding(path);
                 currentUser.setFaceEnabled(true);
                 serviceUser.modifier(currentUser);
+                SessionManager.setCurrentUser(currentUser);
 
-                javafx.application.Platform.runLater(() -> {
+                Platform.runLater(() -> {
                     captureFaceButton.setText("Capture Face");
                     captureFaceButton.setDisable(false);
-                    disableFaceButton.setVisible(true);
-                    disableFaceButton.setManaged(true);
-                    updateCameraStatus("✅ Face enrolled successfully!", "#22aa44");
+                    updateCameraStatus("Face enrolled successfully.", "#22aa44");
                     stopCamera();
                     refreshProfile();
                 });
-
             } catch (Exception e) {
                 System.out.println("Error saving face: " + e.getMessage());
                 e.printStackTrace();
-                javafx.application.Platform.runLater(() -> {
+                Platform.runLater(() -> {
                     captureFaceButton.setText("Capture Face");
                     captureFaceButton.setDisable(false);
                     updateCameraStatus("Error saving face: " + e.getMessage(), "#e8314a");
@@ -397,15 +408,16 @@ public class ProfileUserController {
     @FXML
     private void handleDisableFace(ActionEvent event) {
         User currentUser = SessionManager.getCurrentUser();
-        if (currentUser == null) return;
+        if (currentUser == null) {
+            return;
+        }
 
         try {
             Files.deleteIfExists(Paths.get("face_data/user_" + currentUser.getId() + ".jpg"));
             currentUser.setFaceEnabled(false);
             currentUser.setFaceEncoding(null);
             serviceUser.modifier(currentUser);
-            // disableFaceButton.setVisible(false);
-            // disableFaceButton.setManaged(false);
+            SessionManager.setCurrentUser(currentUser);
             updateCameraStatus("Face recognition has been disabled.", "#888888");
             stopCamera();
             refreshProfile();
@@ -444,37 +456,33 @@ public class ProfileUserController {
     private void stopCamera() {
         if (timer != null && !timer.isShutdown()) {
             timer.shutdown();
-            try { timer.awaitTermination(100, TimeUnit.MILLISECONDS); }
-            catch (InterruptedException ignored) {}
+            try {
+                timer.awaitTermination(100, TimeUnit.MILLISECONDS);
+            } catch (InterruptedException ignored) {
+            }
         }
         if (capture != null && capture.isOpened()) {
             capture.release();
         }
         if (lastDetectedFace != null) {
             lastDetectedFace.release();
+            lastDetectedFace = null;
         }
     }
 
     private void loadUserFaceImage(int userId) {
-        // This method is no longer used - face images are stored but not displayed in profile
         System.out.println("Face image stored for user: " + userId);
     }
-
-
 
     @FXML
     private void handleEnable2FA(ActionEvent event) {
         try {
-            // Try this path first
             URL fxmlUrl = getClass().getResource("/TwoFactorSetup.fxml");
-
-            // If null, try subfolder
             if (fxmlUrl == null) {
                 fxmlUrl = getClass().getResource("/tn/esprit/views/TwoFactorSetup.fxml");
             }
-
             if (fxmlUrl == null) {
-                System.out.println("❌ TwoFactorSetup.fxml not found!");
+                System.out.println("TwoFactorSetup.fxml not found!");
                 return;
             }
 
@@ -483,9 +491,28 @@ public class ProfileUserController {
             stage.setScene(new Scene(root));
             stage.setTitle("Setup 2FA");
             stage.show();
-
         } catch (IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    @FXML
+    private void handleDisable2FA(ActionEvent event) {
+        User currentUser = SessionManager.getCurrentUser();
+        if (currentUser == null) {
+            return;
+        }
+
+        try {
+            twoFactorService.disable2FA(currentUser);
+            serviceUser.modifier(currentUser);
+            SessionManager.setCurrentUser(currentUser);
+            refreshProfile();
+        } catch (Exception e) {
+            if (twoFAStatusLabel != null) {
+                twoFAStatusLabel.setText("Unable to disable 2FA");
+                twoFAStatusLabel.setStyle("-fx-text-fill: #e8314a; -fx-font-size: 14px;");
+            }
         }
     }
 }
