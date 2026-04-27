@@ -44,7 +44,7 @@ public class ProfileUserController {
     @FXML private Label roleBadgeLabel;
     @FXML private Label activeStatusLabel;
     @FXML private Label userIdLabel;
-    @FXML private Label securityLabel;
+    @FXML private Label twoFAStatusLabel;
     @FXML private Label avatarLabel;
     @FXML private Button editProfileButton;
     @FXML private Label faceRecognitionStatusLabel;
@@ -169,7 +169,9 @@ public class ProfileUserController {
                 roleBadgeLabel.setText("VISITOR");
                 activeStatusLabel.setText("Offline");
                 userIdLabel.setText("--");
-                securityLabel.setText("2FA not configured");
+                if (twoFAStatusLabel != null) {
+                    twoFAStatusLabel.setText("2FA not configured");
+                }
                 avatarLabel.setText("GU");
                 return;
             }
@@ -178,6 +180,7 @@ public class ProfileUserController {
             emailLabel.setText(safeValue(user.getEmail(), "No email"));
             roleBadgeLabel.setText(formatRole(user.getRoles()));
             avatarLabel.setText(buildInitials(user.getNom(), user.getEmail()));
+            updateTwoFactorStatus(user);
 
             // Update face recognition status
             if (user.isFaceEnabled()) {
@@ -246,6 +249,22 @@ public class ProfileUserController {
         }
 
         return compact.isEmpty() ? "UP" : compact.toUpperCase();
+    }
+
+    private void updateTwoFactorStatus(User user) {
+        if (twoFAStatusLabel == null) {
+            return;
+        }
+
+        if (user.isIs2faEnabled()
+                && user.getGoogle2faSecret() != null
+                && !user.getGoogle2faSecret().isBlank()) {
+            twoFAStatusLabel.setText("2FA is enabled");
+            twoFAStatusLabel.setStyle("-fx-text-fill: #22aa44; -fx-font-size: 14px;");
+        } else {
+            twoFAStatusLabel.setText("2FA is not enabled");
+            twoFAStatusLabel.setStyle("-fx-text-fill: #f5a623; -fx-font-size: 14px;");
+        }
     }
 
     public void handleEnableFaceRecognition(ActionEvent actionEvent) {
@@ -439,5 +458,34 @@ public class ProfileUserController {
     private void loadUserFaceImage(int userId) {
         // This method is no longer used - face images are stored but not displayed in profile
         System.out.println("Face image stored for user: " + userId);
+    }
+
+
+
+    @FXML
+    private void handleEnable2FA(ActionEvent event) {
+        try {
+            // Try this path first
+            URL fxmlUrl = getClass().getResource("/TwoFactorSetup.fxml");
+
+            // If null, try subfolder
+            if (fxmlUrl == null) {
+                fxmlUrl = getClass().getResource("/tn/esprit/views/TwoFactorSetup.fxml");
+            }
+
+            if (fxmlUrl == null) {
+                System.out.println("❌ TwoFactorSetup.fxml not found!");
+                return;
+            }
+
+            Parent root = FXMLLoader.load(fxmlUrl);
+            Stage stage = (Stage) editProfileButton.getScene().getWindow();
+            stage.setScene(new Scene(root));
+            stage.setTitle("Setup 2FA");
+            stage.show();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 }

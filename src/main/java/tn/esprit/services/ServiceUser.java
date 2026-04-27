@@ -4,10 +4,12 @@ import  tn.esprit.entities.User;
 import  tn.esprit.utils.MyDatabase;
 
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 import org.mindrot.jbcrypt.BCrypt;
@@ -195,40 +197,68 @@ public class ServiceUser implements IService<User> {
             ps.setString(1, googleOauthId);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    return new User(
-                            rs.getInt("id"),
-                            rs.getString("email"),
-                            rs.getString("roles"),
-                            rs.getString("password"),
-                            rs.getString("nom"),
-                            rs.getBoolean("is_active"),
-                            rs.getString("google2fa_secret"),
-                            rs.getBoolean("is_2fa_enabled"),
-                            rs.getString("google_oauth_id"),
-                            rs.getString("oauth_provider"),
-                            rs.getString("face_encoding"),
-                            rs.getBoolean("is_face_enabled")
-                    );
+                    return mapUser(rs);
                 }
             }
         }
         return null;
     }
 
+    public User findByEmail(String email) throws SQLException {
+        String sql = "SELECT * FROM `user` WHERE email = ? LIMIT 1";
+        try (PreparedStatement ps = getConnectionOrThrow().prepareStatement(sql)) {
+            ps.setString(1, email);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return mapUser(rs);
+                }
+            }
+        }
+        return null;
+    }
+
+    public User linkGoogleAccount(User existingUser, User googleUser) throws SQLException {
+        String sql = "UPDATE `user` SET google_oauth_id = ?, oauth_provider = ? WHERE id = ?";
+        try (PreparedStatement ps = getConnectionOrThrow().prepareStatement(sql)) {
+            ps.setString(1, googleUser.getGoogleOauthId());
+            ps.setString(2, googleUser.getOauthProvider());
+            ps.setInt(3, existingUser.getId());
+            ps.executeUpdate();
+        }
+        existingUser.setGoogleOauthId(googleUser.getGoogleOauthId());
+        existingUser.setOauthProvider(googleUser.getOauthProvider());
+        return existingUser;
+    }
+
     public User createOAuthUser(User user) throws SQLException {
-        String sql = "INSERT INTO `user`(email, roles, password, nom, is_active, google2fa_secret, is_2fa_enabled, google_oauth_id, oauth_provider, face_encoding, is_face_enabled) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        StringBuilder columns = new StringBuilder(
+                "email, roles, password, nom, is_active, google2fa_secret, is_2fa_enabled, google_oauth_id, oauth_provider, face_encoding, is_face_enabled"
+        );
+        StringBuilder placeholders = new StringBuilder("?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?");
+
+        boolean requiresLocation = requiresNonNullColumnWithoutDefault("user", "location");
+        if (requiresLocation) {
+            columns.append(", location");
+            placeholders.append(", ?");
+        }
+
+        String sql = "INSERT INTO `user`(" + columns + ") VALUES (" + placeholders + ")";
         try (PreparedStatement ps = getConnectionOrThrow().prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
-            ps.setString(1, user.getEmail());
-            ps.setString(2, user.getRoles());
-            ps.setString(3, ""); // No password for OAuth users
-            ps.setString(4, user.getNom());
-            ps.setBoolean(5, user.isActive());
-            ps.setString(6, user.getGoogle2faSecret());
-            ps.setBoolean(7, user.isIs2faEnabled());
-            ps.setString(8, user.getGoogleOauthId());
-            ps.setString(9, user.getOauthProvider());
-            ps.setString(10, user.getFaceEncoding());
-            ps.setBoolean(11, user.isFaceEnabled());
+            int index = 1;
+            ps.setString(index++, user.getEmail());
+            ps.setString(index++, user.getRoles());
+            ps.setString(index++, ""); // No password for OAuth users
+            ps.setString(index++, user.getNom());
+            ps.setBoolean(index++, user.isActive());
+            ps.setString(index++, user.getGoogle2faSecret());
+            ps.setBoolean(index++, user.isIs2faEnabled());
+            ps.setString(index++, user.getGoogleOauthId());
+            ps.setString(index++, user.getOauthProvider());
+            ps.setString(index++, user.getFaceEncoding());
+            ps.setBoolean(index++, user.isFaceEnabled());
+            if (requiresLocation) {
+                ps.setString(index, "Google OAuth");
+            }
             ps.executeUpdate();
 
             try (ResultSet rs = ps.getGeneratedKeys()) {
@@ -247,24 +277,51 @@ public class ServiceUser implements IService<User> {
         try (Statement stmt = getConnectionOrThrow().createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
             while (rs.next()) {
-                User user = new User(
-                        rs.getInt("id"),
-                        rs.getString("email"),
-                        rs.getString("roles"),
-                        rs.getString("password"),
-                        rs.getString("nom"),
-                        rs.getBoolean("is_active"),
-                        rs.getString("google2fa_secret"),
-                        rs.getBoolean("is_2fa_enabled"),
-                        rs.getString("google_oauth_id"),
-                        rs.getString("oauth_provider"),
-                        rs.getString("face_encoding"),
-                        rs.getBoolean("is_face_enabled")
-                );
-                users.add(user);
+                users.add(mapUser(rs));
             }
         }
 
         return users;
+    }
+
+    private User mapUser(ResultSet rs) throws SQLException {
+        return new User(
+                rs.getInt("id"),
+                rs.getString("email"),
+                rs.getString("roles"),
+                rs.getString("password"),
+                rs.getString("nom"),
+                rs.getBoolean("is_active"),
+                rs.getString("google2fa_secret"),
+                rs.getBoolean("is_2fa_enabled"),
+                rs.getString("google_oauth_id"),
+                rs.getString("oauth_provider"),
+                rs.getString("face_encoding"),
+                rs.getBoolean("is_face_enabled")
+        );
+    }
+
+    private boolean requiresNonNullColumnWithoutDefault(String tableName, String columnName) throws SQLException {
+        DatabaseMetaData metaData = getConnectionOrThrow().getMetaData();
+        try (ResultSet rs = metaData.getColumns(getConnectionOrThrow().getCatalog(), null, tableName, columnName)) {
+            if (rs.next()) {
+                int nullable = rs.getInt("NULLABLE");
+                String defaultValue = rs.getString("COLUMN_DEF");
+                int dataType = rs.getInt("DATA_TYPE");
+                return nullable == DatabaseMetaData.columnNoNulls
+                        && defaultValue == null
+                        && supportsFallbackValue(dataType);
+            }
+        }
+        return false;
+    }
+
+    private boolean supportsFallbackValue(int dataType) {
+        return dataType == Types.CHAR
+                || dataType == Types.VARCHAR
+                || dataType == Types.LONGVARCHAR
+                || dataType == Types.NCHAR
+                || dataType == Types.NVARCHAR
+                || dataType == Types.LONGNVARCHAR;
     }
 }

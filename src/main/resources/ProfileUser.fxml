@@ -79,7 +79,20 @@
 
                                         <Separator style="-fx-opacity: 0.32; -fx-background-color: #6a60ff;" />
 
+                                        <!-- Two-Factor Authentication Section -->
+                                        <Label style="-fx-text-fill: white; -fx-font-size: 18px; -fx-font-weight: 700;" text="Two-Factor Authentication" />
+                                        <Label fx:id="twoFAStatusLabel" style="-fx-text-fill: #f5a623; -fx-font-size: 14px;" text="⚠  2FA is not enabled" />
+                                        <Button fx:id="enable2FAButton" maxWidth="1.7976931348623157E308" onAction="#handleEnable2FA"
+                                                style="-fx-background-color: linear-gradient(to right, #6860ff, #ff274f);
+                                               -fx-background-radius: 16;
+                                               -fx-text-fill: white;
+                                               -fx-font-size: 20px;
+                                               -fx-font-weight: 800;
+                                               -fx-padding: 14 18 14 18;
+                                               -fx-cursor: hand;
+                                               -fx-effect: dropshadow(gaussian, rgba(255,40,82,0.34), 20, 0.2, 0, 8);" text="ENABLE 2FA" />
 
+                                        <Separator style="-fx-opacity: 0.32; -fx-background-color: #6a60ff;" />
 
                                         <!-- Face Recognition Section -->
                                         <Label style="-fx-text-fill: white; -fx-font-size: 18px; -fx-font-weight: 700;" text="Face Recognition" />
