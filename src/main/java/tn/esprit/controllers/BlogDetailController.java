@@ -22,10 +22,22 @@ import java.io.IOException;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import tn.esprit.services.ServiceNewsAPI;
+import tn.esprit.services.ServiceNewsAPI.NewsArticle;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import javafx.scene.control.Hyperlink;
+import javafx.scene.control.Separator;
+import javafx.scene.Node;
+import javafx.scene.control.Hyperlink;
+import javafx.scene.control.Separator;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import javafx.geometry.Insets;
 
 public class BlogDetailController {
     @FXML private Label translationStatus;
-
+    private final ServiceNewsAPI newsService = new ServiceNewsAPI();
     private final TranslationService translationService = new TranslationService();
     private String originalTitle;
     private String originalContent;
@@ -58,6 +70,7 @@ public class BlogDetailController {
         loadLikeSection();
         loadRatingSection();
         loadComments();
+        loadRelatedNews();  // ← AJOUTE CETTE LIGNE
     }
 
     // ── Blog Details ──────────────────────────────────────────────────────
@@ -406,5 +419,100 @@ public class BlogDetailController {
                 translationStatus.setText(statusText);
             });
         }).start();
+    }
+    // ── MÉTIER 5 : NewsAPI — Related News Suggestions ─────────────────────
+    private void loadRelatedNews() {
+        if (currentBlog == null) return;
+
+        // Ajouter un indicateur de chargement à la fin
+        Label loadingLabel = new Label("📰 Chargement des actualités liées...");
+        loadingLabel.setStyle("-fx-text-fill: #64748b; -fx-font-size: 13px; -fx-padding: 10 0;");
+
+        // Ajouter le message À LA FIN du container des commentaires
+        commentsContainer.getChildren().add(loadingLabel);
+
+        new Thread(() -> {
+            List<ServiceNewsAPI.NewsArticle> articles = newsService.getRelatedNews(currentBlog.getTitle());
+
+            javafx.application.Platform.runLater(() -> {
+                // Supprimer le message de chargement
+                commentsContainer.getChildren().remove(loadingLabel);
+
+                // Créer la section des actualités
+                VBox newsSection = createNewsSection(articles);
+
+                // Ajouter la section À LA FIN du container des commentaires
+                commentsContainer.getChildren().add(newsSection);
+            });
+        }).start();
+    }
+    // ── MÉTHODES POUR NEWSAPI ─────────────────────────────────────────────
+
+    private VBox createNewsSection(List<ServiceNewsAPI.NewsArticle> articles) {
+        VBox section = new VBox(15);
+        section.setStyle("-fx-background-color: #0f172a; -fx-background-radius: 15; -fx-padding: 20;");
+        section.setPadding(new Insets(15, 20, 15, 20));
+
+        // Titre de la section
+        Label titleLabel = new Label("📰 Actualités liées");
+        titleLabel.setStyle("-fx-text-fill: white; -fx-font-size: 20px; -fx-font-weight: bold;");
+
+        Separator separator = new Separator();
+        separator.setStyle("-fx-background-color: #1e293b;");
+
+        section.getChildren().addAll(titleLabel, separator);
+
+        if (articles == null || articles.isEmpty()) {
+            Label noNews = new Label("Aucune actualité trouvée pour ce sujet.");
+            noNews.setStyle("-fx-text-fill: #64748b; -fx-font-size: 14px;");
+            section.getChildren().add(noNews);
+            return section;
+        }
+
+        // Ajouter chaque article
+        for (ServiceNewsAPI.NewsArticle article : articles) {
+            VBox articleCard = createNewsCard(article);
+            section.getChildren().add(articleCard);
+        }
+
+        // Disclaimer
+        Label disclaimer = new Label("📰 Actualités fournies par NewsAPI.org");
+        disclaimer.setStyle("-fx-text-fill: #475569; -fx-font-size: 10px;");
+        section.getChildren().add(disclaimer);
+
+        return section;
+    }
+
+    private VBox createNewsCard(ServiceNewsAPI.NewsArticle article) {
+        VBox card = new VBox(8);
+        card.setStyle("-fx-background-color: #1e293b; -fx-background-radius: 10; -fx-padding: 15;");
+
+        // Titre cliquable
+        Hyperlink titleLink = new Hyperlink(article.getTitle());
+        titleLink.setStyle("-fx-text-fill: #7c3aed; -fx-font-size: 15px; -fx-font-weight: bold; -fx-underline: true;");
+        titleLink.setOnAction(e -> {
+            try {
+                java.awt.Desktop.getDesktop().browse(new java.net.URI(article.getUrl()));
+            } catch (Exception ex) {
+                ex.printStackTrace();
+            }
+        });
+
+        // Description
+        Label description = new Label(article.getDescription());
+        description.setWrapText(true);
+        description.setStyle("-fx-text-fill: #cbd5e1; -fx-font-size: 13px;");
+
+        // Métadonnées (source + date)
+        HBox metaBox = new HBox(15);
+        Label sourceLabel = new Label("📰 " + article.getSource());
+        sourceLabel.setStyle("-fx-text-fill: #64748b; -fx-font-size: 11px;");
+        Label dateLabel = new Label("📅 " + article.getFormattedDate());
+        dateLabel.setStyle("-fx-text-fill: #64748b; -fx-font-size: 11px;");
+
+        metaBox.getChildren().addAll(sourceLabel, dateLabel);
+
+        card.getChildren().addAll(titleLink, description, metaBox);
+        return card;
     }
 }
