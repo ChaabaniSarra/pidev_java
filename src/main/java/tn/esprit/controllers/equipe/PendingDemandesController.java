@@ -21,11 +21,9 @@ public class PendingDemandesController implements Initializable {
     @FXML
     private TableView<EquipeJoinRequest> pendingTable;
     @FXML
-    private TableColumn<EquipeJoinRequest, Integer> idCol;
+    private TableColumn<EquipeJoinRequest, String> equipeCol;
     @FXML
-    private TableColumn<EquipeJoinRequest, Integer> equipeCol;
-    @FXML
-    private TableColumn<EquipeJoinRequest, Integer> joueurCol;
+    private TableColumn<EquipeJoinRequest, String> joueurCol;
     @FXML
     private TableColumn<EquipeJoinRequest, String> statutCol;
     @FXML
@@ -39,9 +37,8 @@ public class PendingDemandesController implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
-        idCol.setCellValueFactory(new PropertyValueFactory<>("id"));
-        equipeCol.setCellValueFactory(new PropertyValueFactory<>("equipeId"));
-        joueurCol.setCellValueFactory(new PropertyValueFactory<>("joueurId"));
+        equipeCol.setCellValueFactory(new PropertyValueFactory<>("equipeNom"));
+        joueurCol.setCellValueFactory(new PropertyValueFactory<>("joueurNom"));
         statutCol.setCellValueFactory(new PropertyValueFactory<>("statut"));
         createdCol.setCellValueFactory(new PropertyValueFactory<>("createdAt"));
 

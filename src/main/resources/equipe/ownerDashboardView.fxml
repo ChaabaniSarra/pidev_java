@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.ScrollPane?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.FlowPane?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.Region?>
 <?import javafx.scene.layout.VBox?>
@@ -36,6 +40,10 @@
                 <Label text="Matchs termines" style="-fx-text-fill: #94a3b8;"/>
                 <Label fx:id="finishedMatchesLabel" text="0" style="-fx-text-fill: white; -fx-font-size: 24px;"/>
             </VBox>
+            <VBox prefWidth="180" style="-fx-background-color: #1e293b; -fx-padding: 10; -fx-background-radius: 8;">
+                <Label text="Equipe pleine" style="-fx-text-fill: #94a3b8;"/>
+                <Label fx:id="fullTeamLabel" text="Non" style="-fx-text-fill: white; -fx-font-size: 24px;"/>
+            </VBox>
         </HBox>
 
         <VBox spacing="10" style="-fx-background-color: #1e293b; -fx-padding: 14; -fx-background-radius: 8;">
@@ -48,11 +56,21 @@
             </HBox>
         </VBox>
 
-        <VBox spacing="6" style="-fx-background-color: #1e293b; -fx-padding: 14; -fx-background-radius: 8;">
-            <Label text="Alertes" style="-fx-text-fill: #94a3b8;"/>
-            <Label fx:id="alertsLabel" text="Aucune alerte" style="-fx-text-fill: #f59e0b;"/>
-        </VBox>
+        <HBox spacing="10">
+            <TextField fx:id="searchField" promptText="Search players by name or email..."
+                       style="-fx-background-color: #111827; -fx-text-fill: white; -fx-pref-height: 36; -fx-background-radius: 10; -fx-prompt-text-fill: #94a3b8;"/>
+            <Button text="Refresh" onAction="#handleRefresh"
+                    style="-fx-background-color: #0ea5e9; -fx-text-fill: white; -fx-pref-width: 110; -fx-background-radius: 8;"/>
+        </HBox>
 
+        <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS" style="-fx-background: transparent; -fx-border-color: transparent;">
+            <content>
+                <FlowPane fx:id="memberCardsContainer" hgap="16" vgap="16" prefWrapLength="780" style="-fx-padding: 8;"/>
+            </content>
+        </ScrollPane>
+
+        <TextField fx:id="motifField" promptText="Motif (optionnel)"
+                   style="-fx-background-color: #1e293b; -fx-text-fill: white; -fx-pref-height: 36; -fx-background-radius: 10;"/>
         <Label fx:id="messageLabel" text="" style="-fx-font-size: 13px;"/>
     </VBox>
 </AnchorPane>

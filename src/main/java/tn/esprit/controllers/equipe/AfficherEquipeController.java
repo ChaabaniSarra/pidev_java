@@ -173,9 +173,15 @@ public class AfficherEquipeController implements Initializable {
             }
 
             if (serviceEquipe.isCurrentUserMemberOfEquipe(equipe.getId())) {
-                Label memberLabel = new Label("Vous etes deja membre");
+                Label memberLabel = new Label("Vous êtes membre de cette équipe");
                 memberLabel.setStyle("-fx-text-fill: #22c55e; -fx-font-size: 12px; -fx-font-weight: 700;");
-                box.getChildren().add(memberLabel);
+                Button leaveBtn = new Button("Quitter l'équipe");
+                leaveBtn.setStyle("-fx-background-color: #ef4444; -fx-text-fill: white; -fx-font-weight: 700; -fx-pref-width: 180;");
+                leaveBtn.setOnAction(evt -> {
+                    evt.consume();
+                    handleLeaveEquipe(equipe.getId());
+                });
+                box.getChildren().addAll(memberLabel, leaveBtn);
                 return box;
             }
 
@@ -226,6 +232,18 @@ public class AfficherEquipeController implements Initializable {
             renderCards();
         } catch (SQLException e) {
             messageLabel.setText("Suppression invite impossible : " + e.getMessage());
+            messageLabel.setStyle("-fx-text-fill: #f87171;");
+        }
+    }
+
+    private void handleLeaveEquipe(int equipeId) {
+        try {
+            serviceEquipe.leaveEquipe(equipeId);
+            messageLabel.setText("Vous avez quitte l'equipe.");
+            messageLabel.setStyle("-fx-text-fill: #22c55e;");
+            renderCards();
+        } catch (SQLException e) {
+            messageLabel.setText("Impossible de quitter l'equipe : " + e.getMessage());
             messageLabel.setStyle("-fx-text-fill: #f87171;");
         }
     }

@@ -9,10 +9,12 @@ import  tn.esprit.utils.MyDatabase;
 import  tn.esprit.utils.SessionManager;
 
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -124,10 +126,11 @@ public class ServiceEquipe implements IService<Equipe> {
             throw new SQLException("Une demande pending existe deja pour ce joueur et cette equipe.");
         }
 
-        String sql = "INSERT INTO equipe_join_request(equipe_id, joueur_id, statut, created_at) VALUES (?, ?, 'pending', NOW())";
+        String sql = "INSERT INTO join_request(equipe_id, user_id, status, created_at, created_by_id) VALUES (?, ?, 'pending', NOW(), ?)";
         try (PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setInt(1, equipeId);
             ps.setInt(2, joueurId);
+            ps.setInt(3, joueurId);
             ps.executeUpdate();
             try (ResultSet rs = ps.getGeneratedKeys()) {
                 if (rs.next()) {
@@ -156,13 +159,26 @@ public class ServiceEquipe implements IService<Equipe> {
 
     public void cancelPendingJoinRequestForCurrentUser(int equipeId) throws SQLException {
         int userId = getCurrentUserIdOrThrow();
-        String sql = "DELETE FROM equipe_join_request WHERE equipe_id = ? AND joueur_id = ? AND LOWER(statut) = 'pending'";
+        String sql = "DELETE FROM join_request WHERE equipe_id = ? AND user_id = ? AND LOWER(status) = 'pending'";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, equipeId);
             ps.setInt(2, userId);
             int affected = ps.executeUpdate();
             if (affected == 0) {
                 throw new SQLException("Aucune demande pending a supprimer pour cette equipe.");
+            }
+        }
+    }
+
+    public void leaveEquipe(int equipeId) throws SQLException {
+        int userId = getCurrentUserIdOrThrow();
+        String sql = "DELETE FROM equipe_user WHERE equipe_id = ? AND user_id = ?";
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, equipeId);
+            ps.setInt(2, userId);
+            int affected = ps.executeUpdate();
+            if (affected == 0) {
+                throw new SQLException("Vous n'etes pas membre de cette equipe ou action impossible.");
             }
         }
     }
@@ -191,7 +207,6 @@ public class ServiceEquipe implements IService<Equipe> {
             }
 
             String finalStatus = accepted ? "accepted" : "rejected";
-            String finalMotif = motif == null ? null : motif.trim();
 
             if (accepted) {
                 if (request.joueurId == ownerId) {
@@ -204,21 +219,35 @@ public class ServiceEquipe implements IService<Equipe> {
                     throw new SQLException("Equipe pleine: impossible d'accepter la demande.");
                 }
 
-                String insertMember = "INSERT INTO equipe_member(equipe_id, user_id, joined_at) VALUES (?, ?, NOW())";
+                String timestampColumn = getEquipeUserTimestampColumn();
+                String insertMember = timestampColumn != null
+                        ? "INSERT INTO equipe_user(equipe_id, user_id, " + timestampColumn + ") VALUES (?, ?, NOW())"
+                        : "INSERT INTO equipe_user(equipe_id, user_id) VALUES (?, ?)";
+
                 try (PreparedStatement ps = conn.prepareStatement(insertMember)) {
                     ps.setInt(1, request.equipeId);
                     ps.setInt(2, request.joueurId);
                     ps.executeUpdate();
+                } catch (SQLException firstEx) {
+                    if (firstEx.getMessage() != null && firstEx.getMessage().toLowerCase().contains("unknown column")) {
+                        String retrySql = "INSERT INTO equipe_user(equipe_id, user_id) VALUES (?, ?)";
+                        try (PreparedStatement retryPs = conn.prepareStatement(retrySql)) {
+                            retryPs.setInt(1, request.equipeId);
+                            retryPs.setInt(2, request.joueurId);
+                            retryPs.executeUpdate();
+                        }
+                    } else {
+                        throw firstEx;
+                    }
                 }
             }
 
-            String updateRequest = "UPDATE equipe_join_request "
-                    + "SET statut = ?, processed_at = NOW(), processed_by = ?, motif = ? WHERE id = ?";
+            String updateRequest = "UPDATE join_request "
+                    + "SET status = ?, updated_at = NOW(), updated_by_id = ? WHERE id = ?";
             try (PreparedStatement ps = conn.prepareStatement(updateRequest)) {
                 ps.setString(1, finalStatus);
                 ps.setInt(2, ownerId);
-                ps.setString(3, finalMotif);
-                ps.setInt(4, requestId);
+                ps.setInt(3, requestId);
                 ps.executeUpdate();
             }
 
@@ -237,9 +266,10 @@ public class ServiceEquipe implements IService<Equipe> {
 
     public List<EquipeJoinRequest> getPendingRequestsForOwner(int ownerId) throws SQLException {
         List<EquipeJoinRequest> requests = new ArrayList<>();
-        String sql = "SELECT r.* FROM equipe_join_request r "
+        String sql = "SELECT r.*, u.nom AS joueur_nom, e.nom AS equipe_nom FROM join_request r "
                 + "INNER JOIN equipe e ON e.id = r.equipe_id "
-                + "WHERE e.owner_id = ? AND LOWER(r.statut) = 'pending' "
+                + "LEFT JOIN `user` u ON u.id = r.user_id "
+                + "WHERE e.owner_id = ? AND LOWER(r.status) = 'pending' "
                 + "ORDER BY r.created_at ASC";
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -252,6 +282,199 @@ public class ServiceEquipe implements IService<Equipe> {
         }
 
         return requests;
+    }
+
+    public List<tn.esprit.entities.EquipeMemberView> getMembersForOwnedTeams() throws SQLException {
+        List<tn.esprit.entities.EquipeMemberView> members = new ArrayList<>();
+        String timestampColumn = getEquipeUserTimestampColumn();
+        String timestampSelect = timestampColumn == null ? "" : ", m." + timestampColumn + " AS joined_at";
+        String orderBy = timestampColumn == null ? "" : "ORDER BY m." + timestampColumn + " DESC";
+        String sql = "SELECT m.equipe_id, e.nom AS equipe_nom, m.user_id, u.nom AS joueur_nom, u.email AS joueur_email" + timestampSelect + " "
+                + "FROM equipe_user m "
+                + "JOIN equipe e ON e.id = m.equipe_id "
+                + "JOIN `user` u ON u.id = m.user_id "
+                + "WHERE e.owner_id = ? "
+                + "AND u.id != ? "
+                + "AND u.roles NOT LIKE '%ROLE_ADMIN%' "
+                + orderBy;
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            int ownerId = getCurrentUserIdOrThrow();
+            ps.setInt(1, ownerId);
+            ps.setInt(2, ownerId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Timestamp joinedAt = timestampColumn == null ? null : rs.getTimestamp("joined_at");
+                    members.add(new tn.esprit.entities.EquipeMemberView(
+                            null,
+                            rs.getInt("equipe_id"),
+                            rs.getInt("user_id"),
+                            rs.getString("equipe_nom"),
+                            rs.getString("joueur_nom"),
+                            rs.getString("joueur_email"),
+                            "Member",
+                            joinedAt
+                    ));
+                }
+            }
+        }
+
+        return members;
+    }
+
+    public List<tn.esprit.entities.EquipeMemberView> getOwnerTeamPlayersAndRequests() throws SQLException {
+        int ownerId = getCurrentUserIdOrThrow();
+        List<Equipe> owned = getOwnedEquipes(ownerId);
+        List<tn.esprit.entities.EquipeMemberView> result = new ArrayList<>();
+        if (owned.isEmpty()) {
+            return result;
+        }
+
+        List<Integer> ownedIds = new ArrayList<>();
+        for (Equipe equipe : owned) {
+            ownedIds.add(equipe.getId());
+        }
+        String placeholders = String.join(",", java.util.Collections.nCopies(ownedIds.size(), "?"));
+
+        String pendingSql = "SELECT r.id AS request_id, r.equipe_id, e.nom AS equipe_nom, r.user_id AS joueur_id, u.nom AS joueur_nom, u.email AS joueur_email, r.created_at "
+                + "FROM join_request r "
+                + "JOIN equipe e ON e.id = r.equipe_id "
+                + "JOIN `user` u ON u.id = r.user_id "
+                + "WHERE e.owner_id = ? AND LOWER(r.status) = 'pending' "
+                + "AND u.roles NOT LIKE '%ROLE_ADMIN%' "
+                + "ORDER BY r.created_at DESC";
+        try (PreparedStatement ps = conn.prepareStatement(pendingSql)) {
+            ps.setInt(1, ownerId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    result.add(new tn.esprit.entities.EquipeMemberView(
+                            rs.getInt("request_id"),
+                            rs.getInt("equipe_id"),
+                            rs.getInt("joueur_id"),
+                            rs.getString("equipe_nom"),
+                            rs.getString("joueur_nom"),
+                            rs.getString("joueur_email"),
+                            "Pending",
+                            rs.getTimestamp("created_at")
+                    ));
+                }
+            }
+        }
+
+        String timestampColumn = getEquipeUserTimestampColumn();
+        String timestampSelect = timestampColumn == null ? "" : ", m." + timestampColumn + " AS joined_at";
+        String orderBy = timestampColumn == null ? "" : "ORDER BY m." + timestampColumn + " DESC";
+        String memberSql = "SELECT m.equipe_id, e.nom AS equipe_nom, m.user_id, u.nom AS joueur_nom, u.email AS joueur_email" + timestampSelect + " "
+                + "FROM equipe_user m "
+                + "JOIN equipe e ON e.id = m.equipe_id "
+                + "JOIN `user` u ON u.id = m.user_id "
+                + "WHERE e.owner_id = ? AND u.id != ? "
+                + "AND u.roles NOT LIKE '%ROLE_ADMIN%' "
+                + orderBy;
+        try (PreparedStatement ps = conn.prepareStatement(memberSql)) {
+            ps.setInt(1, ownerId);
+            ps.setInt(2, ownerId);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Timestamp joinedAt = timestampColumn == null ? null : rs.getTimestamp("joined_at");
+                    result.add(new tn.esprit.entities.EquipeMemberView(
+                            null,
+                            rs.getInt("equipe_id"),
+                            rs.getInt("user_id"),
+                            rs.getString("equipe_nom"),
+                            rs.getString("joueur_nom"),
+                            rs.getString("joueur_email"),
+                            "Member",
+                            joinedAt
+                    ));
+                }
+            }
+        }
+
+        String availableSql = "SELECT u.id AS joueur_id, u.nom AS joueur_nom, u.email AS joueur_email "
+                + "FROM `user` u "
+                + "WHERE u.id != ? "
+                + "AND u.roles NOT LIKE '%ROLE_ADMIN%' "
+                + "AND u.id NOT IN (SELECT user_id FROM equipe_user WHERE equipe_id IN (" + placeholders + ")) "
+                + "AND u.id NOT IN (SELECT user_id FROM join_request WHERE equipe_id IN (" + placeholders + ") AND LOWER(status) = 'pending') "
+                + "ORDER BY u.nom ASC";
+        try (PreparedStatement ps = conn.prepareStatement(availableSql)) {
+            int idx = 1;
+            ps.setInt(idx++, ownerId);
+            for (Integer ownedId : ownedIds) {
+                ps.setInt(idx++, ownedId);
+            }
+            for (Integer ownedId : ownedIds) {
+                ps.setInt(idx++, ownedId);
+            }
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    result.add(new tn.esprit.entities.EquipeMemberView(
+                            null,
+                            -1,
+                            rs.getInt("joueur_id"),
+                            "-",
+                            rs.getString("joueur_nom"),
+                            rs.getString("joueur_email"),
+                            "Available",
+                            null
+                    ));
+                }
+            }
+        }
+
+        return result;
+    }
+
+    public void addMemberToFirstOwnedEquipe(int joueurId) throws SQLException {
+        int ownerId = getCurrentUserIdOrThrow();
+        List<Equipe> owned = getOwnedEquipes(ownerId);
+        if (owned.isEmpty()) {
+            throw new SQLException("Aucune équipe trouvee pour ajouter le joueur.");
+        }
+        Equipe equipe = owned.get(0);
+        if (isUserMemberOfTeam(equipe.getId(), joueurId)) {
+            throw new SQLException("Le joueur est deja membre de cette equipe.");
+        }
+
+        String timestampColumn = getEquipeUserTimestampColumn();
+        String sql = timestampColumn != null
+                ? "INSERT INTO equipe_user(equipe_id, user_id, " + timestampColumn + ") VALUES (?, ?, NOW())"
+                : "INSERT INTO equipe_user(equipe_id, user_id) VALUES (?, ?)";
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, equipe.getId());
+            ps.setInt(2, joueurId);
+            ps.executeUpdate();
+        } catch (SQLException firstEx) {
+            if (firstEx.getMessage() != null && firstEx.getMessage().toLowerCase().contains("unknown column")) {
+                String retrySql = "INSERT INTO equipe_user(equipe_id, user_id) VALUES (?, ?)";
+                try (PreparedStatement retryPs = conn.prepareStatement(retrySql)) {
+                    retryPs.setInt(1, equipe.getId());
+                    retryPs.setInt(2, joueurId);
+                    retryPs.executeUpdate();
+                    return;
+                }
+            }
+            throw firstEx;
+        }
+    }
+
+    public void removeMemberFromEquipe(int equipeId, int joueurId) throws SQLException {
+        int ownerId = getCurrentUserIdOrThrow();
+        String sql = "DELETE m FROM equipe_user m "
+                + "JOIN equipe e ON e.id = m.equipe_id "
+                + "WHERE m.equipe_id = ? AND m.user_id = ? AND e.owner_id = ?";
+
+        try (PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, equipeId);
+            ps.setInt(2, joueurId);
+            ps.setInt(3, ownerId);
+            int affected = ps.executeUpdate();
+            if (affected == 0) {
+                throw new SQLException("Membre introuvable ou action non autorisee.");
+            }
+        }
     }
 
     public List<Equipe> getOwnedEquipes(int ownerId) throws SQLException {
@@ -278,7 +501,7 @@ public class ServiceEquipe implements IService<Equipe> {
     public List<Equipe> getJoinedEquipes(int userId) throws SQLException {
         List<Equipe> equipes = new ArrayList<>();
         String sql = "SELECT e.* FROM equipe e "
-                + "INNER JOIN equipe_member m ON m.equipe_id = e.id "
+                + "INNER JOIN equipe_user m ON m.equipe_id = e.id "
                 + "WHERE m.user_id = ? ORDER BY e.id DESC";
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -299,7 +522,7 @@ public class ServiceEquipe implements IService<Equipe> {
     }
 
     public int countMembers(int equipeId) throws SQLException {
-        String sql = "SELECT COUNT(*) AS c FROM equipe_member WHERE equipe_id = ?";
+        String sql = "SELECT COUNT(*) AS c FROM equipe_user WHERE equipe_id = ?";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, equipeId);
             try (ResultSet rs = ps.executeQuery()) {
@@ -347,7 +570,7 @@ public class ServiceEquipe implements IService<Equipe> {
 
         String placeholders = String.join(",", java.util.Collections.nCopies(ownedIds.size(), "?"));
         String sql = "SELECT id, equipe1_id, equipe2_id, score_team1, score_team2 "
-                + "FROM match_game WHERE statut = 'Finished' AND (equipe1_id IN (" + placeholders + ") "
+                + "FROM match_game WHERE LOWER(statut) = 'finished' AND (equipe1_id IN (" + placeholders + ") "
                 + "OR equipe2_id IN (" + placeholders + "))";
 
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -497,7 +720,7 @@ public class ServiceEquipe implements IService<Equipe> {
     }
 
     private boolean hasPendingRequest(int equipeId, int joueurId) throws SQLException {
-        String sql = "SELECT 1 FROM equipe_join_request WHERE equipe_id = ? AND joueur_id = ? AND LOWER(statut) = 'pending' LIMIT 1";
+        String sql = "SELECT 1 FROM join_request WHERE equipe_id = ? AND user_id = ? AND LOWER(status) = 'pending' LIMIT 1";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, equipeId);
             ps.setInt(2, joueurId);
@@ -534,12 +757,12 @@ public class ServiceEquipe implements IService<Equipe> {
     }
 
     private JoinRequestMeta getJoinRequestForUpdate(int requestId) throws SQLException {
-        String sql = "SELECT id, equipe_id, joueur_id, statut FROM equipe_join_request WHERE id = ? FOR UPDATE";
+        String sql = "SELECT id, equipe_id, user_id, status FROM join_request WHERE id = ? FOR UPDATE";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, requestId);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    return new JoinRequestMeta(rs.getInt("equipe_id"), rs.getInt("joueur_id"), rs.getString("statut"));
+                    return new JoinRequestMeta(rs.getInt("equipe_id"), rs.getInt("user_id"), rs.getString("status"));
                 }
             }
         }
@@ -550,17 +773,20 @@ public class ServiceEquipe implements IService<Equipe> {
         return new EquipeJoinRequest(
                 rs.getInt("id"),
                 rs.getInt("equipe_id"),
-                rs.getInt("joueur_id"),
-                rs.getString("statut"),
+                rs.getInt("user_id"),
+                rs.getString("status"),
                 rs.getTimestamp("created_at"),
-                rs.getTimestamp("processed_at"),
-                (Integer) rs.getObject("processed_by"),
-                rs.getString("motif")
+                rs.getTimestamp("updated_at"),
+                (Integer) rs.getObject("created_by_id"),
+                (Integer) rs.getObject("updated_by_id"),
+                null,
+                rs.getString("joueur_nom"),
+                rs.getString("equipe_nom")
         );
     }
 
     private boolean isUserMemberOfTeam(int equipeId, int userId) throws SQLException {
-        String sql = "SELECT 1 FROM equipe_member WHERE equipe_id = ? AND user_id = ? LIMIT 1";
+        String sql = "SELECT 1 FROM equipe_user WHERE equipe_id = ? AND user_id = ? LIMIT 1";
         try (PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, equipeId);
             ps.setInt(2, userId);
@@ -578,29 +804,69 @@ public class ServiceEquipe implements IService<Equipe> {
         return current.getId();
     }
 
+    private String getEquipeUserTimestampColumn() throws SQLException {
+        java.util.Set<String> columns = getEquipeUserColumns();
+        if (columns.contains("joined_at")) {
+            return "joined_at";
+        }
+        if (columns.contains("created_at")) {
+            return "created_at";
+        }
+        if (columns.contains("added_at")) {
+            return "added_at";
+        }
+        return null;
+    }
+
+    private java.util.Set<String> getEquipeUserColumns() throws SQLException {
+        java.util.Set<String> columns = new java.util.HashSet<>();
+        DatabaseMetaData meta = conn.getMetaData();
+        try (ResultSet rs = meta.getColumns(conn.getCatalog(), null, "equipe_user", null)) {
+            while (rs.next()) {
+                columns.add(rs.getString("COLUMN_NAME").toLowerCase());
+            }
+        }
+
+        if (columns.isEmpty()) {
+            String sql = "SELECT * FROM equipe_user LIMIT 1";
+            try (Statement stmt = conn.createStatement();
+                 ResultSet rs = stmt.executeQuery(sql)) {
+                java.sql.ResultSetMetaData rsmd = rs.getMetaData();
+                for (int i = 1; i <= rsmd.getColumnCount(); i++) {
+                    columns.add(rsmd.getColumnLabel(i).toLowerCase());
+                }
+            } catch (SQLException ignored) {
+                // If unable to inspect via query, fall back to metadata only.
+            }
+        }
+
+        return columns;
+    }
+
     private void ensureAdvancedTables() throws SQLException {
-        String createMember = "CREATE TABLE IF NOT EXISTS equipe_member ("
+        String createMember = "CREATE TABLE IF NOT EXISTS equipe_user ("
                 + "id INT AUTO_INCREMENT PRIMARY KEY, "
                 + "equipe_id INT NOT NULL, "
                 + "user_id INT NOT NULL, "
                 + "joined_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, "
-                + "UNIQUE KEY uq_equipe_member (equipe_id, user_id), "
-                + "CONSTRAINT fk_equipe_member_equipe FOREIGN KEY (equipe_id) REFERENCES equipe(id) ON DELETE CASCADE, "
-                + "CONSTRAINT fk_equipe_member_user FOREIGN KEY (user_id) REFERENCES `user`(id) ON DELETE CASCADE"
+                + "UNIQUE KEY uq_equipe_user (equipe_id, user_id), "
+                + "CONSTRAINT fk_equipe_user_equipe FOREIGN KEY (equipe_id) REFERENCES equipe(id) ON DELETE CASCADE, "
+                + "CONSTRAINT fk_equipe_user_user FOREIGN KEY (user_id) REFERENCES `user`(id) ON DELETE CASCADE"
                 + ")";
 
-        String createRequest = "CREATE TABLE IF NOT EXISTS equipe_join_request ("
+        String createRequest = "CREATE TABLE IF NOT EXISTS join_request ("
                 + "id INT AUTO_INCREMENT PRIMARY KEY, "
                 + "equipe_id INT NOT NULL, "
-                + "joueur_id INT NOT NULL, "
-                + "statut VARCHAR(20) NOT NULL DEFAULT 'pending', "
+                + "user_id INT NOT NULL, "
+                + "status VARCHAR(20) NOT NULL DEFAULT 'pending', "
                 + "created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, "
-                + "processed_at TIMESTAMP NULL, "
-                + "processed_by INT NULL, "
-                + "motif VARCHAR(500) NULL, "
+                + "updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP, "
+                + "created_by_id INT NULL, "
+                + "updated_by_id INT NULL, "
                 + "CONSTRAINT fk_join_request_equipe FOREIGN KEY (equipe_id) REFERENCES equipe(id) ON DELETE CASCADE, "
-                + "CONSTRAINT fk_join_request_joueur FOREIGN KEY (joueur_id) REFERENCES `user`(id) ON DELETE CASCADE, "
-                + "CONSTRAINT fk_join_request_processed_by FOREIGN KEY (processed_by) REFERENCES `user`(id) ON DELETE SET NULL"
+                + "CONSTRAINT fk_join_request_user FOREIGN KEY (user_id) REFERENCES `user`(id) ON DELETE CASCADE, "
+                + "CONSTRAINT fk_join_request_created_by FOREIGN KEY (created_by_id) REFERENCES `user`(id) ON DELETE SET NULL, "
+                + "CONSTRAINT fk_join_request_updated_by FOREIGN KEY (updated_by_id) REFERENCES `user`(id) ON DELETE SET NULL"
                 + ")";
 
         try (Statement stmt = conn.createStatement()) {

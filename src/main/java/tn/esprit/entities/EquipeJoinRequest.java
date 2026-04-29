@@ -8,23 +8,34 @@ public class EquipeJoinRequest {
     private int joueurId;
     private String statut;
     private Timestamp createdAt;
-    private Timestamp processedAt;
-    private Integer processedBy;
+    private Timestamp updatedAt;
+    private Integer createdById;
+    private Integer updatedById;
     private String motif;
+    private String joueurNom;
+    private String equipeNom;
 
     public EquipeJoinRequest() {
     }
 
     public EquipeJoinRequest(int id, int equipeId, int joueurId, String statut, Timestamp createdAt,
-                             Timestamp processedAt, Integer processedBy, String motif) {
+                             Timestamp updatedAt, Integer createdById, Integer updatedById, String motif) {
         this.id = id;
         this.equipeId = equipeId;
         this.joueurId = joueurId;
         this.statut = statut;
         this.createdAt = createdAt;
-        this.processedAt = processedAt;
-        this.processedBy = processedBy;
+        this.updatedAt = updatedAt;
+        this.createdById = createdById;
+        this.updatedById = updatedById;
         this.motif = motif;
+    }
+
+    public EquipeJoinRequest(int id, int equipeId, int joueurId, String statut, Timestamp createdAt,
+                             Timestamp updatedAt, Integer createdById, Integer updatedById, String motif, String joueurNom, String equipeNom) {
+        this(id, equipeId, joueurId, statut, createdAt, updatedAt, createdById, updatedById, motif);
+        this.joueurNom = joueurNom;
+        this.equipeNom = equipeNom;
     }
 
     public int getId() {
@@ -67,20 +78,28 @@ public class EquipeJoinRequest {
         this.createdAt = createdAt;
     }
 
-    public Timestamp getProcessedAt() {
-        return processedAt;
+    public Timestamp getUpdatedAt() {
+        return updatedAt;
     }
 
-    public void setProcessedAt(Timestamp processedAt) {
-        this.processedAt = processedAt;
+    public void setUpdatedAt(Timestamp updatedAt) {
+        this.updatedAt = updatedAt;
     }
 
-    public Integer getProcessedBy() {
-        return processedBy;
+    public Integer getCreatedById() {
+        return createdById;
     }
 
-    public void setProcessedBy(Integer processedBy) {
-        this.processedBy = processedBy;
+    public void setCreatedById(Integer createdById) {
+        this.createdById = createdById;
+    }
+
+    public Integer getUpdatedById() {
+        return updatedById;
+    }
+
+    public void setUpdatedById(Integer updatedById) {
+        this.updatedById = updatedById;
     }
 
     public String getMotif() {
@@ -89,5 +108,21 @@ public class EquipeJoinRequest {
 
     public void setMotif(String motif) {
         this.motif = motif;
+    }
+
+    public String getJoueurNom() {
+        return joueurNom;
+    }
+
+    public void setJoueurNom(String joueurNom) {
+        this.joueurNom = joueurNom;
+    }
+
+    public String getEquipeNom() {
+        return equipeNom;
+    }
+
+    public void setEquipeNom(String equipeNom) {
+        this.equipeNom = equipeNom;
     }
 }

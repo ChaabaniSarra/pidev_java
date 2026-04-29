@@ -26,26 +26,7 @@
                 <Label text="Classement des équipes basé sur les matchs terminés et le PPM." wrapText="true"
                        style="-fx-text-fill: #9ca3af; -fx-font-size: 13px;" />
             </VBox>
-            <Region HBox.hgrow="ALWAYS" />
-            <HBox spacing="8">
-                <Label text="PPM FIRST" style="-fx-background-color: rgba(59, 130, 246, 0.18); -fx-text-fill: #bfdbfe; -fx-padding: 6 12; -fx-background-radius: 16; -fx-font-size: 11px; -fx-font-weight: 700;" />
-                <Label text="FINISHED ONLY" style="-fx-background-color: rgba(14, 165, 233, 0.18); -fx-text-fill: #a5f3fc; -fx-padding: 6 12; -fx-background-radius: 16; -fx-font-size: 11px; -fx-font-weight: 700;" />
-            </HBox>
-        </HBox>
-
-        <HBox spacing="12">
-            <VBox spacing="4" style="-fx-background-color: rgba(15, 23, 42, 0.77); -fx-background-radius: 18; -fx-padding: 16; -fx-pref-width: 220;">
-                <Label text="Équipes" style="-fx-text-fill: #cbd5e1; -fx-font-size: 11px; -fx-font-weight: 700; -fx-letter-spacing: 0.14em;" />
-                <Label text="Toutes équipes" style="-fx-text-fill: #e2e8f0; -fx-font-size: 16px; -fx-font-weight: 800;" />
-            </VBox>
-            <VBox spacing="4" style="-fx-background-color: rgba(15, 23, 42, 0.77); -fx-background-radius: 18; -fx-padding: 16; -fx-pref-width: 220;">
-                <Label text="Classement" style="-fx-text-fill: #cbd5e1; -fx-font-size: 11px; -fx-font-weight: 700; -fx-letter-spacing: 0.14em;" />
-                <Label text="Mise à jour auto" style="-fx-text-fill: #e2e8f0; -fx-font-size: 16px; -fx-font-weight: 800;" />
-            </VBox>
-            <VBox spacing="4" style="-fx-background-color: rgba(15, 23, 42, 0.77); -fx-background-radius: 18; -fx-padding: 16; -fx-pref-width: 220;">
-                <Label text="Champion" style="-fx-text-fill: #cbd5e1; -fx-font-size: 11px; -fx-font-weight: 700; -fx-letter-spacing: 0.14em;" />
-                <Label text="Top PPM" style="-fx-text-fill: #e2e8f0; -fx-font-size: 16px; -fx-font-weight: 800;" />
-            </VBox>
+          
         </HBox>
 
         <TableView fx:id="rankingTable" VBox.vgrow="ALWAYS"

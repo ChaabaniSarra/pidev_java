@@ -31,11 +31,10 @@
         <TableView fx:id="pendingTable" VBox.vgrow="ALWAYS"
                    style="-fx-background-color: #1e293b;">
             <columns>
-                <TableColumn fx:id="idCol" text="ID" prefWidth="70"/>
-                <TableColumn fx:id="equipeCol" text="Equipe" prefWidth="120"/>
-                <TableColumn fx:id="joueurCol" text="Joueur" prefWidth="120"/>
+                <TableColumn fx:id="equipeCol" text="Equipe" prefWidth="160"/>
+                <TableColumn fx:id="joueurCol" text="Joueur" prefWidth="160"/>
                 <TableColumn fx:id="statutCol" text="Statut" prefWidth="120"/>
-                <TableColumn fx:id="createdCol" text="Creee le" prefWidth="250"/>
+                <TableColumn fx:id="createdCol" text="Créée le" prefWidth="240"/>
             </columns>
         </TableView>
 
