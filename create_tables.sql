@@ -80,7 +80,7 @@ CREATE TABLE stream (
 );
 
 INSERT INTO stream (url, is_active)
-VALUES ('rtmp://192.168.126.144/live', 1);
+VALUES ('http://192.168.126.144:8080/hls/match1.m3u8 ', 1);
 
 CREATE TABLE stream_reaction (
                                  id INT AUTO_INCREMENT PRIMARY KEY,
@@ -90,4 +90,9 @@ CREATE TABLE stream_reaction (
                                  created_at TIMESTAMP,
                                  stream_id INT,
                                  FOREIGN KEY (stream_id) REFERENCES stream(id) ON DELETE CASCADE
+);
+CREATE TABLE video (
+                       id INT AUTO_INCREMENT PRIMARY KEY,
+                       title VARCHAR(255),
+                       path TEXT
 );
