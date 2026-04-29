@@ -10,6 +10,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import org.opencv.core.Mat;
@@ -17,6 +18,7 @@ import org.opencv.core.MatOfByte;
 import org.opencv.objdetect.CascadeClassifier;
 import org.opencv.videoio.VideoCapture;
 import tn.esprit.entities.User;
+import tn.esprit.services.CloudinaryService;
 import tn.esprit.services.ServiceUser;
 import tn.esprit.services.TwoFactorService;
 import tn.esprit.utils.SessionManager;
@@ -26,6 +28,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.sql.SQLException;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -41,7 +44,10 @@ public class ProfileUserController {
     @FXML private Label userIdLabel;
     @FXML private Label twoFAStatusLabel;
     @FXML private Label avatarLabel;
+    @FXML private ImageView avatarImageView;
     @FXML private Button editProfileButton;
+    @FXML private Button uploadPhotoButton;
+    @FXML private Label profileImageStatusLabel;
     @FXML private Button enable2FAButton;
     @FXML private Button disable2FAButton;
     @FXML private Label faceRecognitionStatusLabel;
@@ -59,6 +65,7 @@ public class ProfileUserController {
     private Mat lastDetectedFace;
     private final ServiceUser serviceUser = new ServiceUser();
     private final TwoFactorService twoFactorService = new TwoFactorService();
+    private final CloudinaryService cloudinaryService = new CloudinaryService();
 
     @FXML
     public void initialize() {
@@ -169,6 +176,7 @@ public class ProfileUserController {
                     cameraSection.setManaged(false);
                 }
                 avatarLabel.setText("GU");
+                loadProfileImage(null);
                 return;
             }
 
@@ -176,6 +184,7 @@ public class ProfileUserController {
             emailLabel.setText(safeValue(user.getEmail(), "No email"));
             roleBadgeLabel.setText(formatRole(user.getRoles()));
             avatarLabel.setText(buildInitials(user.getNom(), user.getEmail()));
+            loadProfileImage(user);
             updateTwoFactorStatus(user);
             updateFaceRecognitionStatus(user);
 
@@ -224,6 +233,91 @@ public class ProfileUserController {
         }
 
         return compact.isEmpty() ? "UP" : compact.toUpperCase();
+    }
+
+    @FXML
+    private void handleUploadPhoto() {
+        User currentUser = SessionManager.getCurrentUser();
+        if (currentUser == null) {
+            updateProfileImageStatus("No user is logged in.", "#e8314a");
+            return;
+        }
+
+        if (!cloudinaryService.isConfigured()) {
+            updateProfileImageStatus(cloudinaryService.getConfigurationError(), "#e8314a");
+            return;
+        }
+
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Select Profile Picture");
+        fileChooser.getExtensionFilters().add(
+                new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.jpeg", "*.webp")
+        );
+
+        Stage stage = (Stage) editProfileButton.getScene().getWindow();
+        File selectedFile = fileChooser.showOpenDialog(stage);
+        if (selectedFile == null) {
+            return;
+        }
+
+        uploadPhotoButton.setDisable(true);
+        updateProfileImageStatus("Uploading image...", "#f5a623");
+
+        new Thread(() -> {
+            try {
+                String imageUrl = cloudinaryService.uploadProfileImage(selectedFile, currentUser.getId());
+                currentUser.setProfileImageUrl(imageUrl);
+                serviceUser.modifier(currentUser);
+                SessionManager.setCurrentUser(currentUser);
+
+                Platform.runLater(() -> {
+                    loadProfileImage(currentUser);
+                    updateProfileImageStatus("Profile picture updated.", "#22aa44");
+                    uploadPhotoButton.setDisable(false);
+                });
+            } catch (SQLException e) {
+                Platform.runLater(() -> {
+                    updateProfileImageStatus("Database update failed: " + e.getMessage(), "#e8314a");
+                    uploadPhotoButton.setDisable(false);
+                });
+            } catch (Exception e) {
+                Platform.runLater(() -> {
+                    updateProfileImageStatus("Upload failed: " + e.getMessage(), "#e8314a");
+                    uploadPhotoButton.setDisable(false);
+                });
+            }
+        }).start();
+    }
+
+    private void loadProfileImage(User user) {
+        if (avatarImageView == null || avatarLabel == null) {
+            return;
+        }
+
+        String imageUrl = user == null ? null : user.getProfileImageUrl();
+        if (imageUrl == null || imageUrl.isBlank()) {
+            avatarImageView.setImage(null);
+            avatarImageView.setVisible(false);
+            avatarImageView.setManaged(false);
+            avatarLabel.setVisible(true);
+            avatarLabel.setManaged(true);
+            return;
+        }
+
+        Image image = new Image(imageUrl, true);
+        avatarImageView.setImage(image);
+        avatarImageView.setVisible(true);
+        avatarImageView.setManaged(true);
+        avatarLabel.setVisible(false);
+        avatarLabel.setManaged(false);
+    }
+
+    private void updateProfileImageStatus(String message, String color) {
+        if (profileImageStatusLabel == null) {
+            return;
+        }
+        profileImageStatusLabel.setText(message);
+        profileImageStatusLabel.setStyle("-fx-text-fill: " + color + "; -fx-font-size: 13px;");
     }
 
     private void updateTwoFactorStatus(User user) {

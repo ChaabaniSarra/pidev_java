@@ -11,6 +11,7 @@ public class User {
     private boolean is2faEnabled;
     private String googleOauthId;
     private String oauthProvider;
+    private String profileImageUrl;
     private String faceEncoding;
     private boolean isFaceEnabled;
 
@@ -19,6 +20,7 @@ public class User {
 
     public User(int id, String email, String roles, String password, String nom, boolean isActive,
                 String google2faSecret, boolean is2faEnabled, String googleOauthId, String oauthProvider,
+                String profileImageUrl,
                 String faceEncoding, boolean isFaceEnabled) {
         this.id = id;
         this.email = email;
@@ -30,12 +32,14 @@ public class User {
         this.is2faEnabled = is2faEnabled;
         this.googleOauthId = googleOauthId;
         this.oauthProvider = oauthProvider;
+        this.profileImageUrl = profileImageUrl;
         this.faceEncoding = faceEncoding;
         this.isFaceEnabled = isFaceEnabled;
     }
 
     public User(String email, String roles, String password, String nom, boolean isActive,
                 String google2faSecret, boolean is2faEnabled, String googleOauthId, String oauthProvider,
+                String profileImageUrl,
                 String faceEncoding, boolean isFaceEnabled) {
         this.email = email;
         this.roles = roles;
@@ -46,6 +50,7 @@ public class User {
         this.is2faEnabled = is2faEnabled;
         this.googleOauthId = googleOauthId;
         this.oauthProvider = oauthProvider;
+        this.profileImageUrl = profileImageUrl;
         this.faceEncoding = faceEncoding;
         this.isFaceEnabled = isFaceEnabled;
     }
@@ -128,6 +133,14 @@ public class User {
 
     public void setOauthProvider(String oauthProvider) {
         this.oauthProvider = oauthProvider;
+    }
+
+    public String getProfileImageUrl() {
+        return profileImageUrl;
+    }
+
+    public void setProfileImageUrl(String profileImageUrl) {
+        this.profileImageUrl = profileImageUrl;
     }
 
     public String getFaceEncoding() {

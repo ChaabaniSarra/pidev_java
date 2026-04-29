@@ -56,8 +56,19 @@ CREATE TABLE IF NOT EXISTS `user` (
     is_2fa_enabled BOOLEAN NOT NULL DEFAULT FALSE,
     google_oauth_id VARCHAR(255),
     oauth_provider VARCHAR(100),
+    profile_image_url TEXT,
     face_encoding TEXT,
     is_face_enabled BOOLEAN NOT NULL DEFAULT FALSE
+);
+
+CREATE TABLE IF NOT EXISTS password_reset_token (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    token VARCHAR(20) NOT NULL,
+    expires_at DATETIME NOT NULL,
+    used BOOLEAN NOT NULL DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_password_reset_user FOREIGN KEY (user_id) REFERENCES `user`(id) ON DELETE CASCADE
 );
 CREATE DATABASE IF NOT EXISTS esport_db;
 USE esport_db;
@@ -70,7 +81,7 @@ CREATE TABLE stream (
 );
 
 INSERT INTO stream (url, is_active)
-VALUES ('rtmp://192.168.126.144/live', 1);
+VALUES ('http://192.168.126.144:8080/hls/match1.m3u8 ', 1);
 
 CREATE TABLE stream_reaction (
                                  id INT AUTO_INCREMENT PRIMARY KEY,
@@ -80,4 +91,9 @@ CREATE TABLE stream_reaction (
                                  created_at TIMESTAMP,
                                  stream_id INT,
                                  FOREIGN KEY (stream_id) REFERENCES stream(id) ON DELETE CASCADE
+);
+CREATE TABLE video (
+                       id INT AUTO_INCREMENT PRIMARY KEY,
+                       title VARCHAR(255),
+                       path TEXT
 );

@@ -6,18 +6,21 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.shape.*?>
 
-<AnchorPane prefHeight="720.0" prefWidth="1280.0" style="-fx-background-color: #05070f;" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tn.esprit.controllers.ProfileUserController">
+<AnchorPane prefHeight="720.0" prefWidth="1280.0" style="-fx-background-color: #070b16;" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="tn.esprit.controllers.ProfileUserController">
 
-    <VBox style="-fx-background-color: #05070f;" AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" AnchorPane.topAnchor="0">
+    <VBox style="-fx-background-color: transparent;" AnchorPane.bottomAnchor="0" AnchorPane.leftAnchor="0" AnchorPane.rightAnchor="0" AnchorPane.topAnchor="0">
 
         <fx:include source="Navbar.fxml" />
 
-        <StackPane VBox.vgrow="ALWAYS" style="-fx-background-color: linear-gradient(to bottom, #111427 0%, #0a0d17 100%);">
+        <StackPane VBox.vgrow="ALWAYS" style="-fx-background-color: linear-gradient(to bottom, #111427 0%, #0d1222 52%, #090d18 100%);">
             <children>
 
-                <ScrollPane style="-fx-background-color: transparent;" fitToWidth="true" pannable="true">
+                <ScrollPane fitToWidth="true" pannable="true"
+                            style="-fx-background: #090d18;
+                                   -fx-background-color: #090d18;">
                     <content>
-                        <VBox alignment="CENTER" spacing="26.0">
+                        <VBox alignment="CENTER" spacing="26.0"
+                              style="-fx-background-color: linear-gradient(to bottom, #111427 0%, #0d1222 52%, #090d18 100%);">
                             <padding>
                                 <Insets bottom="46.0" left="20.0" right="20.0" top="46.0" />
                             </padding>
@@ -26,22 +29,35 @@
 
                             <AnchorPane maxWidth="560.0" prefWidth="560.0" style="-fx-background-color: rgba(16,19,36,0.96);
                                                    -fx-background-radius: 34;
-                                                   -fx-border-color: rgba(104,94,255,0.9);
+                                                   -fx-border-color: rgba(104,94,255,0.88);
                                                    -fx-border-width: 1.5;
                                                    -fx-border-radius: 34;
-                                                   -fx-effect: dropshadow(gaussian, rgba(93,56,255,0.46), 45, 0.35, 0, 0);">
+                                                   -fx-effect: dropshadow(gaussian, rgba(93,56,255,0.32), 42, 0.28, 0, 0);">
                                 <VBox alignment="CENTER" spacing="18.0" AnchorPane.bottomAnchor="34.0" AnchorPane.leftAnchor="40.0" AnchorPane.rightAnchor="40.0" AnchorPane.topAnchor="34.0">
 
                                     <!-- Avatar -->
                                     <StackPane prefHeight="140.0" prefWidth="140.0">
                                         <Circle fill="transparent" radius="56.0" stroke="#6e5cff" strokeWidth="4.0" />
                                         <Circle fill="#111427" radius="44.0" />
+                                        <ImageView fx:id="avatarImageView" fitHeight="88.0" fitWidth="88.0" managed="false" pickOnBounds="true" preserveRatio="true" visible="false" />
                                         <Label fx:id="avatarLabel" style="-fx-text-fill: white; -fx-font-size: 28px; -fx-font-weight: bold;" text="UP" />
                                     </StackPane>
 
                                     <Label fx:id="nameLabel" style="-fx-text-fill: white; -fx-font-size: 28px; -fx-font-weight: 800;" text="User Name" />
 
                                     <Label fx:id="emailLabel" style="-fx-text-fill: #8d93a8; -fx-font-size: 17px;" text="user@email.com" />
+
+                                    <VBox alignment="CENTER" spacing="8.0">
+                                        <Button fx:id="uploadPhotoButton" onAction="#handleUploadPhoto"
+                                                style="-fx-background-color: linear-gradient(to right, #4f6bff, #8a4dff);
+                                                       -fx-background-radius: 999;
+                                                       -fx-text-fill: white;
+                                                       -fx-font-size: 13px;
+                                                       -fx-font-weight: 700;
+                                                       -fx-padding: 8 18 8 18;
+                                                       -fx-cursor: hand;" text="UPLOAD PHOTO" />
+                                        <Label fx:id="profileImageStatusLabel" style="-fx-text-fill: #8d93a8; -fx-font-size: 13px;" text="Profile picture not uploaded" />
+                                    </VBox>
 
                                     <Label fx:id="roleBadgeLabel" style="-fx-background-color: linear-gradient(to right, #6f62ff, #9a58ff);
                                                        -fx-background-radius: 999;
@@ -57,14 +73,14 @@
 
                                         <!-- Edit Profile Button -->
                                         <Button fx:id="editProfileButton" maxWidth="1.7976931348623157E308" onAction="#handleEditProfile"
-                                                style="-fx-background-color: linear-gradient(to right, #6860ff, #ff274f);
+                                                style="-fx-background-color: linear-gradient(to right, #6860ff, #8a4dff);
                                                        -fx-background-radius: 16;
                                                        -fx-text-fill: white;
                                                        -fx-font-size: 20px;
                                                        -fx-font-weight: 800;
                                                        -fx-padding: 14 18 14 18;
                                                        -fx-cursor: hand;
-                                                       -fx-effect: dropshadow(gaussian, rgba(255,40,82,0.34), 20, 0.2, 0, 8);" text="EDIT PROFILE" />
+                                                       -fx-effect: dropshadow(gaussian, rgba(111,86,255,0.36), 20, 0.2, 0, 8);" text="EDIT PROFILE" />
 
                                         <!-- Logout Button -->
                                         <Button maxWidth="1.7976931348623157E308" onAction="#handleLogout"

@@ -1,6 +1,5 @@
 package tn.esprit.controllers;
 
-import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -13,11 +12,7 @@ import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
-import org.opencv.core.*;
-import org.opencv.imgproc.Imgproc;
-import org.opencv.videoio.VideoCapture;
 import tn.esprit.entities.User;
-import tn.esprit.services.FaceRecognitionService;
 import tn.esprit.services.GoogleOAuthService;
 import tn.esprit.services.ServiceUser;
 import tn.esprit.services.TwoFactorService;
@@ -25,13 +20,11 @@ import tn.esprit.utils.SessionManager;
 
 import java.io.IOException;
 import java.sql.SQLException;
-import java.util.List;
 
 public class LoginController {
 
     private final ServiceUser serviceUser = new ServiceUser();
     private final TwoFactorService twoFactorService = new TwoFactorService();
-
     @FXML private TextField usernameField;
     @FXML private PasswordField passwordField;
     @FXML private Label messageLabel;
@@ -39,14 +32,12 @@ public class LoginController {
     @FXML private Label passwordError;
     @FXML private Button loginButton;
 
-    // ── Init ─────────────────────────────────────────────────────────────────
     @FXML
     public void initialize() {
         usernameField.textProperty().addListener((obs, old, val) -> validateEmail());
         passwordField.textProperty().addListener((obs, old, val) -> validatePassword());
     }
 
-    // ── Email / Password Login ────────────────────────────────────────────────
     @FXML
     private void handleLogin() {
         String username = usernameField.getText().trim();
@@ -74,11 +65,8 @@ public class LoginController {
             messageLabel.setTextFill(Color.web("#5b4cdf"));
             messageLabel.setText("Bienvenue, " + user.getNom() + "!");
 
-            // ── Check if 2FA is required ──────────────────────────────────
             if (twoFactorService.requires2FA(user)) {
-                Parent root = FXMLLoader.load(
-                        getClass().getResource("/TwoFactorVerify.fxml")
-                );
+                Parent root = FXMLLoader.load(getClass().getResource("/TwoFactorVerify.fxml"));
                 Stage stage = (Stage) loginButton.getScene().getWindow();
                 stage.setScene(new Scene(root));
                 stage.setTitle("Two-Factor Authentication");
@@ -86,146 +74,35 @@ public class LoginController {
                 return;
             }
 
-            // No 2FA → go straight home
             loadHomePage();
 
         } catch (SQLException e) {
             messageLabel.setTextFill(Color.RED);
-            messageLabel.setText("Erreur base de données : " + e.getMessage());
+            messageLabel.setText("Erreur base de donnees : " + e.getMessage());
         } catch (IOException e) {
             messageLabel.setTextFill(Color.RED);
             messageLabel.setText("Impossible d'ouvrir la page d'accueil.");
         }
     }
 
-    // ── Face Recognition Login ────────────────────────────────────────────────
     @FXML
     private void handleFaceRecognition(ActionEvent event) {
-        messageLabel.setTextFill(Color.web("#5b4cdf"));
-        messageLabel.setText("📷 Opening camera for face login...");
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/FaceRecognition.fxml"));
+            Parent root = loader.load();
+            FaceRecognitionController controller = loader.getController();
+            controller.setLoginMode();
 
-        new Thread(() -> {
-            try {
-                nu.pattern.OpenCV.loadLocally();
-
-                VideoCapture capture = new VideoCapture(0, org.opencv.videoio.Videoio.CAP_DSHOW);
-                if (!capture.isOpened()) {
-                    capture = new VideoCapture(1, org.opencv.videoio.Videoio.CAP_DSHOW);
-                }
-
-                if (!capture.isOpened()) {
-                    Platform.runLater(() -> {
-                        messageLabel.setTextFill(Color.RED);
-                        messageLabel.setText("❌ Camera not found!");
-                    });
-                    return;
-                }
-
-                // Warm up camera
-                Mat frame = new Mat();
-                for (int i = 0; i < 10; i++) {
-                    capture.read(frame);
-                    Thread.sleep(50);
-                }
-                capture.read(frame);
-                capture.release();
-
-                if (frame.empty()) {
-                    Platform.runLater(() -> {
-                        messageLabel.setTextFill(Color.RED);
-                        messageLabel.setText("❌ Could not read camera frame!");
-                    });
-                    return;
-                }
-
-                // Get all users with face enabled
-                List<User> usersWithFace = serviceUser.getUsersWithFaceEnabled();
-
-                if (usersWithFace.isEmpty()) {
-                    Platform.runLater(() -> {
-                        messageLabel.setTextFill(Color.RED);
-                        messageLabel.setText("❌ No users with face recognition enrolled!");
-                    });
-                    return;
-                }
-
-                // Convert to grayscale for matching
-                Mat capturedGray = new Mat();
-                Imgproc.cvtColor(frame, capturedGray, Imgproc.COLOR_BGR2GRAY);
-
-                User matchedUser = null;
-                double bestMatch = 0.0;
-
-                for (User user : usersWithFace) {
-                    String facePath = user.getFaceEncoding();
-                    if (facePath == null || facePath.isEmpty()) continue;
-
-                    Mat enrolledMat = org.opencv.imgcodecs.Imgcodecs.imread(facePath, 0);
-                    if (enrolledMat.empty()) continue;
-
-                    Mat resized = new Mat();
-                    Imgproc.resize(capturedGray, resized, enrolledMat.size());
-
-                    Mat result = new Mat();
-                    Imgproc.matchTemplate(resized, enrolledMat, result, Imgproc.TM_CCOEFF_NORMED);
-
-                    double similarity = Core.minMaxLoc(result).maxVal;
-                    System.out.println("User: " + user.getNom() + " similarity: " + similarity);
-
-                    if (similarity > bestMatch) {
-                        bestMatch = similarity;
-                        matchedUser = user;
-                    }
-                }
-
-                final User finalMatchedUser = matchedUser;
-                final double finalBestMatch = bestMatch;
-
-                Platform.runLater(() -> {
-                    if (finalMatchedUser != null && finalBestMatch >= 0.4) {
-                        SessionManager.setCurrentUser(finalMatchedUser);
-                        messageLabel.setTextFill(Color.GREEN);
-                        messageLabel.setText("✅ Face recognized! Logging in as "
-                                + finalMatchedUser.getNom() + "...");
-
-                        // ── Check 2FA after face login too ────────────────
-                        if (twoFactorService.requires2FA(finalMatchedUser)) {
-                            try {
-                                Parent root = FXMLLoader.load(
-                                        getClass().getResource("/tn/esprit/views/TwoFactorVerify.fxml")
-                                );
-                                Stage stage = (Stage) loginButton.getScene().getWindow();
-                                stage.setScene(new Scene(root));
-                                stage.setTitle("Two-Factor Authentication");
-                                stage.show();
-                            } catch (IOException e) {
-                                messageLabel.setTextFill(Color.RED);
-                                messageLabel.setText("❌ Error opening 2FA screen.");
-                            }
-                        } else {
-                            loadHomePage();
-                        }
-
-                    } else {
-                        messageLabel.setTextFill(Color.RED);
-                        messageLabel.setText(
-                                "❌ Face not recognized! Please enroll first or use email login."
-                        );
-                    }
-                });
-
-            } catch (Exception e) {
-                System.out.println("Face recognition error: " + e.getMessage());
-                e.printStackTrace();
-                Platform.runLater(() -> {
-                    messageLabel.setTextFill(Color.RED);
-                    messageLabel.setText("❌ Error: " + e.getMessage());
-                });
-            }
-        }).start();
+            Stage stage = (Stage) loginButton.getScene().getWindow();
+            stage.setScene(new Scene(root));
+            stage.setTitle("Face Recognition Sign In");
+            stage.show();
+        } catch (IOException e) {
+            messageLabel.setTextFill(Color.RED);
+            messageLabel.setText("Unable to open face recognition screen.");
+        }
     }
 
-    // ── Forgot Password ───────────────────────────────────────────────────────
     @FXML
     public void handleForgotPassword(ActionEvent event) {
         try {
@@ -240,7 +117,6 @@ public class LoginController {
         }
     }
 
-    // ── Google OAuth ──────────────────────────────────────────────────────────
     @FXML
     private void handleGoogleSignUp() {
         try {
@@ -262,11 +138,8 @@ public class LoginController {
                 messageLabel.setTextFill(Color.web("#5b4cdf"));
                 messageLabel.setText("Bienvenue, " + existingUser.getNom() + "!");
 
-                // Check 2FA for Google login too
                 if (twoFactorService.requires2FA(existingUser)) {
-                    Parent root = FXMLLoader.load(
-                            getClass().getResource("/TwoFactorVerify.fxml")
-                    );
+                    Parent root = FXMLLoader.load(getClass().getResource("/TwoFactorVerify.fxml"));
                     Stage stage = (Stage) loginButton.getScene().getWindow();
                     stage.setScene(new Scene(root));
                     stage.setTitle("Two-Factor Authentication");
@@ -278,13 +151,13 @@ public class LoginController {
             } else {
                 if (serviceUser.emailExists(googleUser.getEmail())) {
                     messageLabel.setTextFill(Color.RED);
-                    messageLabel.setText("Un compte avec cet email existe déjà.");
+                    messageLabel.setText("Un compte avec cet email existe deja.");
                     return;
                 }
                 User newUser = serviceUser.createOAuthUser(googleUser);
                 SessionManager.setCurrentUser(newUser);
                 messageLabel.setTextFill(Color.web("#27ae60"));
-                messageLabel.setText("Compte créé ! Bienvenue, " + newUser.getNom() + "!");
+                messageLabel.setText("Compte cree. Bienvenue, " + newUser.getNom() + "!");
                 loadHomePage();
             }
 
@@ -293,14 +166,13 @@ public class LoginController {
             messageLabel.setText("Erreur Google Auth : " + e.getMessage());
         } catch (SQLException e) {
             messageLabel.setTextFill(Color.RED);
-            messageLabel.setText("Erreur base de données : " + e.getMessage());
+            messageLabel.setText("Erreur base de donnees : " + e.getMessage());
         } catch (Exception e) {
             messageLabel.setTextFill(Color.RED);
             messageLabel.setText("Erreur : " + e.getMessage());
         }
     }
 
-    // ── Register ──────────────────────────────────────────────────────────────
     @FXML
     private void goToRegister(ActionEvent event) {
         try {
@@ -311,7 +183,6 @@ public class LoginController {
         }
     }
 
-    // ── Validation ────────────────────────────────────────────────────────────
     private boolean validateEmail() {
         String email = usernameField.getText().trim();
         if (email.isEmpty()) {
@@ -333,7 +204,7 @@ public class LoginController {
             return false;
         }
         if (password.length() < 6) {
-            setError(passwordField, passwordError, "Au moins 6 caractères.");
+            setError(passwordField, passwordError, "Au moins 6 caracteres.");
             return false;
         }
         clearError(passwordField, passwordError);
@@ -342,20 +213,18 @@ public class LoginController {
 
     private void setError(Control field, Label errorLabel, String message) {
         field.setStyle("-fx-border-color: red; -fx-border-radius: 5;");
-        errorLabel.setText("⚠ " + message);
+        errorLabel.setText("Attention: " + message);
         errorLabel.setVisible(true);
         errorLabel.setManaged(true);
     }
 
     private void clearError(Control field, Label errorLabel) {
-        field.setStyle("-fx-border-color: transparent transparent #27ae60 transparent;"
-                + " -fx-border-width: 0 0 1.5 0;");
+        field.setStyle("-fx-border-color: transparent transparent #27ae60 transparent; -fx-border-width: 0 0 1.5 0;");
         errorLabel.setText("");
         errorLabel.setVisible(false);
         errorLabel.setManaged(false);
     }
 
-    // ── Navigation ────────────────────────────────────────────────────────────
     private void loadScene(ActionEvent event, String resourcePath, String title) throws IOException {
         Parent root = FXMLLoader.load(getClass().getResource(resourcePath));
         Stage stage = (Stage) ((Control) event.getSource()).getScene().getWindow();
@@ -367,8 +236,7 @@ public class LoginController {
     private void loadHomePage() {
         try {
             User user = SessionManager.getCurrentUser();
-            String fxml = "admin@gmail.com".equalsIgnoreCase(user.getEmail())
-                    ? "/main.fxml" : "/home.fxml";
+            String fxml = "admin@gmail.com".equalsIgnoreCase(user.getEmail()) ? "/main.fxml" : "/home.fxml";
             Parent root = FXMLLoader.load(getClass().getResource(fxml));
             Stage stage = (Stage) loginButton.getScene().getWindow();
             stage.setScene(new Scene(root, 980, 720));

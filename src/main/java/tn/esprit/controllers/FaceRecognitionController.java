@@ -7,9 +7,11 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Hyperlink;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import org.opencv.core.Mat;
 import org.opencv.core.MatOfByte;
@@ -24,7 +26,9 @@ import org.opencv.objdetect.CascadeClassifier;
 import org.opencv.videoio.VideoCapture;
 import org.opencv.videoio.Videoio;
 import tn.esprit.entities.User;
+import tn.esprit.services.FaceRecognitionService;
 import tn.esprit.services.ServiceUser;
+import tn.esprit.services.TwoFactorService;
 import tn.esprit.utils.SessionManager;
 
 import java.io.File;
@@ -33,6 +37,7 @@ import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.sql.SQLException;
+import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
@@ -40,17 +45,22 @@ import java.util.concurrent.TimeUnit;
 public class FaceRecognitionController {
 
     @FXML private ImageView cameraView;
+    @FXML private Label titleLabel;
     @FXML private Label statusLabel;
     @FXML private Button captureFaceButton;
     @FXML private Button disableFaceButton;
+    @FXML private Hyperlink backLink;
 
     private VideoCapture capture;
     private CascadeClassifier faceDetector;
     private ScheduledExecutorService timer;
     private Mat lastDetectedFace;
     private User user;
+    private Mode mode = Mode.ENROLL;
 
     private final ServiceUser serviceUser = new ServiceUser();
+    private final FaceRecognitionService faceRecognitionService = new FaceRecognitionService();
+    private final TwoFactorService twoFactorService = new TwoFactorService();
 
     @FXML
     public void initialize() {
@@ -64,8 +74,12 @@ public class FaceRecognitionController {
                 user = SessionManager.getCurrentUser();
             }
 
+            updateModeUi();
             updateDisableButtonState();
             startCamera();
+            if (!faceRecognitionService.isConfigured()) {
+                updateStatus(faceRecognitionService.getConfigurationError(), "#e8314a");
+            }
             if (!cascadeLoaded) {
                 updateStatus("Camera started. Face detection is unavailable, but capture still works.", "#f5a623");
             }
@@ -78,6 +92,13 @@ public class FaceRecognitionController {
     public void setUser(User user) {
         this.user = user;
         updateDisableButtonState();
+    }
+
+    public void setLoginMode() {
+        this.mode = Mode.LOGIN;
+        if (titleLabel != null) {
+            updateModeUi();
+        }
     }
 
     private boolean loadFaceDetector() {
@@ -125,6 +146,14 @@ public class FaceRecognitionController {
     }
 
     private void updateDisableButtonState() {
+        if (mode == Mode.LOGIN) {
+            if (disableFaceButton != null) {
+                disableFaceButton.setVisible(false);
+                disableFaceButton.setManaged(false);
+            }
+            return;
+        }
+
         boolean enabled = user != null
                 && user.isFaceEnabled()
                 && Files.exists(Paths.get(getFaceDataPath()));
@@ -200,12 +229,21 @@ public class FaceRecognitionController {
         Image imageToShow = matToImage(previewFrame);
         Platform.runLater(() -> {
             cameraView.setImage(imageToShow);
-            updateStatus("Camera is running. Click Capture Face when ready.", "#22aa44");
+            if (mode == Mode.LOGIN) {
+                updateStatus("Camera is running. Click Sign In when ready.", "#22aa44");
+            } else {
+                updateStatus("Camera is running. Click Capture Face when ready.", "#22aa44");
+            }
         });
     }
 
     @FXML
     private void handleCaptureFace(ActionEvent event) {
+        if (mode == Mode.LOGIN) {
+            handleLoginWithFace();
+            return;
+        }
+
         User currentUser = user != null ? user : SessionManager.getCurrentUser();
         if (currentUser == null) {
             updateStatus("No user is logged in.", "#e8314a");
@@ -222,6 +260,7 @@ public class FaceRecognitionController {
 
         new Thread(() -> {
             try {
+                faceRecognitionService.validateFaceImage(lastDetectedFace);
                 Files.createDirectories(Paths.get("face_data"));
 
                 String path = getFaceDataPath();
@@ -256,6 +295,79 @@ public class FaceRecognitionController {
         }).start();
     }
 
+    private void handleLoginWithFace() {
+        if (lastDetectedFace == null || lastDetectedFace.empty()) {
+            updateStatus("No valid frame available. Please look at the camera.", "#e8314a");
+            return;
+        }
+
+        captureFaceButton.setText("Processing...");
+        captureFaceButton.setDisable(true);
+
+        new Thread(() -> {
+            try {
+                if (!faceRecognitionService.isConfigured()) {
+                    throw new IOException(faceRecognitionService.getConfigurationError());
+                }
+
+                faceRecognitionService.validateFaceImage(lastDetectedFace);
+                List<User> usersWithFace = serviceUser.getUsersWithFaceEnabled();
+                if (usersWithFace.isEmpty()) {
+                    throw new IOException("No users with face recognition enrolled.");
+                }
+
+                User matchedUser = null;
+                double bestMatch = Double.MAX_VALUE;
+                String recognitionError = null;
+
+                for (User candidate : usersWithFace) {
+                    String facePath = candidate.getFaceEncoding();
+                    if (facePath == null || facePath.isBlank()) {
+                        continue;
+                    }
+
+                    FaceRecognitionService.MatchResult result =
+                            faceRecognitionService.recognizeFace(facePath, lastDetectedFace);
+
+                    if (result.hasError()) {
+                        recognitionError = result.errorMessage();
+                        continue;
+                    }
+
+                    if (result.matched() && result.confidence() < bestMatch) {
+                        bestMatch = result.confidence();
+                        matchedUser = candidate;
+                    }
+                }
+
+                User finalMatchedUser = matchedUser;
+                String finalRecognitionError = recognitionError;
+
+                Platform.runLater(() -> {
+                    captureFaceButton.setText("Sign In");
+                    captureFaceButton.setDisable(false);
+
+                    if (finalMatchedUser != null) {
+                        SessionManager.setCurrentUser(finalMatchedUser);
+                        updateStatus("Face recognized. Signing in as " + finalMatchedUser.getNom() + ".", "#22aa44");
+                        stopCamera();
+                        openPostLoginScreen(finalMatchedUser);
+                    } else if (finalRecognitionError != null) {
+                        updateStatus(finalRecognitionError, "#e8314a");
+                    } else {
+                        updateStatus("Face not recognized. Try again or use email login.", "#e8314a");
+                    }
+                });
+            } catch (Exception e) {
+                Platform.runLater(() -> {
+                    captureFaceButton.setText("Sign In");
+                    captureFaceButton.setDisable(false);
+                    updateStatus("Face login failed: " + e.getMessage(), "#e8314a");
+                });
+            }
+        }).start();
+    }
+
     @FXML
     private void handleDisableFaceRecognition(ActionEvent event) {
         User currentUser = user != null ? user : SessionManager.getCurrentUser();
@@ -281,6 +393,11 @@ public class FaceRecognitionController {
     @FXML
     private void handleBackToProfile(ActionEvent event) {
         stopCamera();
+        if (mode == Mode.LOGIN) {
+            goToLogin();
+            return;
+        }
+
         try {
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/ProfileUser.fxml"));
             Parent root = loader.load();
@@ -291,6 +408,55 @@ public class FaceRecognitionController {
         } catch (IOException e) {
             e.printStackTrace();
             updateStatus("Unable to return to profile.", "#e8314a");
+        }
+    }
+
+    private void goToLogin() {
+        try {
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/Login.fxml"));
+            Parent root = loader.load();
+            Stage stage = (Stage) cameraView.getScene().getWindow();
+            stage.setScene(new Scene(root));
+            stage.setTitle("Login");
+            stage.show();
+        } catch (IOException e) {
+            updateStatus("Unable to return to login.", "#e8314a");
+        }
+    }
+
+    private void openPostLoginScreen(User loggedUser) {
+        try {
+            Stage stage = (Stage) cameraView.getScene().getWindow();
+            if (twoFactorService.requires2FA(loggedUser)) {
+                Parent root = FXMLLoader.load(getClass().getResource("/TwoFactorVerify.fxml"));
+                stage.setScene(new Scene(root));
+                stage.setTitle("Two-Factor Authentication");
+                stage.show();
+                return;
+            }
+
+            String fxml = "admin@gmail.com".equalsIgnoreCase(loggedUser.getEmail()) ? "/main.fxml" : "/home.fxml";
+            Parent root = FXMLLoader.load(getClass().getResource(fxml));
+            stage.setScene(new Scene(root, 980, 720));
+            stage.setTitle("Esports Community");
+            stage.show();
+        } catch (IOException e) {
+            updateStatus("Unable to open the next screen.", "#e8314a");
+        }
+    }
+
+    private void updateModeUi() {
+        if (mode == Mode.LOGIN) {
+            titleLabel.setText("Face Recognition Sign In");
+            captureFaceButton.setText("Sign In");
+            disableFaceButton.setVisible(false);
+            disableFaceButton.setManaged(false);
+            backLink.setText("Back to Login");
+        } else {
+            titleLabel.setText("Face Recognition Setup");
+            captureFaceButton.setText("Capture Face");
+            backLink.setText("Back to Profile");
+            updateDisableButtonState();
         }
     }
 
@@ -324,5 +490,10 @@ public class FaceRecognitionController {
             lastDetectedFace.release();
             lastDetectedFace = null;
         }
+    }
+
+    private enum Mode {
+        ENROLL,
+        LOGIN
     }
 }

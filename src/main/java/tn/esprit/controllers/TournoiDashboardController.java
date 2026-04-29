@@ -87,7 +87,7 @@ public class TournoiDashboardController implements Initializable {
             private final HBox box = new HBox(8, editBtn, deleteBtn);
 
             {
-                editBtn.setStyle("-fx-background-color: #f59e0b; -fx-text-fill: white; -fx-cursor: hand;");
+            editBtn.setStyle("-fx-background-color: #6e5cff; -fx-text-fill: white; -fx-cursor: hand;");
                 deleteBtn.setStyle("-fx-background-color: #dc2626; -fx-text-fill: white; -fx-cursor: hand;");
 
                 editBtn.setOnAction(e -> {

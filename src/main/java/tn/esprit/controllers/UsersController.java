@@ -65,7 +65,7 @@ public class UsersController implements Initializable {
             private final HBox box = new HBox(5, editBtn, deleteBtn);
 
             {
-                editBtn.setStyle("-fx-background-color: #f39c12; -fx-text-fill: white; -fx-cursor: hand;");
+            editBtn.setStyle("-fx-background-color: #6e5cff; -fx-text-fill: white; -fx-cursor: hand;");
                 deleteBtn.setStyle("-fx-background-color: #e74c3c; -fx-text-fill: white; -fx-cursor: hand;");
 
                 editBtn.setOnAction(e -> {

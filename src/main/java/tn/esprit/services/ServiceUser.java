@@ -19,11 +19,12 @@ public class ServiceUser implements IService<User> {
 
     public ServiceUser() {
         conn = MyDatabase.getInstance().getConnection();
+        ensureProfileImageColumn();
     }
 
     @Override
     public void ajouter(User user) throws SQLException {
-        String sql = "INSERT INTO `user`(email, roles, password, nom, is_active, google2fa_secret, is_2fa_enabled, google_oauth_id, oauth_provider, face_encoding, is_face_enabled) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO `user`(email, roles, password, nom, is_active, google2fa_secret, is_2fa_enabled, google_oauth_id, oauth_provider, profile_image_url, face_encoding, is_face_enabled) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         try (PreparedStatement ps = getConnectionOrThrow().prepareStatement(sql)) {
             ps.setString(1, user.getEmail());
             ps.setString(2, user.getRoles());
@@ -34,15 +35,16 @@ public class ServiceUser implements IService<User> {
             ps.setBoolean(7, user.isIs2faEnabled());
             ps.setString(8, user.getGoogleOauthId());
             ps.setString(9, user.getOauthProvider());
-            ps.setString(10, user.getFaceEncoding());
-            ps.setBoolean(11, user.isFaceEnabled());
+            ps.setString(10, user.getProfileImageUrl());
+            ps.setString(11, user.getFaceEncoding());
+            ps.setBoolean(12, user.isFaceEnabled());
             ps.executeUpdate();
         }
     }
 
     @Override
     public void modifier(User user) throws SQLException {
-        String sql = "UPDATE `user` SET email=?, roles=?, password=?, nom=?, is_active=?, google2fa_secret=?, is_2fa_enabled=?, google_oauth_id=?, oauth_provider=?, face_encoding=?, is_face_enabled=? WHERE id=?";
+        String sql = "UPDATE `user` SET email=?, roles=?, password=?, nom=?, is_active=?, google2fa_secret=?, is_2fa_enabled=?, google_oauth_id=?, oauth_provider=?, profile_image_url=?, face_encoding=?, is_face_enabled=? WHERE id=?";
         try (PreparedStatement ps = getConnectionOrThrow().prepareStatement(sql)) {
             ps.setString(1, user.getEmail());
             ps.setString(2, user.getRoles());
@@ -53,9 +55,10 @@ public class ServiceUser implements IService<User> {
             ps.setBoolean(7, user.isIs2faEnabled());
             ps.setString(8, user.getGoogleOauthId());
             ps.setString(9, user.getOauthProvider());
-            ps.setString(10, user.getFaceEncoding());
-            ps.setBoolean(11, user.isFaceEnabled());
-            ps.setInt(12, user.getId());
+            ps.setString(10, user.getProfileImageUrl());
+            ps.setString(11, user.getFaceEncoding());
+            ps.setBoolean(12, user.isFaceEnabled());
+            ps.setInt(13, user.getId());
             ps.executeUpdate();
         }
     }
@@ -88,6 +91,7 @@ public class ServiceUser implements IService<User> {
                         rs.getBoolean("is_2fa_enabled"),
                         rs.getString("google_oauth_id"),
                         rs.getString("oauth_provider"),
+                        rs.getString("profile_image_url"),
                         rs.getString("face_encoding"),
                         rs.getBoolean("is_face_enabled")
                 );
@@ -141,6 +145,7 @@ public class ServiceUser implements IService<User> {
                                 rs.getBoolean("is_2fa_enabled"),
                                 rs.getString("google_oauth_id"),
                                 rs.getString("oauth_provider"),
+                                rs.getString("profile_image_url"),
                                 rs.getString("face_encoding"),
                                 rs.getBoolean("is_face_enabled")
                         );
@@ -217,6 +222,15 @@ public class ServiceUser implements IService<User> {
         return null;
     }
 
+    public void updatePassword(int userId, String newPassword) throws SQLException {
+        String sql = "UPDATE `user` SET password = ? WHERE id = ?";
+        try (PreparedStatement ps = getConnectionOrThrow().prepareStatement(sql)) {
+            ps.setString(1, hashIfNeeded(newPassword));
+            ps.setInt(2, userId);
+            ps.executeUpdate();
+        }
+    }
+
     public User linkGoogleAccount(User existingUser, User googleUser) throws SQLException {
         String sql = "UPDATE `user` SET google_oauth_id = ?, oauth_provider = ? WHERE id = ?";
         try (PreparedStatement ps = getConnectionOrThrow().prepareStatement(sql)) {
@@ -232,9 +246,9 @@ public class ServiceUser implements IService<User> {
 
     public User createOAuthUser(User user) throws SQLException {
         StringBuilder columns = new StringBuilder(
-                "email, roles, password, nom, is_active, google2fa_secret, is_2fa_enabled, google_oauth_id, oauth_provider, face_encoding, is_face_enabled"
+                "email, roles, password, nom, is_active, google2fa_secret, is_2fa_enabled, google_oauth_id, oauth_provider, profile_image_url, face_encoding, is_face_enabled"
         );
-        StringBuilder placeholders = new StringBuilder("?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?");
+        StringBuilder placeholders = new StringBuilder("?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?");
 
         boolean requiresLocation = requiresNonNullColumnWithoutDefault("user", "location");
         if (requiresLocation) {
@@ -254,6 +268,7 @@ public class ServiceUser implements IService<User> {
             ps.setBoolean(index++, user.isIs2faEnabled());
             ps.setString(index++, user.getGoogleOauthId());
             ps.setString(index++, user.getOauthProvider());
+            ps.setString(index++, user.getProfileImageUrl());
             ps.setString(index++, user.getFaceEncoding());
             ps.setBoolean(index++, user.isFaceEnabled());
             if (requiresLocation) {
@@ -296,9 +311,29 @@ public class ServiceUser implements IService<User> {
                 rs.getBoolean("is_2fa_enabled"),
                 rs.getString("google_oauth_id"),
                 rs.getString("oauth_provider"),
+                rs.getString("profile_image_url"),
                 rs.getString("face_encoding"),
                 rs.getBoolean("is_face_enabled")
         );
+    }
+
+    private void ensureProfileImageColumn() {
+        if (conn == null) {
+            return;
+        }
+
+        try {
+            DatabaseMetaData metaData = conn.getMetaData();
+            try (ResultSet rs = metaData.getColumns(conn.getCatalog(), null, "user", "profile_image_url")) {
+                if (!rs.next()) {
+                    try (Statement stmt = conn.createStatement()) {
+                        stmt.executeUpdate("ALTER TABLE `user` ADD COLUMN profile_image_url TEXT NULL AFTER oauth_provider");
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Unable to ensure profile_image_url column: " + e.getMessage());
+        }
     }
 
     private boolean requiresNonNullColumnWithoutDefault(String tableName, String columnName) throws SQLException {

@@ -24,7 +24,8 @@
                      -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.22), 40, 0.15, 0, 8);">
 
             <!-- Title -->
-            <Label text="Face Recognition Setup"
+            <Label fx:id="titleLabel"
+                   text="Face Recognition Setup"
                    style="-fx-font-size: 26px; -fx-font-weight: 800; -fx-text-fill: #111;"/>
 
             <!-- Camera Feed -->
@@ -72,7 +73,8 @@
                            -fx-effect: dropshadow(gaussian, rgba(232,49,74,0.35), 16, 0.2, 0, 6);"/>
 
             <!-- Back to Profile Link -->
-            <Hyperlink text="Back to Profile"
+            <Hyperlink fx:id="backLink"
+                       text="Back to Profile"
                        onAction="#handleBackToProfile"
                        style="-fx-text-fill: #5b4cdf;
                               -fx-font-size: 13px;

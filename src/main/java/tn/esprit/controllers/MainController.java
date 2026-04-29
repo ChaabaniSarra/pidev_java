@@ -14,7 +14,8 @@ import java.util.ResourceBundle;
 
 public class MainController implements Initializable {
 
-    @FXML private StackPane contentArea;
+    @FXML
+    private StackPane contentArea;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -77,30 +78,21 @@ public class MainController implements Initializable {
             e.printStackTrace();
         }
     }
+
+    // ✅ STREAM (correct)
     @FXML
-    public void showOrders() {
-        loadPage("/orders.fxml");
-    }
-    @FXML
-    private void showStream() {
+    public void showStream() {
         loadPage("/stream.fxml");
     }
-    private void loadPage(String fxmlPath) {
+
+    // ✅ méthode commune (si elle n’existe pas déjà chez toi)
+    private void loadPage(String path) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
-            Parent page = loader.load();
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(path));
+            Parent view = loader.load();
 
             contentArea.getChildren().clear();
-            contentArea.getChildren().add(page);
-
-            // FIX SAFE
-            if (page instanceof javafx.scene.layout.Region region) {
-                region.setPrefWidth(contentArea.getWidth());
-                region.setPrefHeight(contentArea.getHeight());
-
-                region.prefWidthProperty().bind(contentArea.widthProperty());
-                region.prefHeightProperty().bind(contentArea.heightProperty());
-            }
+            contentArea.getChildren().add(view);
 
         } catch (IOException e) {
             e.printStackTrace();
