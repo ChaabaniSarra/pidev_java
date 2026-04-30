@@ -10,6 +10,8 @@ public class OwnerDashboardStats {
     private int losses;
     private double winRate;
     private boolean hasFullTeam;
+    private int totalMembers;
+    private int totalMaxMembers;
 
     public int getOwnedTeamsCount() {
         return ownedTeamsCount;
@@ -81,5 +83,21 @@ public class OwnerDashboardStats {
 
     public void setHasFullTeam(boolean hasFullTeam) {
         this.hasFullTeam = hasFullTeam;
+    }
+
+    public int getTotalMembers() {
+        return totalMembers;
+    }
+
+    public void setTotalMembers(int totalMembers) {
+        this.totalMembers = totalMembers;
+    }
+
+    public int getTotalMaxMembers() {
+        return totalMaxMembers;
+    }
+
+    public void setTotalMaxMembers(int totalMaxMembers) {
+        this.totalMaxMembers = totalMaxMembers;
     }
 }

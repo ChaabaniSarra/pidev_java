@@ -6,15 +6,20 @@
   <component name="ChangeListManager">
     <list default="true" id="884cf7d6-6a9e-4e69-a425-b844a341d249" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/create_tables.sql" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/tn/esprit/controllers/equipe/AfficherEquipeController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tn/esprit/controllers/equipe/AfficherEquipeController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/tn/esprit/controllers/equipe/ClassementGlobalController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tn/esprit/controllers/equipe/ClassementGlobalController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/tn/esprit/controllers/equipe/EquipeDashboardController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tn/esprit/controllers/equipe/EquipeDashboardController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/tn/esprit/controllers/equipe/OwnerDashboardViewController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tn/esprit/controllers/equipe/OwnerDashboardViewController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/tn/esprit/controllers/equipe/PendingDemandesController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tn/esprit/controllers/equipe/PendingDemandesController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/java/tn/esprit/entities/EquipeJoinRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tn/esprit/entities/EquipeJoinRequest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/tn/esprit/controllers/matchgame/MatchGameDashboardController.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tn/esprit/controllers/matchgame/MatchGameDashboardController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/tn/esprit/entities/OwnerDashboardStats.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tn/esprit/entities/OwnerDashboardStats.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/tn/esprit/services/EmailService.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tn/esprit/services/EmailService.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/tn/esprit/services/ServiceEquipe.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tn/esprit/services/ServiceEquipe.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/tn/esprit/services/ServiceMatchGame.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/tn/esprit/services/ServiceMatchGame.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/equipe/afficherEquipe.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/equipe/afficherEquipe.fxml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/equipe/classementGlobal.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/equipe/classementGlobal.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/equipe/equipeDashboard.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/equipe/equipeDashboard.fxml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/resources/equipe/ownerDashboardView.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/equipe/ownerDashboardView.fxml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/main/resources/equipe/pendingDemandes.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/equipe/pendingDemandes.fxml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/resources/matchgame/matchGameDashboard.fxml" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/resources/matchgame/matchGameDashboard.fxml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -71,7 +76,7 @@
       <recent name="tn.esprit.controllers" />
     </key>
   </component>
-  <component name="RunManager" selected="Application.FxLauncher">
+  <component name="RunManager" selected="Application.MainFX (JavaFX)">
     <configuration name="FxLauncher" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="tn.esprit.test.FxLauncher" />
       <module name="WorkshopJDBC-JavaFX-3A56" />
@@ -101,8 +106,10 @@
       </method>
     </configuration>
     <list>
+      <item itemvalue="Application.MainFX (JavaFX)" />
       <item itemvalue="Application.FxLauncher" />
       <item itemvalue="Application.MainFX" />
+      <item itemvalue="Maven.Run JavaFX (Maven)" />
     </list>
     <recent_temporary>
       <list>
@@ -131,6 +138,7 @@
       <workItem from="1777155649846" duration="2024000" />
       <workItem from="1777161656846" duration="4959000" />
       <workItem from="1777226149697" duration="7453000" />
+      <workItem from="1777500802135" duration="15711000" />
     </task>
     <servers />
   </component>

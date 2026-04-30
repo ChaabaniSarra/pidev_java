@@ -13,12 +13,20 @@ import javafx.scene.control.TextField;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.Region;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import tn.esprit.entities.Equipe;
+import tn.esprit.entities.OwnerDashboardStats;
+import tn.esprit.entities.TeamInvitation;
+
 import tn.esprit.services.ServiceEquipe;
 import tn.esprit.utils.SessionManager;
 
@@ -43,6 +51,8 @@ public class AfficherEquipeController implements Initializable {
     private TextField searchField;
     @FXML
     private ComboBox<String> sortCombo;
+    @FXML
+    private VBox invitationsContainer;
 
     private final ServiceEquipe serviceEquipe = new ServiceEquipe();
     private final List<Equipe> allEquipes = new ArrayList<>();
@@ -51,6 +61,7 @@ public class AfficherEquipeController implements Initializable {
     public void initialize(URL url, ResourceBundle resourceBundle) {
         setupSearchAndSort();
         loadEquipes();
+        loadInvitations();
     }
 
     private void setupSearchAndSort() {
@@ -120,32 +131,137 @@ public class AfficherEquipeController implements Initializable {
         return value == null ? "" : value.toLowerCase(Locale.ROOT);
     }
 
+    // ═══════════════════════════════════════════
+    //  INVITATION NOTIFICATIONS
+    // ═══════════════════════════════════════════
+
+    private void loadInvitations() {
+        invitationsContainer.getChildren().clear();
+        try {
+            List<TeamInvitation> invitations = serviceEquipe.getInvitationsForCurrentUser();
+            if (invitations.isEmpty()) return;
+
+            // Header label
+            Label header = new Label("✉ Invitations reçues (" + invitations.size() + ")");
+            header.setStyle("-fx-text-fill: #a78bfa; -fx-font-size: 14px; -fx-font-weight: 700;");
+            invitationsContainer.getChildren().add(header);
+
+            for (TeamInvitation inv : invitations) {
+                invitationsContainer.getChildren().add(buildInvitationCard(inv));
+            }
+        } catch (SQLException e) {
+            // Silent: invitations are optional UI
+            System.out.println("Invitations load error: " + e.getMessage());
+        }
+    }
+
+    private HBox buildInvitationCard(TeamInvitation inv) {
+        HBox card = new HBox(14);
+        card.setAlignment(Pos.CENTER_LEFT);
+        card.setStyle("-fx-background-color: #1e293b; -fx-background-radius: 12; -fx-padding: 12 18;"
+            + "-fx-border-color: rgba(124,58,237,0.25); -fx-border-radius: 12; -fx-border-width: 1;");
+
+        Label icon = new Label("✉");
+        icon.setStyle("-fx-font-size: 18px;");
+
+        VBox info = new VBox(2);
+        Label title = new Label("Invitation de " + inv.getOwnerNom() + " pour l'équipe " + inv.getEquipeNom());
+        title.setStyle("-fx-text-fill: #f1f5f9; -fx-font-size: 13px; -fx-font-weight: 700;");
+        Label date = new Label(inv.getCreatedAt() != null ? inv.getCreatedAt().toString() : "");
+        date.setStyle("-fx-text-fill: #64748b; -fx-font-size: 11px;");
+        info.getChildren().addAll(title, date);
+        HBox.setHgrow(info, Priority.ALWAYS);
+
+        Button acceptBtn = new Button("✓ Accepter");
+        acceptBtn.setStyle("-fx-background-color: #7c3aed; -fx-text-fill: white; -fx-font-weight: 700;"
+            + "-fx-background-radius: 10; -fx-pref-height: 32; -fx-pref-width: 110; -fx-cursor: hand; -fx-font-size: 12px;");
+        acceptBtn.setOnAction(e -> handleAcceptInvitation(inv));
+
+        Button refuseBtn = new Button("✕ Refuser");
+        refuseBtn.setStyle("-fx-background-color: #ef4444; -fx-text-fill: white; -fx-font-weight: 700;"
+            + "-fx-background-radius: 10; -fx-pref-height: 32; -fx-pref-width: 110; -fx-cursor: hand; -fx-font-size: 12px;");
+        refuseBtn.setOnAction(e -> handleRefuseInvitation(inv));
+
+        Region spacer = new Region();
+        HBox.setHgrow(spacer, Priority.ALWAYS);
+
+        card.getChildren().addAll(icon, info, spacer, acceptBtn, refuseBtn);
+        return card;
+    }
+
+    private void handleAcceptInvitation(TeamInvitation inv) {
+        try {
+            serviceEquipe.respondToInvitation(inv.getId(), true);
+            messageLabel.setStyle("-fx-text-fill: #a78bfa;");
+            messageLabel.setText("Invitation acceptée ! Vous avez rejoint l'équipe " + inv.getEquipeNom() + ".");
+            loadEquipes();
+            loadInvitations();
+        } catch (SQLException e) {
+            messageLabel.setStyle("-fx-text-fill: #f87171;");
+            messageLabel.setText("Erreur : " + e.getMessage());
+        }
+    }
+
+    private void handleRefuseInvitation(TeamInvitation inv) {
+        try {
+            serviceEquipe.respondToInvitation(inv.getId(), false);
+            messageLabel.setStyle("-fx-text-fill: #a78bfa;");
+            messageLabel.setText("Invitation refusée.");
+            loadInvitations();
+        } catch (SQLException e) {
+            messageLabel.setStyle("-fx-text-fill: #f87171;");
+            messageLabel.setText("Erreur : " + e.getMessage());
+        }
+    }
+
     private VBox buildCard(Equipe equipe, int rank) {
-        VBox card = new VBox(8);
-        card.setPrefWidth(270);
-        card.setPrefHeight(305);
-        card.setStyle("-fx-padding: 12; -fx-background-color: #111b3e;"
-            + "-fx-background-radius: 12; -fx-border-color: rgba(255,255,255,0.1); -fx-border-radius: 12;");
+        VBox card = new VBox(10);
+        card.setPrefWidth(290);
+        card.setPrefHeight(320);
+        card.setStyle("-fx-padding: 18 16 14 16;"
+            + "-fx-background-color: #111b3e;"
+            + "-fx-background-radius: 16;"
+            + "-fx-border-color: rgba(124,58,237,0.18);"
+            + "-fx-border-radius: 16;"
+            + "-fx-border-width: 1;"
+            + "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.30), 12, 0, 0, 4);");
+
+        // Hover effect
+        card.setOnMouseEntered(e -> card.setStyle(card.getStyle().replace(
+            "rgba(124,58,237,0.18)", "rgba(124,58,237,0.45)")));
+        card.setOnMouseExited(e -> card.setStyle(card.getStyle().replace(
+            "rgba(124,58,237,0.45)", "rgba(124,58,237,0.18)")));
 
         Label rankLabel = new Label("#" + rank);
-        rankLabel.setStyle("-fx-font-size: 26px; -fx-font-weight: 800; -fx-text-fill: rgba(255,255,255,0.20);");
+        rankLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: 800; -fx-text-fill: rgba(255,255,255,0.14);");
 
         StackPane avatarPane = createAvatar(equipe);
 
         Label nomLabel = new Label(equipe.getNom());
-        nomLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: 700; -fx-text-fill: #e5e7eb;");
+        nomLabel.setStyle("-fx-font-size: 20px; -fx-font-weight: 700; -fx-text-fill: #f1f5f9;");
 
         Label subtitle = new Label("ESPORT TEAM");
-        subtitle.setStyle("-fx-font-size: 12px; -fx-text-fill: #94a3b8;");
+        subtitle.setStyle("-fx-font-size: 11px; -fx-text-fill: #64748b; -fx-font-weight: 600;");
 
         VBox header = new VBox(rankLabel);
         header.setAlignment(Pos.TOP_LEFT);
 
-        VBox body = new VBox(10, avatarPane, nomLabel, subtitle);
+        VBox body = new VBox(8, avatarPane, nomLabel, subtitle);
         body.setAlignment(Pos.CENTER);
 
+        // ── QR Code Button ──
+        Button qrBtn = new Button("📱 QR");
+        qrBtn.setStyle("-fx-background-color: rgba(124,58,237,0.25); -fx-text-fill: #a78bfa; -fx-font-weight: 700;"
+            + "-fx-background-radius: 8; -fx-pref-height: 28; -fx-pref-width: 70; -fx-cursor: hand; -fx-font-size: 11px;");
+        qrBtn.setOnMouseEntered(e -> qrBtn.setStyle(qrBtn.getStyle().replace("rgba(124,58,237,0.25)", "rgba(124,58,237,0.45)")));
+        qrBtn.setOnMouseExited(e -> qrBtn.setStyle(qrBtn.getStyle().replace("rgba(124,58,237,0.45)", "rgba(124,58,237,0.25)")));
+        qrBtn.setOnAction(e -> showQrCodePopup(equipe));
+
+        HBox qrRow = new HBox(qrBtn);
+        qrRow.setAlignment(Pos.CENTER_RIGHT);
+
         VBox actions = buildActions(equipe, card);
-        card.getChildren().addAll(header, body, actions);
+        card.getChildren().addAll(header, body, qrRow, actions);
         return card;
     }
 
@@ -174,9 +290,9 @@ public class AfficherEquipeController implements Initializable {
 
             if (serviceEquipe.isCurrentUserMemberOfEquipe(equipe.getId())) {
                 Label memberLabel = new Label("Vous êtes membre de cette équipe");
-                memberLabel.setStyle("-fx-text-fill: #22c55e; -fx-font-size: 12px; -fx-font-weight: 700;");
+                memberLabel.setStyle("-fx-text-fill: #a78bfa; -fx-font-size: 12px; -fx-font-weight: 700;");
                 Button leaveBtn = new Button("Quitter l'équipe");
-                leaveBtn.setStyle("-fx-background-color: #ef4444; -fx-text-fill: white; -fx-font-weight: 700; -fx-pref-width: 180;");
+                leaveBtn.setStyle("-fx-background-color: #ef4444; -fx-text-fill: white; -fx-font-weight: 700; -fx-pref-width: 200; -fx-pref-height: 36; -fx-background-radius: 10; -fx-cursor: hand;");
                 leaveBtn.setOnAction(evt -> {
                     evt.consume();
                     handleLeaveEquipe(equipe.getId());
@@ -188,7 +304,7 @@ public class AfficherEquipeController implements Initializable {
             boolean pending = serviceEquipe.hasPendingRequestForCurrentUser(equipe.getId());
             if (pending) {
                 Button cancelBtn = new Button("Supprimer invite");
-                cancelBtn.setStyle("-fx-background-color: #ef4444; -fx-text-fill: white; -fx-font-weight: 700; -fx-pref-width: 180;");
+                cancelBtn.setStyle("-fx-background-color: #ef4444; -fx-text-fill: white; -fx-font-weight: 700; -fx-pref-width: 200; -fx-pref-height: 36; -fx-background-radius: 10; -fx-cursor: hand;");
                 cancelBtn.setOnAction(evt -> {
                     evt.consume();
                     handleCancelInvite(equipe.getId());
@@ -196,7 +312,7 @@ public class AfficherEquipeController implements Initializable {
                 box.getChildren().add(cancelBtn);
             } else {
                 Button joinBtn = new Button("Demander a joindre");
-                joinBtn.setStyle("-fx-background-color: #22c55e; -fx-text-fill: white; -fx-font-weight: 700; -fx-pref-width: 180;");
+                joinBtn.setStyle("-fx-background-color: #7c3aed; -fx-text-fill: white; -fx-font-weight: 700; -fx-pref-width: 200; -fx-pref-height: 36; -fx-background-radius: 10; -fx-cursor: hand; -fx-font-size: 13px;");
                 joinBtn.setOnAction(evt -> {
                     evt.consume();
                     handleJoinRequest(equipe.getId());
@@ -212,11 +328,106 @@ public class AfficherEquipeController implements Initializable {
         return box;
     }
 
+    // ═══════════════════════════════════════════
+    //  QR CODE — REST API CALL
+    // ═══════════════════════════════════════════
+
+    private void showQrCodePopup(Equipe equipe) {
+        // Fetch team details
+        int memberCount = 0;
+        String ownerName = "—";
+        int wins = 0;
+        int totalMatchs = 0;
+        try {
+            memberCount = serviceEquipe.countMembers(equipe.getId());
+            ownerName = serviceEquipe.getOwnerNameByEquipeId(equipe.getId());
+            OwnerDashboardStats stats = serviceEquipe.getOwnerDashboardStats(equipe.getId());
+            wins = stats.getWins();
+            totalMatchs = stats.getTotalFinishedMatches();
+        } catch (SQLException ignored) {}
+
+        // ── Appel REST API externe : qrserver.com ──
+        String qrData = equipe.getNom()
+                + "\nMembres: " + memberCount + "/" + equipe.getMaxMembers()
+                + "\nVictoires: " + wins + "/" + totalMatchs + " matchs";
+        String encodedData;
+        try {
+            encodedData = java.net.URLEncoder.encode(qrData, "UTF-8");
+        } catch (Exception ex) {
+            encodedData = qrData.replace(" ", "+");
+        }
+        String apiUrl = "https://api.qrserver.com/v1/create-qr-code/?size=250x250&format=png&data=" + encodedData;
+
+        Stage popup = new Stage();
+        popup.initModality(Modality.APPLICATION_MODAL);
+        popup.initStyle(StageStyle.UNDECORATED);
+        popup.setTitle("QR Code — " + equipe.getNom());
+
+        VBox root = new VBox(14);
+        root.setAlignment(Pos.CENTER);
+        root.setStyle("-fx-background-color: #0f172a; -fx-padding: 28; -fx-background-radius: 18;"
+            + "-fx-border-color: rgba(124,58,237,0.4); -fx-border-radius: 18; -fx-border-width: 2;");
+
+        // Title
+        Label title = new Label("📱 QR Code");
+        title.setStyle("-fx-text-fill: #a78bfa; -fx-font-size: 20px; -fx-font-weight: 800;");
+
+        Label teamName = new Label(equipe.getNom());
+        teamName.setStyle("-fx-text-fill: #f1f5f9; -fx-font-size: 18px; -fx-font-weight: 700;");
+
+        Label subtitle = new Label("ESPORT TEAM");
+        subtitle.setStyle("-fx-text-fill: #64748b; -fx-font-size: 10px; -fx-font-weight: 600;");
+
+
+        // QR Code image from API
+        ImageView qrImageView = new ImageView();
+        qrImageView.setFitWidth(200);
+        qrImageView.setFitHeight(200);
+        qrImageView.setPreserveRatio(true);
+
+        Label loadingLabel = new Label("Chargement...");
+        loadingLabel.setStyle("-fx-text-fill: #64748b; -fx-font-size: 12px;");
+
+        // Load image from REST API in background
+        new Thread(() -> {
+            try {
+                Image qrImage = new Image(apiUrl, true);
+                javafx.application.Platform.runLater(() -> {
+                    qrImageView.setImage(qrImage);
+                    loadingLabel.setText("Scannez pour découvrir l'équipe");
+                    loadingLabel.setStyle("-fx-text-fill: #64748b; -fx-font-size: 11px;");
+                });
+            } catch (Exception ex) {
+                javafx.application.Platform.runLater(() -> {
+                    loadingLabel.setText("Erreur API : " + ex.getMessage());
+                    loadingLabel.setStyle("-fx-text-fill: #ef4444; -fx-font-size: 11px;");
+                });
+            }
+        }).start();
+
+        // API info label
+        Label apiLabel = new Label("🔗 REST API: api.qrserver.com");
+        apiLabel.setStyle("-fx-text-fill: #475569; -fx-font-size: 10px;");
+
+        // Close button
+        Button closeBtn = new Button("Fermer");
+        closeBtn.setStyle("-fx-background-color: #7c3aed; -fx-text-fill: white; -fx-font-weight: 700;"
+            + "-fx-background-radius: 10; -fx-pref-height: 36; -fx-pref-width: 140; -fx-cursor: hand; -fx-font-size: 13px;");
+        closeBtn.setOnAction(e -> popup.close());
+
+        root.getChildren().addAll(title, teamName, subtitle, qrImageView, loadingLabel, apiLabel, closeBtn);
+
+        Scene scene = new Scene(root, 340, 460);
+        scene.setFill(javafx.scene.paint.Color.TRANSPARENT);
+        popup.setScene(scene);
+        popup.showAndWait();
+    }
+
     private void handleJoinRequest(int equipeId) {
         try {
             serviceEquipe.createJoinRequest(equipeId);
             messageLabel.setText("Demande envoyee en statut pending.");
-            messageLabel.setStyle("-fx-text-fill: #22c55e;");
+            messageLabel.setStyle("-fx-text-fill: #a78bfa;");
             renderCards();
         } catch (SQLException e) {
             messageLabel.setText("Demande impossible : " + e.getMessage());
@@ -228,7 +439,7 @@ public class AfficherEquipeController implements Initializable {
         try {
             serviceEquipe.cancelPendingJoinRequestForCurrentUser(equipeId);
             messageLabel.setText("Invite supprimee (pending annule).");
-            messageLabel.setStyle("-fx-text-fill: #22c55e;");
+            messageLabel.setStyle("-fx-text-fill: #a78bfa;");
             renderCards();
         } catch (SQLException e) {
             messageLabel.setText("Suppression invite impossible : " + e.getMessage());
@@ -240,7 +451,7 @@ public class AfficherEquipeController implements Initializable {
         try {
             serviceEquipe.leaveEquipe(equipeId);
             messageLabel.setText("Vous avez quitte l'equipe.");
-            messageLabel.setStyle("-fx-text-fill: #22c55e;");
+            messageLabel.setStyle("-fx-text-fill: #a78bfa;");
             renderCards();
         } catch (SQLException e) {
             messageLabel.setText("Impossible de quitter l'equipe : " + e.getMessage());
@@ -282,24 +493,41 @@ public class AfficherEquipeController implements Initializable {
     }
 
     private StackPane createAvatar(Equipe equipe) {
-        Circle circle = new Circle(36);
+        Circle circle = new Circle(40);
         circle.setFill(Color.web("#172554"));
-        circle.setStroke(Color.web("#263564"));
+        circle.setStroke(Color.web("#7c3aed"));
+        circle.setStrokeWidth(2);
 
         StackPane avatar = new StackPane(circle);
         avatar.setAlignment(Pos.CENTER);
 
         String logo = equipe.getLogo();
         if (logo != null && !logo.isBlank()) {
-            File file = new File(logo);
-            if (file.exists()) {
-                Image image = new Image(file.toURI().toString(), 72, 72, true, true);
-                ImageView imageView = new ImageView(image);
-                imageView.setFitWidth(72);
-                imageView.setFitHeight(72);
-                imageView.setClip(new Circle(36, 36, 36));
-                avatar.getChildren().add(imageView);
-                return avatar;
+            String imageUrl = null;
+
+            // Web URL (API teams)
+            if (logo.startsWith("http://") || logo.startsWith("https://")) {
+                imageUrl = logo;
+            } else {
+                // Local file path
+                File file = new File(logo);
+                if (file.exists()) {
+                    imageUrl = file.toURI().toString();
+                }
+            }
+
+            if (imageUrl != null) {
+                try {
+                    Image image = new Image(imageUrl, 80, 80, true, true, true);
+                    ImageView imageView = new ImageView(image);
+                    imageView.setFitWidth(80);
+                    imageView.setFitHeight(80);
+                    imageView.setClip(new Circle(40, 40, 40));
+                    avatar.getChildren().add(imageView);
+                    return avatar;
+                } catch (Exception e) {
+                    // Fallback to initials if image loading fails
+                }
             }
         }
 
