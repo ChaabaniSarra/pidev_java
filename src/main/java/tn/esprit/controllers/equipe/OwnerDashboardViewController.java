@@ -2,6 +2,7 @@ package tn.esprit.controllers.equipe;
 
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
+import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
@@ -9,7 +10,10 @@ import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.Priority;
 import javafx.scene.layout.Region;
+import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
 import tn.esprit.entities.EquipeMemberView;
 import tn.esprit.entities.OwnerDashboardStats;
 import tn.esprit.services.ServiceEquipe;
@@ -23,15 +27,11 @@ import java.util.ResourceBundle;
 public class OwnerDashboardViewController implements Initializable {
 
     @FXML
-    private Label ownedTeamsLabel;
-    @FXML
-    private Label joinedTeamsLabel;
-    @FXML
     private Label pendingRequestsLabel;
     @FXML
     private Label finishedMatchesLabel;
     @FXML
-    private Label fullTeamLabel;
+    private Label membersMaxLabel;
     @FXML
     private Label resultsLabel;
     @FXML
@@ -42,8 +42,6 @@ public class OwnerDashboardViewController implements Initializable {
     @FXML
     private FlowPane memberCardsContainer;
 
-    @FXML
-    private TextField motifField;
     @FXML
     private Label messageLabel;
 
@@ -65,7 +63,7 @@ public class OwnerDashboardViewController implements Initializable {
     private void handleRefresh() {
         loadStats();
         loadTeamMembers();
-        messageLabel.setStyle("-fx-text-fill: #22c55e;");
+        messageLabel.setStyle("-fx-text-fill: #a78bfa;");
         messageLabel.setText("Liste mise à jour.");
     }
 
@@ -96,56 +94,103 @@ public class OwnerDashboardViewController implements Initializable {
 
     private VBox createMemberCard(EquipeMemberView member) {
         VBox card = new VBox(10);
-        card.setStyle("-fx-background-color: rgba(15, 23, 42, 0.95); -fx-background-radius: 18; -fx-padding: 18; -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.18), 16, 0.0, 0.0, 8.0);");
-        card.setPrefWidth(240);
+        String baseStyle = "-fx-background-color: #111b3e;"
+            + "-fx-background-radius: 16;"
+            + "-fx-padding: 18 16 14 16;"
+            + "-fx-border-color: rgba(124,58,237,0.18);"
+            + "-fx-border-radius: 16;"
+            + "-fx-border-width: 1;"
+            + "-fx-effect: dropshadow(gaussian, rgba(0,0,0,0.25), 10, 0, 0, 4);";
+        card.setStyle(baseStyle);
+        card.setPrefWidth(270);
 
-        Label teamLabel = new Label(member.getEquipeNom() == null || member.getEquipeNom().isEmpty() ? "Sans équipe" : member.getEquipeNom());
-        teamLabel.setStyle("-fx-text-fill: #cbd5e1; -fx-font-size: 12px; -fx-font-weight: 700;");
+        // Hover effect
+        card.setOnMouseEntered(e -> card.setStyle(baseStyle.replace(
+            "rgba(124,58,237,0.18)", "rgba(124,58,237,0.45)")));
+        card.setOnMouseExited(e -> card.setStyle(baseStyle));
 
+        // ── Avatar + Name Row ──
+        String initials = getInitials(member.getJoueurNom());
+        Circle avatarBg = new Circle(22);
+        avatarBg.setFill(Color.web("#7c3aed"));
+        Label initialsLabel = new Label(initials);
+        initialsLabel.setStyle("-fx-text-fill: white; -fx-font-size: 14px; -fx-font-weight: 800;");
+        StackPane avatar = new StackPane(avatarBg, initialsLabel);
+
+        VBox nameBlock = new VBox(2);
         Label playerLabel = new Label(member.getJoueurNom());
-        playerLabel.setStyle("-fx-text-fill: white; -fx-font-size: 16px; -fx-font-weight: 800;");
-
+        playerLabel.setStyle("-fx-text-fill: #f1f5f9; -fx-font-size: 16px; -fx-font-weight: 800;");
         Label emailLabel = new Label(member.getJoueurEmail());
-        emailLabel.setStyle("-fx-text-fill: #94a3b8; -fx-font-size: 12px;");
+        emailLabel.setStyle("-fx-text-fill: #64748b; -fx-font-size: 11px;");
+        nameBlock.getChildren().addAll(playerLabel, emailLabel);
 
+        HBox topRow = new HBox(12, avatar, nameBlock);
+        topRow.setAlignment(Pos.CENTER_LEFT);
+
+        // ── Status Badge ──
         Label statusLabel = new Label(member.getStatus());
-        statusLabel.setStyle("-fx-background-color: rgba(59, 130, 246, 0.18); -fx-text-fill: #bfdbfe; -fx-padding: 4 10; -fx-background-radius: 12; -fx-font-size: 11px; -fx-font-weight: 700;");
+        String statusStyle;
+        if ("Member".equalsIgnoreCase(member.getStatus())) {
+            statusStyle = "-fx-background-color: rgba(124,58,237,0.18); -fx-text-fill: #c4b5fd;";
+        } else if ("Pending".equalsIgnoreCase(member.getStatus())) {
+            statusStyle = "-fx-background-color: rgba(245,158,11,0.18); -fx-text-fill: #fcd34d;";
+        } else if ("Invited".equalsIgnoreCase(member.getStatus())) {
+            statusStyle = "-fx-background-color: rgba(14,165,233,0.18); -fx-text-fill: #7dd3fc;";
+        } else {
+            statusStyle = "-fx-background-color: rgba(100,116,139,0.18); -fx-text-fill: #94a3b8;";
+        }
+        statusLabel.setStyle(statusStyle + "-fx-padding: 4 12; -fx-background-radius: 8; -fx-font-size: 11px; -fx-font-weight: 700;");
 
-        String joinedText = member.getJoinedAt() == null ? "" : "Rejoint le " + member.getJoinedAt().toString();
-        Label joinedLabel = new Label(joinedText);
-        joinedLabel.setStyle("-fx-text-fill: #9ca3af; -fx-font-size: 11px;");
+        HBox badgeRow = new HBox(10, statusLabel);
+        badgeRow.setAlignment(Pos.CENTER_LEFT);
 
-        HBox titleRow = new HBox(10, teamLabel, new Region());
-        HBox.setHgrow(titleRow.getChildren().get(1), Priority.ALWAYS);
+        // ── Spacer ──
+        Region spacer = new Region();
+        VBox.setVgrow(spacer, Priority.ALWAYS);
 
+        // ── Action Buttons ──
         HBox actionBox = new HBox(10);
-        actionBox.setStyle("-fx-alignment: center-right;");
-
-        Button primaryButton = new Button();
-        primaryButton.setStyle("-fx-background-radius: 12; -fx-text-fill: white; -fx-padding: 8 14;");
-        Button secondaryButton = new Button("Supprimer");
-        secondaryButton.setStyle("-fx-background-color: #ef4444; -fx-text-fill: white; -fx-background-radius: 12; -fx-padding: 8 14;");
+        actionBox.setAlignment(Pos.CENTER_LEFT);
 
         if ("Pending".equalsIgnoreCase(member.getStatus())) {
-            primaryButton.setText("Accepter");
-            primaryButton.setStyle("-fx-background-color: #22c55e; -fx-text-fill: white; -fx-background-radius: 12; -fx-padding: 8 14;");
-            primaryButton.setOnAction(e -> handleAcceptRequest(member));
-            secondaryButton.setOnAction(e -> handleRejectRequest(member));
-            actionBox.getChildren().addAll(primaryButton, secondaryButton);
+            Button acceptBtn = new Button("✓ Accepter");
+            acceptBtn.setStyle("-fx-background-color: #7c3aed; -fx-text-fill: white; -fx-font-weight: 700;"
+                + "-fx-background-radius: 10; -fx-pref-height: 34; -fx-pref-width: 110; -fx-cursor: hand; -fx-font-size: 12px;");
+            acceptBtn.setOnAction(e -> handleAcceptRequest(member));
+            Button rejectBtn = new Button("✕ Rejeter");
+            rejectBtn.setStyle("-fx-background-color: #ef4444; -fx-text-fill: white; -fx-font-weight: 700;"
+                + "-fx-background-radius: 10; -fx-pref-height: 34; -fx-pref-width: 110; -fx-cursor: hand; -fx-font-size: 12px;");
+            rejectBtn.setOnAction(e -> handleRejectRequest(member));
+            actionBox.getChildren().addAll(acceptBtn, rejectBtn);
         } else if ("Member".equalsIgnoreCase(member.getStatus())) {
-            primaryButton.setText("Supprimer");
-            primaryButton.setStyle("-fx-background-color: #ef4444; -fx-text-fill: white; -fx-background-radius: 12; -fx-padding: 8 14;");
-            primaryButton.setOnAction(e -> handleRemoveMember(member));
-            actionBox.getChildren().add(primaryButton);
+            Button removeBtn = new Button("Supprimer");
+            removeBtn.setStyle("-fx-background-color: #ef4444; -fx-text-fill: white; -fx-font-weight: 700;"
+                + "-fx-background-radius: 10; -fx-pref-height: 34; -fx-pref-width: 120; -fx-cursor: hand; -fx-font-size: 12px;");
+            removeBtn.setOnAction(e -> handleRemoveMember(member));
+            actionBox.getChildren().add(removeBtn);
+        } else if ("Invited".equalsIgnoreCase(member.getStatus())) {
+            Label invitedLabel = new Label("✉ Invitation envoyée");
+            invitedLabel.setStyle("-fx-text-fill: #a78bfa; -fx-font-size: 12px; -fx-font-weight: 700;");
+            actionBox.getChildren().add(invitedLabel);
         } else {
-            primaryButton.setText("Ajouter");
-            primaryButton.setStyle("-fx-background-color: #0ea5e9; -fx-text-fill: white; -fx-background-radius: 12; -fx-padding: 8 14;");
-            primaryButton.setOnAction(e -> handleAddMember(member));
-            actionBox.getChildren().add(primaryButton);
+            Button inviteBtn = new Button("✉ Inviter");
+            inviteBtn.setStyle("-fx-background-color: #7c3aed; -fx-text-fill: white; -fx-font-weight: 700;"
+                + "-fx-background-radius: 10; -fx-pref-height: 34; -fx-pref-width: 120; -fx-cursor: hand; -fx-font-size: 12px;");
+            inviteBtn.setOnAction(e -> handleInviteMember(member));
+            actionBox.getChildren().add(inviteBtn);
         }
 
-        card.getChildren().addAll(titleRow, playerLabel, emailLabel, statusLabel, joinedLabel, actionBox);
+        card.getChildren().addAll(topRow, badgeRow, spacer, actionBox);
         return card;
+    }
+
+    private String getInitials(String nom) {
+        if (nom == null || nom.isBlank()) return "?";
+        String[] parts = nom.trim().split("\\s+");
+        if (parts.length >= 2) {
+            return (parts[0].substring(0, 1) + parts[1].substring(0, 1)).toUpperCase();
+        }
+        return nom.trim().substring(0, Math.min(2, nom.trim().length())).toUpperCase();
     }
 
     private void handleAcceptRequest(EquipeMemberView member) {
@@ -155,11 +200,10 @@ public class OwnerDashboardViewController implements Initializable {
             return;
         }
         try {
-            serviceEquipe.processJoinRequest(member.getRequestId(), true, motifField.getText());
+            serviceEquipe.processJoinRequest(member.getRequestId(), true, null);
             loadStats();
             loadTeamMembers();
-            motifField.clear();
-            messageLabel.setStyle("-fx-text-fill: #22c55e;");
+            messageLabel.setStyle("-fx-text-fill: #a78bfa;");
             messageLabel.setText("Demande acceptée.");
         } catch (SQLException e) {
             messageLabel.setStyle("-fx-text-fill: #ef4444;");
@@ -174,11 +218,10 @@ public class OwnerDashboardViewController implements Initializable {
             return;
         }
         try {
-            serviceEquipe.processJoinRequest(member.getRequestId(), false, motifField.getText());
+            serviceEquipe.processJoinRequest(member.getRequestId(), false, null);
             loadStats();
             loadTeamMembers();
-            motifField.clear();
-            messageLabel.setStyle("-fx-text-fill: #22c55e;");
+            messageLabel.setStyle("-fx-text-fill: #a78bfa;");
             messageLabel.setText("Demande rejetée.");
         } catch (SQLException e) {
             messageLabel.setStyle("-fx-text-fill: #ef4444;");
@@ -186,16 +229,23 @@ public class OwnerDashboardViewController implements Initializable {
         }
     }
 
-    private void handleAddMember(EquipeMemberView member) {
+    private void handleInviteMember(EquipeMemberView member) {
         try {
-            serviceEquipe.addMemberToFirstOwnedEquipe(member.getJoueurId());
+            List<tn.esprit.entities.Equipe> owned = serviceEquipe.getOwnedEquipes(
+                    tn.esprit.utils.SessionManager.getCurrentUser().getId());
+            if (owned.isEmpty()) {
+                messageLabel.setStyle("-fx-text-fill: #ef4444;");
+                messageLabel.setText("Aucune équipe trouvée.");
+                return;
+            }
+            serviceEquipe.createInvitation(owned.get(0).getId(), member.getJoueurId());
             loadStats();
             loadTeamMembers();
-            messageLabel.setStyle("-fx-text-fill: #22c55e;");
-            messageLabel.setText("Joueur ajouté à l'équipe.");
+            messageLabel.setStyle("-fx-text-fill: #a78bfa;");
+            messageLabel.setText("Invitation envoyée à " + member.getJoueurNom() + " (email de notification envoyé).");
         } catch (SQLException e) {
             messageLabel.setStyle("-fx-text-fill: #ef4444;");
-            messageLabel.setText("Ajout impossible : " + e.getMessage());
+            messageLabel.setText("Invitation impossible : " + e.getMessage());
         }
     }
 
@@ -204,7 +254,7 @@ public class OwnerDashboardViewController implements Initializable {
             serviceEquipe.removeMemberFromEquipe(member.getEquipeId(), member.getJoueurId());
             loadStats();
             loadTeamMembers();
-            messageLabel.setStyle("-fx-text-fill: #22c55e;");
+            messageLabel.setStyle("-fx-text-fill: #a78bfa;");
             messageLabel.setText("Membre supprimé.");
         } catch (SQLException e) {
             messageLabel.setStyle("-fx-text-fill: #ef4444;");
@@ -225,16 +275,13 @@ public class OwnerDashboardViewController implements Initializable {
     private void loadStats() {
         try {
             OwnerDashboardStats stats = serviceEquipe.getOwnerDashboardStatsForCurrentOwner();
-            ownedTeamsLabel.setText(String.valueOf(stats.getOwnedTeamsCount()));
-            joinedTeamsLabel.setText(String.valueOf(stats.getJoinedTeamsCount()));
             pendingRequestsLabel.setText(String.valueOf(stats.getPendingRequestsCount()));
             finishedMatchesLabel.setText(String.valueOf(stats.getTotalFinishedMatches()));
-            fullTeamLabel.setText(stats.isHasFullTeam() ? "Oui" : "Non");
+            membersMaxLabel.setText(stats.getTotalMembers() + " / " + stats.getTotalMaxMembers());
             resultsLabel.setText("V: " + stats.getWins() + "   N: " + stats.getDraws() + "   P: " + stats.getLosses());
             winRateLabel.setText(stats.getWinRate() + "%");
 
-            messageLabel.setStyle("-fx-text-fill: #22c55e;");
-            messageLabel.setText("Dashboard chargé.");
+            messageLabel.setText("");
         } catch (SQLException e) {
             messageLabel.setStyle("-fx-text-fill: #ef4444;");
             messageLabel.setText("Erreur dashboard owner: " + e.getMessage());

@@ -121,6 +121,87 @@ public class ServiceMatchGame implements IService<MatchGame> {
         return inserted;
     }
 
+    public int seedSampleMatchGames() throws SQLException {
+        List<Integer> equipeIds = new ArrayList<>();
+        String readTeams = "SELECT id FROM equipe ORDER BY id ASC LIMIT 4";
+        try (Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery(readTeams)) {
+            while (rs.next()) {
+                equipeIds.add(rs.getInt("id"));
+            }
+        }
+
+        if (equipeIds.size() < 2) {
+            throw new SQLException("Impossible de semer les matchs : au moins 2 équipes sont requises.");
+        }
+
+        Integer tournoiId = null;
+        try (Statement stmt = conn.createStatement();
+             ResultSet rs = stmt.executeQuery("SELECT id FROM tournoi ORDER BY id ASC LIMIT 1")) {
+            if (rs.next()) {
+                tournoiId = rs.getInt("id");
+            }
+        }
+        if (tournoiId == null) {
+            throw new SQLException("Impossible de semer les matchs : aucun tournoi trouvé.");
+        }
+
+        String checkSql = "SELECT COUNT(*) AS c FROM match_game WHERE date_match = ? AND equipe1_id = ? AND equipe2_id = ? AND tournoi_id = ?";
+        String insertSql = "INSERT INTO match_game(date_match, score_team1, score_team2, statut, equipe1_id, equipe2_id, tournoi_id) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        int inserted = 0;
+
+        try (PreparedStatement check = conn.prepareStatement(checkSql);
+             PreparedStatement ps = conn.prepareStatement(insertSql)) {
+            Object[][] seeds = new Object[][]{
+                {Timestamp.valueOf("2026-04-01 18:00:00"), 3, 1, "Termine", equipeIds.get(0), equipeIds.get(1)},
+                {Timestamp.valueOf("2026-04-02 19:30:00"), 2, 2, "Finished", equipeIds.get(0), equipeIds.get(1)},
+                {Timestamp.valueOf("2026-04-03 20:00:00"), 1, 0, "Termine", equipeIds.get(0), equipeIds.get(1)}
+            };
+
+            if (equipeIds.size() >= 3) {
+                seeds = new Object[][]{
+                    {Timestamp.valueOf("2026-04-01 18:00:00"), 3, 1, "Termine", equipeIds.get(0), equipeIds.get(1)},
+                    {Timestamp.valueOf("2026-04-02 19:30:00"), 2, 2, "Finished", equipeIds.get(1), equipeIds.get(2)},
+                    {Timestamp.valueOf("2026-04-03 20:00:00"), 1, 0, "Termine", equipeIds.get(0), equipeIds.get(2)},
+                    {Timestamp.valueOf("2026-04-10 17:00:00"), 0, 0, "Planifie", equipeIds.get(0), equipeIds.get(1)}
+                };
+            }
+            if (equipeIds.size() >= 4) {
+                seeds = new Object[][]{
+                    {Timestamp.valueOf("2026-04-01 18:00:00"), 3, 1, "Termine", equipeIds.get(0), equipeIds.get(1)},
+                    {Timestamp.valueOf("2026-04-02 19:30:00"), 2, 2, "Finished", equipeIds.get(1), equipeIds.get(2)},
+                    {Timestamp.valueOf("2026-04-03 20:00:00"), 1, 0, "Termine", equipeIds.get(0), equipeIds.get(2)},
+                    {Timestamp.valueOf("2026-04-04 16:15:00"), 0, 2, "Finished", equipeIds.get(2), equipeIds.get(3)},
+                    {Timestamp.valueOf("2026-04-10 17:00:00"), 0, 0, "Planifie", equipeIds.get(0), equipeIds.get(3)}
+                };
+            }
+
+            for (Object[] seed : seeds) {
+                check.setTimestamp(1, (Timestamp) seed[0]);
+                check.setInt(2, (Integer) seed[4]);
+                check.setInt(3, (Integer) seed[5]);
+                check.setInt(4, tournoiId);
+                try (ResultSet rs = check.executeQuery()) {
+                    int count = rs.next() ? rs.getInt("c") : 0;
+                    if (count > 0) {
+                        continue;
+                    }
+                }
+
+                ps.setTimestamp(1, (Timestamp) seed[0]);
+                ps.setInt(2, (Integer) seed[1]);
+                ps.setInt(3, (Integer) seed[2]);
+                ps.setString(4, (String) seed[3]);
+                ps.setInt(5, (Integer) seed[4]);
+                ps.setInt(6, (Integer) seed[5]);
+                ps.setInt(7, tournoiId);
+                inserted += ps.executeUpdate();
+            }
+        }
+
+        return inserted;
+    }
+
     public List<Integer> getRegisteredEquipeIds(int tournoiId) throws SQLException {
         List<Integer> equipeIds = new ArrayList<>();
         String sql = "SELECT equipe_id FROM tournoi_equipe WHERE tournoi_id = ? ORDER BY equipe_id ASC";

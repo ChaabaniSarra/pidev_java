@@ -48,6 +48,8 @@ public class ClassementGlobalController implements Initializable {
     private TableColumn<EquipeStanding, String> badgeCol;
     @FXML
     private Label messageLabel;
+    @FXML
+    private Label totalEquipesLabel;
 
     private final ServiceEquipe serviceEquipe = new ServiceEquipe();
     private final DecimalFormat ppmFormat = new DecimalFormat("0.00");
@@ -75,16 +77,28 @@ public class ClassementGlobalController implements Initializable {
     }
 
     private void applyTableTheme() {
+        // Load the external CSS stylesheet
         URL css = getClass().getResource("/styles/classement-global.css");
         if (css != null) {
             rankingTable.getStylesheets().add(css.toExternalForm());
         }
         rankingTable.getStyleClass().add("classement-table");
-        rankingTable.setFixedCellSize(34);
+        rankingTable.setFixedCellSize(40);
+        rankingTable.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
 
-        Label placeholder = new Label("Aucune equipe a afficher.");
-        placeholder.setStyle("-fx-text-fill: #94a3b8; -fx-font-size: 13px;");
+        // Dark placeholder
+        Label placeholder = new Label("Aucune équipe à afficher.");
+        placeholder.setStyle("-fx-text-fill: #94a3b8; -fx-font-size: 14px;");
         rankingTable.setPlaceholder(placeholder);
+
+        // Force dark background inline as fallback in case CSS doesn't load
+        rankingTable.setStyle(
+                "-fx-background-color: #1e293b;" +
+                "-fx-control-inner-background: #1e293b;" +
+                "-fx-control-inner-background-alt: #1a2640;" +
+                "-fx-table-cell-border-color: transparent;" +
+                "-fx-border-color: transparent;"
+        );
     }
 
     private void setupCellRendering() {
@@ -183,8 +197,11 @@ public class ClassementGlobalController implements Initializable {
         try {
             List<EquipeStanding> ranking = serviceEquipe.getGlobalRanking();
             rankingTable.setItems(FXCollections.observableArrayList(ranking));
-            messageLabel.setText(ranking.isEmpty() ? "Aucune equipe disponible." : "Classement charge.");
-            messageLabel.setStyle("-fx-text-fill: #22c55e;");
+            messageLabel.setText(ranking.isEmpty() ? "Aucune equipe disponible." : "");
+            messageLabel.setStyle(ranking.isEmpty() ? "-fx-text-fill: #94a3b8;" : "");
+            if (totalEquipesLabel != null) {
+                totalEquipesLabel.setText(String.valueOf(ranking.size()));
+            }
         } catch (SQLException e) {
             messageLabel.setStyle("-fx-text-fill: #ef4444;");
             messageLabel.setText("Erreur chargement classement: " + e.getMessage());

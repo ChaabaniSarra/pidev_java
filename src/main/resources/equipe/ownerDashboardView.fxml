@@ -13,64 +13,108 @@
 <AnchorPane xmlns="http://javafx.com/javafx"
             xmlns:fx="http://javafx.com/fxml"
             fx:controller="tn.esprit.controllers.equipe.OwnerDashboardViewController"
-            prefHeight="520.0" prefWidth="820.0"
+            prefHeight="620.0" prefWidth="1020.0"
             style="-fx-background-color: #0f172a;">
 
-    <VBox spacing="16"
-          AnchorPane.topAnchor="20" AnchorPane.leftAnchor="20"
-          AnchorPane.rightAnchor="20" AnchorPane.bottomAnchor="20">
+    <VBox spacing="20"
+          AnchorPane.topAnchor="28" AnchorPane.leftAnchor="28"
+          AnchorPane.rightAnchor="28" AnchorPane.bottomAnchor="20">
 
-        <Label text="Dashboard Owner Equipe"
-               style="-fx-font-size: 22px; -fx-font-weight: bold; -fx-text-fill: white;"/>
+        <!-- ── Header ── -->
+        <HBox alignment="CENTER_LEFT" spacing="16">
+            <VBox alignment="CENTER" minWidth="48" minHeight="48" maxWidth="48" maxHeight="48"
+                  style="-fx-background-color: #7c3aed; -fx-background-radius: 14;">
+                <Label text="👑" style="-fx-font-size: 22px;" />
+            </VBox>
+            <VBox spacing="2">
+                <Label text="Owner Dashboard"
+                       style="-fx-font-size: 26px; -fx-font-weight: 800; -fx-text-fill: #f8fafc;"/>
+                <Label text="Gérez votre équipe, membres et demandes"
+                       style="-fx-font-size: 13px; -fx-text-fill: #64748b;"/>
+            </VBox>
+            <Region HBox.hgrow="ALWAYS"/>
+        </HBox>
 
-        <HBox spacing="12">
-            <VBox prefWidth="180" style="-fx-background-color: #1e293b; -fx-padding: 10; -fx-background-radius: 8;">
-                <Label text="Possedees" style="-fx-text-fill: #94a3b8;"/>
-                <Label fx:id="ownedTeamsLabel" text="0" style="-fx-text-fill: white; -fx-font-size: 24px;"/>
+        <!-- ── Stats Row ── -->
+        <HBox spacing="14">
+            <!-- Stat 1 - Pending -->
+            <VBox alignment="CENTER" HBox.hgrow="ALWAYS"
+                  style="-fx-background-color: #1e293b; -fx-padding: 16 12;
+                         -fx-background-radius: 14;
+                         -fx-border-color: rgba(245,158,11,0.20); -fx-border-radius: 14; -fx-border-width: 1;">
+                <Label fx:id="pendingRequestsLabel" text="0"
+                       style="-fx-text-fill: #fcd34d; -fx-font-size: 28px; -fx-font-weight: 800;"/>
+                <Label text="Pending"
+                       style="-fx-text-fill: #64748b; -fx-font-size: 11px; -fx-font-weight: 600;"/>
             </VBox>
-            <VBox prefWidth="180" style="-fx-background-color: #1e293b; -fx-padding: 10; -fx-background-radius: 8;">
-                <Label text="Rejointes" style="-fx-text-fill: #94a3b8;"/>
-                <Label fx:id="joinedTeamsLabel" text="0" style="-fx-text-fill: white; -fx-font-size: 24px;"/>
+            <!-- Stat 2 - Matchs -->
+            <VBox alignment="CENTER" HBox.hgrow="ALWAYS"
+                  style="-fx-background-color: #1e293b; -fx-padding: 16 12;
+                         -fx-background-radius: 14;
+                         -fx-border-color: rgba(14,165,233,0.20); -fx-border-radius: 14; -fx-border-width: 1;">
+                <Label fx:id="finishedMatchesLabel" text="0"
+                       style="-fx-text-fill: #7dd3fc; -fx-font-size: 28px; -fx-font-weight: 800;"/>
+                <Label text="Matchs"
+                       style="-fx-text-fill: #64748b; -fx-font-size: 11px; -fx-font-weight: 600;"/>
             </VBox>
-            <VBox prefWidth="180" style="-fx-background-color: #1e293b; -fx-padding: 10; -fx-background-radius: 8;">
-                <Label text="Pending" style="-fx-text-fill: #94a3b8;"/>
-                <Label fx:id="pendingRequestsLabel" text="0" style="-fx-text-fill: white; -fx-font-size: 24px;"/>
-            </VBox>
-            <VBox prefWidth="180" style="-fx-background-color: #1e293b; -fx-padding: 10; -fx-background-radius: 8;">
-                <Label text="Matchs termines" style="-fx-text-fill: #94a3b8;"/>
-                <Label fx:id="finishedMatchesLabel" text="0" style="-fx-text-fill: white; -fx-font-size: 24px;"/>
-            </VBox>
-            <VBox prefWidth="180" style="-fx-background-color: #1e293b; -fx-padding: 10; -fx-background-radius: 8;">
-                <Label text="Equipe pleine" style="-fx-text-fill: #94a3b8;"/>
-                <Label fx:id="fullTeamLabel" text="Non" style="-fx-text-fill: white; -fx-font-size: 24px;"/>
+            <!-- Stat 3 - Membres / Max membres -->
+            <VBox alignment="CENTER" HBox.hgrow="ALWAYS"
+                  style="-fx-background-color: #1e293b; -fx-padding: 16 12;
+                         -fx-background-radius: 14;
+                         -fx-border-color: rgba(124,58,237,0.20); -fx-border-radius: 14; -fx-border-width: 1;">
+                <Label fx:id="membersMaxLabel" text="0 / 0"
+                       style="-fx-text-fill: #a78bfa; -fx-font-size: 28px; -fx-font-weight: 800;"/>
+                <Label text="Membres / Max"
+                       style="-fx-text-fill: #64748b; -fx-font-size: 11px; -fx-font-weight: 600;"/>
             </VBox>
         </HBox>
 
-        <VBox spacing="10" style="-fx-background-color: #1e293b; -fx-padding: 14; -fx-background-radius: 8;">
-            <Label text="Performance" style="-fx-text-fill: #94a3b8;"/>
-            <Label fx:id="resultsLabel" text="V: 0 N: 0 P: 0" style="-fx-text-fill: white; -fx-font-size: 16px;"/>
-            <HBox spacing="8">
-                <Label text="Win Rate:" style="-fx-text-fill: #94a3b8;"/>
-                <Label fx:id="winRateLabel" text="0%" style="-fx-text-fill: #22c55e; -fx-font-size: 16px; -fx-font-weight: bold;"/>
-                <Region HBox.hgrow="ALWAYS"/>
-            </HBox>
-        </VBox>
-
-        <HBox spacing="10">
-            <TextField fx:id="searchField" promptText="Search players by name or email..."
-                       style="-fx-background-color: #111827; -fx-text-fill: white; -fx-pref-height: 36; -fx-background-radius: 10; -fx-prompt-text-fill: #94a3b8;"/>
-            <Button text="Refresh" onAction="#handleRefresh"
-                    style="-fx-background-color: #0ea5e9; -fx-text-fill: white; -fx-pref-width: 110; -fx-background-radius: 8;"/>
+        <!-- ── Performance Card ── -->
+        <HBox spacing="14">
+            <VBox spacing="8" HBox.hgrow="ALWAYS"
+                  style="-fx-background-color: #1e293b; -fx-padding: 16 20;
+                         -fx-background-radius: 14;
+                         -fx-border-color: rgba(124,58,237,0.12); -fx-border-radius: 14; -fx-border-width: 1;">
+                <Label text="⚡ Performance"
+                       style="-fx-text-fill: #94a3b8; -fx-font-size: 12px; -fx-font-weight: 700;"/>
+                <Label fx:id="resultsLabel" text="V: 0   N: 0   P: 0"
+                       style="-fx-text-fill: #f1f5f9; -fx-font-size: 18px; -fx-font-weight: 700;"/>
+            </VBox>
+            <VBox spacing="8" alignment="CENTER"
+                  style="-fx-background-color: #1e293b; -fx-padding: 16 28;
+                         -fx-background-radius: 14;
+                         -fx-border-color: rgba(124,58,237,0.12); -fx-border-radius: 14; -fx-border-width: 1;">
+                <Label text="WIN RATE"
+                       style="-fx-text-fill: #64748b; -fx-font-size: 10px; -fx-font-weight: 700;"/>
+                <Label fx:id="winRateLabel" text="0%"
+                       style="-fx-text-fill: #a78bfa; -fx-font-size: 24px; -fx-font-weight: 800;"/>
+            </VBox>
         </HBox>
 
-        <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS" style="-fx-background: transparent; -fx-border-color: transparent;">
+        <!-- ── Search Bar ── -->
+        <HBox spacing="12" alignment="CENTER_LEFT">
+            <TextField fx:id="searchField" promptText="🔍  Rechercher un joueur..."
+                       HBox.hgrow="ALWAYS"
+                       style="-fx-background-color: #1e293b; -fx-text-fill: #e5e7eb;
+                              -fx-pref-height: 40; -fx-background-radius: 10;
+                              -fx-prompt-text-fill: #64748b; -fx-padding: 0 14;"/>
+        </HBox>
+
+        <!-- ── Members Cards ── -->
+        <ScrollPane fitToWidth="true" VBox.vgrow="ALWAYS"
+                    style="-fx-background: transparent; -fx-background-color: transparent;
+                           -fx-border-color: transparent;">
             <content>
-                <FlowPane fx:id="memberCardsContainer" hgap="16" vgap="16" prefWrapLength="780" style="-fx-padding: 8;"/>
+                <FlowPane fx:id="memberCardsContainer" hgap="16" vgap="16"
+                          prefWrapLength="960" style="-fx-padding: 4;"/>
             </content>
         </ScrollPane>
 
-        <TextField fx:id="motifField" promptText="Motif (optionnel)"
-                   style="-fx-background-color: #1e293b; -fx-text-fill: white; -fx-pref-height: 36; -fx-background-radius: 10;"/>
-        <Label fx:id="messageLabel" text="" style="-fx-font-size: 13px;"/>
+        <!-- ── Message ── -->
+        <HBox spacing="12" alignment="CENTER_LEFT">
+            <Label fx:id="messageLabel" text=""
+                   style="-fx-font-size: 13px; -fx-text-fill: #64748b;"/>
+        </HBox>
+
     </VBox>
 </AnchorPane>
