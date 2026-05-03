@@ -1,5 +1,6 @@
 package tn.esprit.controllers;
 
+import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -14,6 +15,7 @@ import tn.esprit.entities.Category;
 import tn.esprit.entities.Product;
 import tn.esprit.services.CartService;
 import tn.esprit.services.CategoryService;
+import tn.esprit.services.CurrencyService;
 import tn.esprit.services.ProductService;
 
 import java.io.File;
@@ -26,7 +28,15 @@ public class AfficherProduitsController implements Initializable {
     @FXML private FlowPane productsContainer;
     @FXML private VBox categoriesBox;
     @FXML private TextField searchField;
-
+    @FXML private Button prevBtn, nextBtn;
+    @FXML private Label pageLabel;
+    @FXML private ComboBox<String> currencyCombo;
+    @FXML private Label rateLabel;
+    private CurrencyService currencyService = new CurrencyService();
+    private String selectedCurrency = "TND";
+    private static final int PRODUCTS_PER_PAGE = 6; // ← produits par page
+    private int currentPage = 0;
+    private List<Product> currentProducts;
     private ProductService productService = new ProductService();
     private CategoryService categoryService = new CategoryService();
     private List<Product> allProducts;
@@ -40,6 +50,17 @@ public class AfficherProduitsController implements Initializable {
         allCategories = categoryService.getAllCategories();
         loadCategoryButtons();
         displayProducts(allProducts);
+        // ✅ Charger les devises
+        currencyCombo.setItems(FXCollections.observableArrayList(
+                "TND", "EUR", "USD", "GBP"
+        ));
+        currencyCombo.setValue("TND");
+
+// ✅ Changer devise
+        currencyCombo.setOnAction(e -> {
+            selectedCurrency = currencyCombo.getValue();
+            showPage(); // recharger les cartes
+        });
     }
 
     private void loadCategoryButtons() {
@@ -76,10 +97,9 @@ public class AfficherProduitsController implements Initializable {
     }
 
     private void displayProducts(List<Product> products) {
-        productsContainer.getChildren().clear();
-        for (Product p : products) {
-            productsContainer.getChildren().add(createProductCard(p));
-        }
+        this.currentProducts = products;
+        this.currentPage = 0;
+        showPage();
     }
 
     private VBox createProductCard(Product p) {
@@ -122,7 +142,16 @@ public class AfficherProduitsController implements Initializable {
         HBox footer = new HBox(10);
         footer.setAlignment(Pos.CENTER_LEFT);
 
-        Label priceLabel = new Label(String.format("%.2f TND", p.getPrice()));
+        String priceText;
+        if (selectedCurrency.equals("TND")) {
+            priceText = String.format("%.2f TND", p.getPrice());
+        } else {
+            double converted = currencyService.convertFromTND(p.getPrice(), selectedCurrency);
+            priceText = converted > 0
+                    ? String.format("%.2f %s", converted, selectedCurrency)
+                    : String.format("%.2f TND", p.getPrice());
+        }
+        Label priceLabel = new Label(priceText);
         priceLabel.setStyle(
                 "-fx-font-size: 16px; -fx-font-weight: bold; -fx-text-fill: #1e293b;"
         );
@@ -213,6 +242,44 @@ public class AfficherProduitsController implements Initializable {
 
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+    // ✅ Afficher la page courante
+    private void showPage() {
+        productsContainer.getChildren().clear();
+
+        int totalPages = (int) Math.ceil((double) currentProducts.size() / PRODUCTS_PER_PAGE);
+        if (totalPages == 0) totalPages = 1;
+
+        int start = currentPage * PRODUCTS_PER_PAGE;
+        int end = Math.min(start + PRODUCTS_PER_PAGE, currentProducts.size());
+
+        for (int i = start; i < end; i++) {
+            productsContainer.getChildren().add(createProductCard(currentProducts.get(i)));
+        }
+
+        // Mise à jour label et boutons
+        pageLabel.setText("Page " + (currentPage + 1) + " / " + totalPages);
+        prevBtn.setDisable(currentPage == 0);
+        nextBtn.setDisable(currentPage >= totalPages - 1);
+    }
+
+    // ✅ Page suivante
+    @FXML
+    private void handleNext() {
+        int totalPages = (int) Math.ceil((double) currentProducts.size() / PRODUCTS_PER_PAGE);
+        if (currentPage < totalPages - 1) {
+            currentPage++;
+            showPage();
+        }
+    }
+
+    // ✅ Page précédente
+    @FXML
+    private void handlePrevious() {
+        if (currentPage > 0) {
+            currentPage--;
+            showPage();
         }
     }
 }

@@ -157,4 +157,5 @@ public class BlogsController implements Initializable {
             blogsTable.setItems(filtered);
         }
     }
+    
 }

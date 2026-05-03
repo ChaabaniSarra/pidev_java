@@ -89,6 +89,7 @@ public class NavbarController {
         try {
             loadScene(event, "/ProfileUser.fxml", "Profile User");
         } catch (IOException e) {
+            e.printStackTrace();
             System.out.println("Unable to open profile.");
         }
     }
@@ -103,10 +104,19 @@ public class NavbarController {
     @FXML
     private void goToLive(ActionEvent event) {
         try {
-            loadScene(event, "/stream.fxml", "Live Stream");
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/stream.fxml"));
+            Parent root = loader.load();
+
+            Stage stage = (Stage) ((javafx.scene.Node) event.getSource())
+                    .getScene()
+                    .getWindow();
+
+            stage.setScene(new Scene(root, 1280, 720));
+            stage.setTitle("Live Stream");
+            stage.show();
+
         } catch (IOException e) {
-            e.printStackTrace(); // 🔥 IMPORTANT pour voir l’erreur réelle
-            System.out.println("❌ Unable to open stream.");
+            e.printStackTrace();
         }
     }
     @FXML

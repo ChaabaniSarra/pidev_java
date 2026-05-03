@@ -19,7 +19,7 @@
 
         <ScrollPane fitToWidth="true" style="-fx-background: transparent; -fx-background-color: transparent;">
             <VBox spacing="30" style="-fx-padding: 40 100 40 100;">
-                
+
                 <!-- Back Button -->
                 <Button text="← Retour aux blogs" onAction="#handleBack"
                         style="-fx-background-color: transparent; -fx-text-fill: #94a3b8; -fx-cursor: hand; -fx-font-size: 14px;"/>
@@ -38,10 +38,53 @@
                     <Label fx:id="blogTitle" wrapText="true"
                            style="-fx-text-fill: white; -fx-font-size: 36px; -fx-font-weight: bold;"/>
 
+                    <!-- LIKES -->
+                    <HBox alignment="CENTER_LEFT" spacing="12" style="-fx-padding: 10 0 5 0;">
+                        <Button fx:id="likeButton" text="🤍 J'aime" onAction="#handleLike"
+                                style="-fx-background-color: #1e293b; -fx-text-fill: white; -fx-background-radius: 20; -fx-cursor: hand; -fx-font-size: 13px; -fx-padding: 6 16 6 16;"/>
+                        <Label fx:id="likeCountLabel" text="0"
+                               style="-fx-text-fill: #94a3b8; -fx-font-size: 14px; -fx-font-weight: bold;"/>
+                        <Label text="personnes aiment ce blog"
+                               style="-fx-text-fill: #64748b; -fx-font-size: 12px;"/>
+                    </HBox>
+
+                    <!-- RATING -->
+                    <VBox spacing="6" style="-fx-padding: 5 0 15 0;">
+                        <Label text="Noter ce blog :"
+                               style="-fx-text-fill: #94a3b8; -fx-font-size: 13px;"/>
+                        <HBox fx:id="starsContainer" spacing="6"/>
+                        <Label fx:id="ratingLabel" text="0.0/5  (0 votes)"
+                               style="-fx-text-fill: #f59e0b; -fx-font-size: 13px; -fx-font-weight: bold;"/>
+                    </VBox>
+
                     <Label fx:id="blogContent" wrapText="true"
                            style="-fx-text-fill: #cbd5e1; -fx-font-size: 18px; -fx-line-spacing: 5;"/>
                 </VBox>
-
+                <!-- TRADUCTION -->
+                <VBox spacing="8" style="-fx-padding: 10 0 10 0;">
+                    <Label text="🌍 Traduire ce blog :"
+                           style="-fx-text-fill: #94a3b8; -fx-font-size: 13px;"/>
+                    <HBox spacing="10" alignment="CENTER_LEFT">
+                        <Button text="🇬🇧 Anglais" onAction="#handleTranslateEN"
+                                style="-fx-background-color: #1e293b; -fx-text-fill: white;
+                       -fx-background-radius: 20; -fx-cursor: hand;
+                       -fx-font-size: 12px; -fx-padding: 5 15 5 15;"/>
+                        <Button text="🇸🇦 Arabe" onAction="#handleTranslateAR"
+                                style="-fx-background-color: #1e293b; -fx-text-fill: white;
+                       -fx-background-radius: 20; -fx-cursor: hand;
+                       -fx-font-size: 12px; -fx-padding: 5 15 5 15;"/>
+                        <Button text="🇪🇸 Espagnol" onAction="#handleTranslateES"
+                                style="-fx-background-color: #1e293b; -fx-text-fill: white;
+                       -fx-background-radius: 20; -fx-cursor: hand;
+                       -fx-font-size: 12px; -fx-padding: 5 15 5 15;"/>
+                        <Button text="↩️ Original" onAction="#handleRestoreOriginal"
+                                style="-fx-background-color: #334155; -fx-text-fill: white;
+                       -fx-background-radius: 20; -fx-cursor: hand;
+                       -fx-font-size: 12px; -fx-padding: 5 15 5 15;"/>
+                    </HBox>
+                    <Label fx:id="translationStatus" text=""
+                           style="-fx-text-fill: #64748b; -fx-font-size: 11px;"/>
+                </VBox>
                 <!-- Comments Section Header -->
                 <VBox spacing="10">
                     <Label fx:id="commentHeaderLabel" text="Commentaires"
@@ -62,6 +105,7 @@
 
                 <!-- Comments List -->
                 <VBox fx:id="commentsContainer" spacing="15"/>
+
             </VBox>
         </ScrollPane>
     </VBox>

@@ -14,7 +14,8 @@ import java.util.ResourceBundle;
 
 public class MainController implements Initializable {
 
-    @FXML private StackPane contentArea;
+    @FXML
+    private StackPane contentArea;
 
     @Override
     public void initialize(URL url, ResourceBundle rb) {
@@ -60,6 +61,7 @@ public class MainController implements Initializable {
     public void showBlogs() {
         loadPage("/Blogs.fxml");
     }
+
     @FXML
     public void showStatistiques() {
         loadPage("/statistiques.fxml");
@@ -77,30 +79,24 @@ public class MainController implements Initializable {
             e.printStackTrace();
         }
     }
+
+    @FXML
+    public void showStream() {
+        loadPage("/stream.fxml");
+    }
+
     @FXML
     public void showOrders() {
         loadPage("/orders.fxml");
     }
-    @FXML
-    private void showStream() {
-        loadPage("/stream.fxml");
-    }
-    private void loadPage(String fxmlPath) {
+
+    private void loadPage(String path) {
         try {
-            FXMLLoader loader = new FXMLLoader(getClass().getResource(fxmlPath));
-            Parent page = loader.load();
+            FXMLLoader loader = new FXMLLoader(getClass().getResource(path));
+            Parent view = loader.load();
 
             contentArea.getChildren().clear();
-            contentArea.getChildren().add(page);
-
-            // FIX SAFE
-            if (page instanceof javafx.scene.layout.Region region) {
-                region.setPrefWidth(contentArea.getWidth());
-                region.setPrefHeight(contentArea.getHeight());
-
-                region.prefWidthProperty().bind(contentArea.widthProperty());
-                region.prefHeightProperty().bind(contentArea.heightProperty());
-            }
+            contentArea.getChildren().add(view);
 
         } catch (IOException e) {
             e.printStackTrace();
